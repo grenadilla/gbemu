@@ -8,6 +8,11 @@ void Register8::set(uint8_t val) {
     value = val;
 }
 
+Register16::Register16(Register8* hi, Register8* lo) {
+    high = hi;
+    low = lo;
+}
+
 uint16_t Register16::get() {
     return (((uint16_t) high->get()) << 8) + low->get();
 }

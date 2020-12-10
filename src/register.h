@@ -12,7 +12,7 @@ class Register8 {
 
 class Register16 {
     public:
-        Register16(Register8* high, Register8* low);
+        Register16(Register8* hi, Register8* lo);
         uint16_t get();
         void set(uint16_t val);
     private:
