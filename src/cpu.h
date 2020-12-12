@@ -25,6 +25,9 @@ class CPU {
         uint16_t PC;
         uint16_t SP;
 
+        // TODO add memory mappings and change from simple array
+        uint8_t RAM[65536] = {0};
+
         typedef void (CPU::*MemFuncPtr)();
         struct Opcode {
             // Opcode including prefix 
@@ -50,6 +53,22 @@ class CPU {
         //(this->*(opcode_table[0]))();
         
         // --opcode Helper Functions--
+
+        // --Loads--
+        void load_reg_to_mem(const Register16& ptr, const Register8& data);
+        void load_reg_to_mem_inc(Register16& ptr, const Register8& data);
+        void load_reg_to_mem_dec(Register16& ptr, const Register8& data);
+
+        void load_mem_to_reg( Register8& reg, const Register16& ptr);
+        void load_mem_to_reg_inc(Register8& reg, Register16& ptr);
+        void load_mem_to_reg_dec(Register8& reg, Register16& ptr);
+
+        void load_imm_to_reg(Register8& reg, uint8_t imm);
+        void load_imm_to_mem(const Register16& ptr, uint8_t imm);
+
+        void load_reg_to_reg(Register8& reg, const Register8& data);
+
+        // TODO Load RAM, port register, or mode register
 
         // --opcodes--
         // --NOP--
