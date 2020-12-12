@@ -59,7 +59,7 @@ class CPU {
         void load_reg_to_mem_inc(Register16& ptr, const Register8& data);
         void load_reg_to_mem_dec(Register16& ptr, const Register8& data);
 
-        void load_mem_to_reg( Register8& reg, const Register16& ptr);
+        void load_mem_to_reg(Register8& reg, const Register16& ptr);
         void load_mem_to_reg_inc(Register8& reg, Register16& ptr);
         void load_mem_to_reg_dec(Register8& reg, Register16& ptr);
 

@@ -1,49 +1,17 @@
 #include "cpu.h"
 
-CPU::Opcode CPU::opcode_table[] = {0};
-CPU::Opcode CPU::opcode_prefixed_table[] = {0};
-
-
-void CPU::load_reg_to_mem(const Register16& ptr, const Register8& data) {
-    RAM[ptr.get()] = data.get();
-}
-
-void CPU::load_reg_to_mem_inc(Register16& ptr, const Register8& data) {
-    uint16_t address = ptr.get();
-    RAM[address] = data.get();
-    ptr.set(address + 1);
-}
-
-void CPU::load_reg_to_mem_dec(Register16& ptr, const Register8& data) {
-    uint16_t address = ptr.get();
-    RAM[address] = data.get();
-    ptr.set(address - 1);
-}
-
-void CPU::load_mem_to_reg(Register8& reg, const Register16& ptr) {
-    reg.set(RAM[ptr.get()]);
-}
-
-void CPU::load_mem_to_reg_inc(Register8& reg, Register16& ptr) {
-    uint16_t address = ptr.get();
-    reg.set(RAM[address]);
-    ptr.set(address + 1);
-}
-
-void CPU::load_mem_to_reg_dec(Register8& reg, Register16& ptr) {
-    uint16_t address = ptr.get();
-    reg.set(RAM[address]);
-    ptr.set(address - 1);
-}
-
-void CPU::load_imm_to_reg(Register8& reg, uint8_t imm) {
-    reg.set(imm);
-}
-
-void CPU::load_imm_to_mem(const Register16& ptr, uint8_t imm) {
-    RAM[ptr.get()] = imm;
-}
-
-void CPU::load_reg_to_reg(Register8& reg, const Register8& data) {
-    reg.set(data.get());
-}
+void CPU::opcode_02() { load_reg_to_mem(BC, A); }
+void CPU::opcode_06() { load_imm_to_reg(B, RAM[PC + 1]); }
+void CPU::opcode_0A() { load_mem_to_reg(A, BC); }
+void CPU::opcode_0E() { load_imm_to_reg(C, RAM[PC + 1]); }
+void CPU::opcode_12() { load_reg_to_mem(DE, A); }
+void CPU::opcode_16() { load_imm_to_reg(D, RAM[PC + 1]); }
+void CPU::opcode_1A() { load_mem_to_reg(A, DE); }
+void CPU::opcode_22() { load_reg_to_mem_inc(HL, A); }
+void CPU::opcode_26() { load_imm_to_reg(H, RAM[PC + 1]); }
+void CPU::opcode_2A() { load_mem_to_reg_inc(A, HL); }
+void CPU::opcode_2E() { load_imm_to_reg(L, RAM[PC + 1]); }
+void CPU::opcode_32() { load_reg_to_mem_dec(HL, A); }
+void CPU::opcode_36() { load_imm_to_mem(HL, RAM[PC + 1]); }
+void CPU::opcode_3A() { load_mem_to_reg_dec(A, HL); }
+void CPU::opcode_3E() { load_imm_to_reg(A, RAM[PC + 1]); }
