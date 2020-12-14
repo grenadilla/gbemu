@@ -68,7 +68,14 @@ class CPU {
 
         void load_reg_to_reg(Register8& reg, const Register8& data);
 
-        // TODO Load RAM, port register, or mode register
+        void load_reg_to_mem_imm(uint16_t ptr, const Register8& data);
+        void load_mem_imm_to_reg(Register8& reg, uint16_t ptr);
+
+        void load_reg_to_upper_mem_imm(uint8_t upper_ptr, const Register8& data);
+        void load_upper_mem_imm_to_reg(Register8& reg, uint8_t upper_ptr);
+
+        void load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data);
+        void load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr);
 
         // --opcodes--
         // --NOP--
