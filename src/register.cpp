@@ -26,18 +26,38 @@ void RegisterF::set(uint8_t val) {
     set(val & 0xf0);
 }
 
-uint8_t RegisterF::get_zero() const {
+bool RegisterF::get_zero() const {
     return value >> 7;
 }
 
-uint8_t RegisterF::get_subtract() const {
+bool RegisterF::get_subtract() const {
     return (value >> 6) & 0x1;
 }
 
-uint8_t RegisterF::get_half_carry() const {
+bool RegisterF::get_half_carry() const {
     return (value >> 5) & 0x1;
 }
 
-uint8_t RegisterF::get_carry() const {
+bool RegisterF::get_carry() const {
     return (value >> 4) & 0x1;
+}
+
+void RegisterF::set_zero(bool val) {
+    value &= 0x7F;
+    value |= (val << 7);
+}
+
+void RegisterF::set_subtract(bool val) {
+    value &= 0xBF;
+    value |= (val << 6);
+}
+
+void RegisterF::set_half_carry(bool val) {
+    value &= 0xDF;
+    value |- (val << 5);
+}
+
+void RegisterF::set_carry(bool val) {
+    value &= 0xEF;
+    value |= (val << 4);
 }

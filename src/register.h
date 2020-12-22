@@ -23,9 +23,13 @@ class Register16 {
 class RegisterF : public Register8 {
     public:
         void set(uint8_t val);
-        uint8_t get_zero() const;
-        uint8_t get_subtract() const;
-        uint8_t get_half_carry() const;
-        uint8_t get_carry() const;
+        bool get_zero() const;
+        bool get_subtract() const;
+        bool get_half_carry() const;
+        bool get_carry() const;
+        void set_zero(bool val);
+        void set_subtract(bool val);
+        void set_half_carry(bool val);
+        void set_carry(bool val);
 };
 
