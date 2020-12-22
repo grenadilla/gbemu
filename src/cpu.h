@@ -77,6 +77,14 @@ class CPU {
         void load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data);
         void load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr);
 
+        // Increments and decrements
+        void inc_reg8(Register8& reg);
+        void inc_reg16(Register16& reg);
+        void inc_mem(const Register16& ptr);
+        void dec_reg8(Register8& reg);
+        void dec_reg16(Register16& reg);
+        void dec_mem(const Register16& ptr);
+
         // --opcodes--
         // --NOP--
         void opcode_00();
@@ -100,4 +108,12 @@ class CPU {
         void opcode_77(); void opcode_78(); void opcode_79(); void opcode_7A(); void opcode_7B();
         void opcode_7C(); void opcode_7D(); void opcode_7E(); void opcode_7F(); void opcode_E0();
         void opcode_E2(); void opcode_EA(); void opcode_F0(); void opcode_F2(); void opcode_FA();
+
+        // --Increment and decrement opcodes--
+        void opcode_03(); void opcode_13(); void opcode_23(); void opcode_33();
+        void opcode_04(); void opcode_14(); void opcode_24(); void opcode_34();
+        void opcode_05(); void opcode_15(); void opcode_25(); void opcode_35();
+        void opcode_0B(); void opcode_1B(); void opcode_2B(); void opcode_3B();
+        void opcode_0C(); void opcode_1C(); void opcode_2C(); void opcode_3C();
+        void opcode_0D(); void opcode_1D(); void opcode_2D(); void opcode_3D();
 };

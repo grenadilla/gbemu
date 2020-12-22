@@ -1,5 +1,8 @@
 #include "cpu.h"
 
+static const uint8_t MAX_8BIT = 255;
+static const uint8_t MAX_4BIT = 15;
+
 void CPU::load_reg_to_mem(const Register16& ptr, const Register8& data) {
     RAM[ptr.get()] = data.get();
 }
@@ -70,4 +73,48 @@ void CPU::load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data) {
 void CPU::load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr) {
     uint16_t address = 0xff00 | upper_ptr.get();
     reg.set(RAM[address]);
+}
+
+void CPU::inc_reg8(Register8& reg) {
+    F.set_zero(reg.get() == MAX_8BIT);
+    F.set_subtract(false);
+    F.set_half_carry(reg.get() == MAX_4BIT);
+
+    reg.set(reg.get() + 1);
+}
+
+void CPU::inc_reg16(Register16& reg) {
+    // No flags for these
+    reg.set(reg.get() + 1);
+}
+
+void CPU::inc_mem(const Register16& ptr) {
+    uint8_t val = RAM[ptr.get()];
+    F.set_zero(val == MAX_8BIT);
+    F.set_subtract(false);
+    F.set_half_carry(val == MAX_4BIT);
+
+    RAM[ptr.get()] = val + 1;
+}
+
+void CPU::dec_reg8(Register8& reg) {
+    F.set_zero(reg.get() == 1);
+    F.set_subtract(true);
+    F.set_half_carry(reg.get() == MAX_4BIT + 1);
+
+    reg.set(reg.get() - 1);
+}
+
+void CPU::dec_reg16(Register16& reg) {
+    // No flags for these
+    reg.set(reg.get() - 1);
+}
+
+void CPU::dec_mem(const Register16& ptr) {
+    uint8_t val = RAM[ptr.get()];
+    F.set_zero(val == 1);
+    F.set_subtract(true);
+    F.set_half_carry(val == MAX_4BIT + 1);
+
+    RAM[ptr.get()] = val - 1;
 }

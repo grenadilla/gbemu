@@ -1,5 +1,6 @@
 #include "cpu.h"
 
+// Loads
 void CPU::opcode_02() { load_reg_to_mem(BC, A); }
 void CPU::opcode_06() { load_imm_to_reg(B, RAM[PC + 1]); }
 void CPU::opcode_0A() { load_mem_to_reg(A, BC); }
@@ -95,3 +96,29 @@ void CPU::opcode_EA() { load_reg_to_mem_imm( (uint16_t) ((RAM[PC + 2] << 8) | RA
 void CPU::opcode_F0() { load_upper_mem_imm_to_reg(A, RAM[PC + 1]); }
 void CPU::opcode_F2() { load_upper_mem_reg_to_reg(A, C); }
 void CPU::opcode_FA() { load_mem_imm_to_reg(A, (uint16_t) ((RAM[PC + 2] << 8) | RAM[PC + 1])); }
+
+// Increments and decrements
+void CPU::opcode_03() { inc_reg16(BC); }
+void CPU::opcode_13() { inc_reg16(DE); }
+void CPU::opcode_23() { inc_reg16(HL); }
+void CPU::opcode_33() { SP++; }
+void CPU::opcode_04() { inc_reg8(B); }
+void CPU::opcode_14() { inc_reg8(D); }
+void CPU::opcode_24() { inc_reg8(H); }
+void CPU::opcode_34() { inc_mem(HL); }
+void CPU::opcode_05() { dec_reg8(B); }
+void CPU::opcode_15() { dec_reg8(D); }
+void CPU::opcode_25() { dec_reg8(H); }
+void CPU::opcode_35() { dec_mem(HL); }
+void CPU::opcode_0B() { dec_reg16(BC); }
+void CPU::opcode_1B() { dec_reg16(DE); }
+void CPU::opcode_2B() { dec_reg16(HL); }
+void CPU::opcode_3B() { SP--; }
+void CPU::opcode_0C() { inc_reg8(C); }
+void CPU::opcode_1C() { inc_reg8(E); }
+void CPU::opcode_2C() { inc_reg8(L); }
+void CPU::opcode_3C() { inc_reg8(A); }
+void CPU::opcode_0D() { dec_reg8(C); }
+void CPU::opcode_1D() { dec_reg8(E); }
+void CPU::opcode_2D() { dec_reg8(L); }
+void CPU::opcode_3D() { dec_reg8(A); }
