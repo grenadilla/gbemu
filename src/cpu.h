@@ -53,6 +53,7 @@ class CPU {
         //(this->*(opcode_table[0]))();
         
         // --opcode Helper Functions--
+        uint16_t retrieve_imm16();
 
         // --Loads--
         void load_reg_to_mem(const Register16& ptr, const Register8& data);
@@ -63,19 +64,22 @@ class CPU {
         void load_mem_to_reg_inc(Register8& reg, Register16& ptr);
         void load_mem_to_reg_dec(Register8& reg, Register16& ptr);
 
-        void load_imm_to_reg(Register8& reg, uint8_t imm);
-        void load_imm_to_mem(const Register16& ptr, uint8_t imm);
+        void load_imm_to_reg(Register8& reg);
+        void load_imm_to_mem(const Register16& ptr);
 
         void load_reg_to_reg(Register8& reg, const Register8& data);
 
-        void load_reg_to_mem_imm(uint16_t ptr, const Register8& data);
-        void load_mem_imm_to_reg(Register8& reg, uint16_t ptr);
+        void load_reg_to_mem_imm(const Register8& data);
+        void load_mem_imm_to_reg(Register8& reg);
 
-        void load_reg_to_upper_mem_imm(uint8_t upper_ptr, const Register8& data);
-        void load_upper_mem_imm_to_reg(Register8& reg, uint8_t upper_ptr);
+        void load_reg_to_upper_mem_imm(const Register8& data);
+        void load_upper_mem_imm_to_reg(Register8& reg);
 
         void load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data);
         void load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr);
+
+        void load_imm_to_reg16(Register16& reg);
+        void load_sp_to_mem();
 
         // Increments and decrements
         void inc_reg8(Register8& reg);
@@ -108,6 +112,8 @@ class CPU {
         void opcode_77(); void opcode_78(); void opcode_79(); void opcode_7A(); void opcode_7B();
         void opcode_7C(); void opcode_7D(); void opcode_7E(); void opcode_7F(); void opcode_E0();
         void opcode_E2(); void opcode_EA(); void opcode_F0(); void opcode_F2(); void opcode_FA();
+
+        void opcode_01(); void opcode_11(); void opcode_21(); void opcode_31(); void opcode_08();
 
         // --Increment and decrement opcodes--
         void opcode_03(); void opcode_13(); void opcode_23(); void opcode_33();

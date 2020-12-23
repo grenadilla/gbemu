@@ -3,6 +3,10 @@
 static const uint8_t MAX_8BIT = 255;
 static const uint8_t MAX_4BIT = 15;
 
+uint16_t CPU::retrieve_imm16() {
+    return (uint16_t) ((RAM[PC + 2] << 8) | RAM[PC + 1]);
+}
+
 void CPU::load_reg_to_mem(const Register16& ptr, const Register8& data) {
     RAM[ptr.get()] = data.get();
 }
@@ -35,33 +39,35 @@ void CPU::load_mem_to_reg_dec(Register8& reg, Register16& ptr) {
     ptr.set(address - 1);
 }
 
-void CPU::load_imm_to_reg(Register8& reg, uint8_t imm) {
-    reg.set(imm);
+void CPU::load_imm_to_reg(Register8& reg) {
+    reg.set(RAM[PC + 1]);
 }
 
-void CPU::load_imm_to_mem(const Register16& ptr, uint8_t imm) {
-    RAM[ptr.get()] = imm;
+void CPU::load_imm_to_mem(const Register16& ptr) {
+    RAM[ptr.get()] = RAM[PC + 1];
 }
 
 void CPU::load_reg_to_reg(Register8& reg, const Register8& data) {
     reg.set(data.get());
 }
 
-void CPU::load_reg_to_mem_imm(uint16_t ptr, const Register8& data) {
+void CPU::load_reg_to_mem_imm(const Register8& data) {
+    uint16_t ptr = retrieve_imm16();
     RAM[ptr] = data.get();
 }
 
-void CPU::load_mem_imm_to_reg(Register8& reg, uint16_t ptr) {
+void CPU::load_mem_imm_to_reg(Register8& reg) {
+    uint16_t ptr = retrieve_imm16();
     reg.set(RAM[ptr]);
 }
 
-void CPU::load_reg_to_upper_mem_imm(uint8_t upper_ptr, const Register8& data) {
-    uint16_t address = 0xff00 | upper_ptr;
+void CPU::load_reg_to_upper_mem_imm(const Register8& data) {
+    uint16_t address = 0xff00 | RAM[PC + 1];
     RAM[address] = data.get();
 }
 
-void CPU::load_upper_mem_imm_to_reg(Register8& reg, uint8_t upper_ptr) {
-    uint16_t address = 0xff00 | upper_ptr;
+void CPU::load_upper_mem_imm_to_reg(Register8& reg) {
+    uint16_t address = 0xff00 | RAM[PC + 1];
     reg.set(RAM[address]);
 }
 
@@ -73,6 +79,17 @@ void CPU::load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data) {
 void CPU::load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr) {
     uint16_t address = 0xff00 | upper_ptr.get();
     reg.set(RAM[address]);
+}
+
+void CPU::load_imm_to_reg16(Register16& reg) {
+    uint16_t imm = retrieve_imm16();
+    reg.set(imm);
+}
+
+void CPU::load_sp_to_mem() {
+    uint16_t ptr = retrieve_imm16();
+    RAM[ptr] = SP & 0x00FF;
+    RAM[ptr] = (SP & 0xFF00) >> 8;
 }
 
 void CPU::inc_reg8(Register8& reg) {

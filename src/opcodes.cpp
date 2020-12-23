@@ -2,20 +2,20 @@
 
 // Loads
 void CPU::opcode_02() { load_reg_to_mem(BC, A); }
-void CPU::opcode_06() { load_imm_to_reg(B, RAM[PC + 1]); }
+void CPU::opcode_06() { load_imm_to_reg(B); }
 void CPU::opcode_0A() { load_mem_to_reg(A, BC); }
-void CPU::opcode_0E() { load_imm_to_reg(C, RAM[PC + 1]); }
+void CPU::opcode_0E() { load_imm_to_reg(C); }
 void CPU::opcode_12() { load_reg_to_mem(DE, A); }
-void CPU::opcode_16() { load_imm_to_reg(D, RAM[PC + 1]); }
+void CPU::opcode_16() { load_imm_to_reg(D); }
 void CPU::opcode_1A() { load_mem_to_reg(A, DE); }
 void CPU::opcode_22() { load_reg_to_mem_inc(HL, A); }
-void CPU::opcode_26() { load_imm_to_reg(H, RAM[PC + 1]); }
+void CPU::opcode_26() { load_imm_to_reg(H); }
 void CPU::opcode_2A() { load_mem_to_reg_inc(A, HL); }
-void CPU::opcode_2E() { load_imm_to_reg(L, RAM[PC + 1]); }
+void CPU::opcode_2E() { load_imm_to_reg(L); }
 void CPU::opcode_32() { load_reg_to_mem_dec(HL, A); }
-void CPU::opcode_36() { load_imm_to_mem(HL, RAM[PC + 1]); }
+void CPU::opcode_36() { load_imm_to_mem(HL); }
 void CPU::opcode_3A() { load_mem_to_reg_dec(A, HL); }
-void CPU::opcode_3E() { load_imm_to_reg(A, RAM[PC + 1]); }
+void CPU::opcode_3E() { load_imm_to_reg(A); }
 
 void CPU::opcode_40() { load_reg_to_reg(B, B); }
 void CPU::opcode_41() { load_reg_to_reg(B, C); }
@@ -89,13 +89,19 @@ void CPU::opcode_7D() { load_reg_to_reg(A, L); }
 void CPU::opcode_7E() { load_mem_to_reg(A, HL); }
 void CPU::opcode_7F() { load_reg_to_reg(A, A); }
 
-void CPU::opcode_E0() { load_reg_to_upper_mem_imm(RAM[PC + 1], A); }
+void CPU::opcode_E0() { load_reg_to_upper_mem_imm(A); }
 void CPU::opcode_E2() { load_reg_to_upper_mem_reg(C, A); }
 // TODO check endianness, currently is little endian
-void CPU::opcode_EA() { load_reg_to_mem_imm( (uint16_t) ((RAM[PC + 2] << 8) | RAM[PC + 1]), A); }
-void CPU::opcode_F0() { load_upper_mem_imm_to_reg(A, RAM[PC + 1]); }
+void CPU::opcode_EA() { load_reg_to_mem_imm(A); }
+void CPU::opcode_F0() { load_upper_mem_imm_to_reg(A); }
 void CPU::opcode_F2() { load_upper_mem_reg_to_reg(A, C); }
-void CPU::opcode_FA() { load_mem_imm_to_reg(A, (uint16_t) ((RAM[PC + 2] << 8) | RAM[PC + 1])); }
+void CPU::opcode_FA() { load_mem_imm_to_reg(A); }
+
+void CPU::opcode_01() { load_imm_to_reg16(BC); }
+void CPU::opcode_11() { load_imm_to_reg16(DE); }
+void CPU::opcode_21() { load_imm_to_reg16(HL); }
+void CPU::opcode_31() { SP = retrieve_imm16(); }
+void CPU::opcode_08() { load_sp_to_mem(); }
 
 // Increments and decrements
 void CPU::opcode_03() { inc_reg16(BC); }
