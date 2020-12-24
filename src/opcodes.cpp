@@ -103,6 +103,46 @@ void CPU::opcode_21() { load_imm_to_reg16(HL); }
 void CPU::opcode_31() { SP = retrieve_imm16(); }
 void CPU::opcode_08() { load_sp_to_mem(); }
 
+// Arithmetic
+void CPU::opcode_80() { add_reg(B); }
+void CPU::opcode_81() { add_reg(C); }
+void CPU::opcode_82() { add_reg(D); }
+void CPU::opcode_83() { add_reg(E); }
+void CPU::opcode_84() { add_reg(H); }
+void CPU::opcode_85() { add_reg(L); }
+void CPU::opcode_86() { add_mem(HL); }
+void CPU::opcode_87() { add_reg(A); }
+void CPU::opcode_88() { addc_reg(B); }
+void CPU::opcode_89() { addc_reg(C); }
+void CPU::opcode_8A() { addc_reg(D); }
+void CPU::opcode_8B() { addc_reg(E); }
+void CPU::opcode_8C() { addc_reg(H); }
+void CPU::opcode_8D() { addc_reg(L); }
+void CPU::opcode_8E() { addc_mem(HL); }
+void CPU::opcode_8F() { addc_reg(A); }
+
+void CPU::opcode_90() { sub_reg(B); }
+void CPU::opcode_91() { sub_reg(C); }
+void CPU::opcode_92() { sub_reg(D); }
+void CPU::opcode_93() { sub_reg(E); }
+void CPU::opcode_94() { sub_reg(H); }
+void CPU::opcode_95() { sub_reg(L); }
+void CPU::opcode_96() { sub_mem(HL); }
+void CPU::opcode_97() { sub_reg(A); }
+void CPU::opcode_98() { subc_reg(B); }
+void CPU::opcode_99() { subc_reg(C); }
+void CPU::opcode_9A() { subc_reg(D); }
+void CPU::opcode_9B() { subc_reg(E); }
+void CPU::opcode_9C() { subc_reg(H); }
+void CPU::opcode_9D() { subc_reg(L); }
+void CPU::opcode_9E() { subc_mem(HL); }
+void CPU::opcode_9F() { subc_reg(A); }
+
+void CPU::opcode_C6() { add_imm(); }
+void CPU::opcode_D6() { sub_imm(); }
+void CPU::opcode_CE() { addc_imm(); }
+void CPU::opcode_DE() { subc_imm(); }
+
 // Increments and decrements
 void CPU::opcode_03() { inc_reg16(BC); }
 void CPU::opcode_13() { inc_reg16(DE); }

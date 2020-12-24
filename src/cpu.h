@@ -136,6 +136,16 @@ class CPU {
 
         void opcode_01(); void opcode_11(); void opcode_21(); void opcode_31(); void opcode_08();
 
+        // --Arithmetic opcodes--
+        void opcode_80(); void opcode_81(); void opcode_82(); void opcode_83(); void opcode_84();
+        void opcode_85(); void opcode_86(); void opcode_87(); void opcode_88(); void opcode_89();
+        void opcode_8A(); void opcode_8B(); void opcode_8C(); void opcode_8D(); void opcode_8E();
+        void opcode_8F(); void opcode_90(); void opcode_91(); void opcode_92(); void opcode_93();
+        void opcode_94(); void opcode_95(); void opcode_96(); void opcode_97(); void opcode_98();
+        void opcode_99(); void opcode_9A(); void opcode_9B(); void opcode_9C(); void opcode_9D();
+        void opcode_9E(); void opcode_9F();
+        void opcode_C6(); void opcode_D6(); void opcode_CE(); void opcode_DE();
+
         // --Increment and decrement opcodes--
         void opcode_03(); void opcode_13(); void opcode_23(); void opcode_33();
         void opcode_04(); void opcode_14(); void opcode_24(); void opcode_34();
