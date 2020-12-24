@@ -14,7 +14,7 @@ Register16::Register16(Register8* hi, Register8* lo) {
 }
 
 uint16_t Register16::get() const {
-    return (((uint16_t) high->get()) << 8) + low->get();
+    return ((static_cast<uint16_t>(high->get())) << 8) + low->get();
 }
 
 void Register16::set(uint16_t val) {

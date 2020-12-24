@@ -143,6 +143,12 @@ void CPU::opcode_D6() { sub_imm(); }
 void CPU::opcode_CE() { addc_imm(); }
 void CPU::opcode_DE() { subc_imm(); }
 
+void CPU::opcode_09() { add_HL(BC); }
+void CPU::opcode_19() { add_HL(DE); }
+void CPU::opcode_29() { add_HL(HL); }
+void CPU::opcode_39() { add_HL(SP); }
+void CPU::opcode_E8() { add_SP(); }
+
 // Increments and decrements
 void CPU::opcode_03() { inc_reg16(BC); }
 void CPU::opcode_13() { inc_reg16(DE); }

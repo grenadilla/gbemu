@@ -4,7 +4,7 @@ static const uint8_t MAX_8BIT = 255;
 static const uint8_t MAX_4BIT = 15;
 
 uint16_t CPU::retrieve_imm16() {
-    return (uint16_t) ((RAM[PC + 2] << 8) | RAM[PC + 1]);
+    return static_cast<uint16_t>((RAM[PC + 2] << 8) | RAM[PC + 1]);
 }
 
 void CPU::load_reg_to_mem(const Register16& ptr, const Register8& data) {
@@ -136,89 +136,112 @@ void CPU::dec_mem(const Register16& ptr) {
     RAM[ptr.get()] = val - 1;
 }
 
-void CPU::add_A(uint8_t val) {
+void CPU::add(Register8& dest, uint8_t val) {
     F.set_subtract(false);
-    F.set_half_carry(((A.get() & 0x0F) + (val & 0x0F)) & 0x10);
-    uint8_t result = A.get() + val;
-    F.set_carry(result < A.get() && result < val);
+    F.set_half_carry(((dest.get() & 0x0F) + (val & 0x0F)) & 0x10);
+    uint8_t result = dest.get() + val;
+    F.set_carry(result < dest.get() && result < val);
     F.set_zero(result == 0);
-    A.set(result);
+    dest.set(result);
 }
 
 void CPU::add_reg(const Register8& reg) {
-    add_A(reg.get());
+    add(A, reg.get());
 }
 
 void CPU::add_mem(const Register16& ptr) {
-    add_A(RAM[ptr.get()]);
+    add(A, RAM[ptr.get()]);
 }
 
 void CPU::add_imm() {
-    add_A(RAM[PC + 1]);
+    add(A, RAM[PC + 1]);
 }
 
-void CPU::addc_A(uint8_t val) {
+void CPU::addc(Register8& dest, uint8_t val) {
     bool carry = F.get_carry();
     F.set_subtract(false);
-    F.set_half_carry(((A.get() & 0x0F) + (val & 0x0F) + carry) & 0x10);
-    uint8_t result = A.get() + val + carry;
-    F.set_carry(result < A.get() && result < val);
+    F.set_half_carry(((dest.get() & 0x0F) + (val & 0x0F) + carry) & 0x10);
+    uint8_t result = dest.get() + val + carry;
+    F.set_carry(result < dest.get() && result < val);
     F.set_zero(result == 0);
-    A.set(result);
+    dest.set(result);
 }
 
 void CPU::addc_reg(const Register8& reg) {
-    addc_A(reg.get());
+    addc(A, reg.get());
 }
 
 void CPU::addc_mem(const Register16& ptr) {
-    addc_A(RAM[ptr.get()]);
+    addc(A, RAM[ptr.get()]);
 }
 
 void CPU::addc_imm() {
-    addc_A(RAM[PC + 1]);
+    addc(A, RAM[PC + 1]);
 }
 
-void CPU::sub_A(uint8_t val) {
+void CPU::sub(Register8& dest, uint8_t val) {
     F.set_subtract(true);
-    F.set_half_carry((A.get() & 0x0F) < (val & 0x0F));
-    F.set_carry(A.get() < val);
-    uint8_t result = A.get() - val;
+    F.set_half_carry((dest.get() & 0x0F) < (val & 0x0F));
+    F.set_carry(dest.get() < val);
+    uint8_t result = dest.get() - val;
     F.set_zero(result == 0);
-    A.set(result);
+    dest.set(result);
 }
 
 void CPU::sub_reg(const Register8& reg) {
-    sub_A(reg.get());
+    sub(A, reg.get());
 }
 
 void CPU::sub_mem(const Register16& ptr) {
-    sub_A(RAM[ptr.get()]);
+    sub(A, RAM[ptr.get()]);
 }
 
 void CPU::sub_imm() {
-    sub_A(RAM[PC + 1]);
+    sub(A, RAM[PC + 1]);
 }
 
-void CPU::subc_A(uint8_t val) {
+void CPU::subc(Register8& dest, uint8_t val) {
     bool carry = F.get_carry();
     F.set_subtract(true);
-    F.set_half_carry((A.get() & 0x0F) < (val & 0x0F) + carry);
-    F.set_carry(A.get() < val + carry);
-    uint8_t result = A.get() - val - carry;
+    F.set_half_carry((dest.get() & 0x0F) < (val & 0x0F) + carry);
+    F.set_carry(dest.get() < val + carry);
+    uint8_t result = dest.get() - val - carry;
     F.set_zero(result == 0);
-    A.set(result);
+    dest.set(result);
 }
 
 void CPU::subc_reg(const Register8& reg) {
-    subc_A(reg.get());
+    subc(A, reg.get());
 }
 
 void CPU::subc_mem(const Register16& ptr) {
-    subc_A(RAM[ptr.get()]);
+    subc(A, RAM[ptr.get()]);
 }
 
 void CPU::subc_imm() {
-    subc_A(RAM[PC + 1]);
+    subc(A, RAM[PC + 1]);
 }
 
+void CPU::add_HL(const Register16& reg) {
+    add(L, reg.low->get());
+    add(H, reg.high->get());
+}
+
+void CPU::add_HL(uint16_t val) {
+    add(L, val & 0x00FF);
+    add(H, (val & 0xFF00) >> 8);
+}
+
+void CPU::add_SP() {
+    // Uses signed two's complement
+    int8_t val = static_cast<int8_t>(RAM[PC + 1]);
+
+    F.set_zero(false);
+    F.set_subtract(false);
+    uint8_t lower_sp = SP & 0xFF;
+    F.set_half_carry(((lower_sp & 0x0F) + (val & 0x0F)) & 0x10);
+    uint8_t lower_result = lower_sp + val;
+    F.set_carry(lower_result < lower_sp && lower_result < val);
+
+    SP += val;
+}

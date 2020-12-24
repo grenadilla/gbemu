@@ -82,25 +82,30 @@ class CPU {
         void load_sp_to_mem();
 
         // Arithmetic on accumulator register
-        void add_A(uint8_t val);
+        void add(Register8& dest, uint8_t val);
         void add_reg(const Register8& reg);
         void add_mem(const Register16& ptr);
         void add_imm();
 
-        void addc_A(uint8_t val);
+        void addc(Register8& dest, uint8_t val);
         void addc_reg(const Register8& reg);
         void addc_mem(const Register16& ptr);
         void addc_imm();
 
-        void sub_A(uint8_t val);
+        void sub(Register8& dest, uint8_t val);
         void sub_reg(const Register8& reg);
         void sub_mem(const Register16& ptr);
         void sub_imm();
 
-        void subc_A(uint8_t val);
+        void subc(Register8& dest, uint8_t val);
         void subc_reg(const Register8& reg);
         void subc_mem(const Register16& ptr);
         void subc_imm();
+
+        void add_HL(const Register16& reg);
+        void add_HL(uint16_t val);
+
+        void add_SP();
 
         // Increments and decrements
         void inc_reg8(Register8& reg);
@@ -145,6 +150,7 @@ class CPU {
         void opcode_99(); void opcode_9A(); void opcode_9B(); void opcode_9C(); void opcode_9D();
         void opcode_9E(); void opcode_9F();
         void opcode_C6(); void opcode_D6(); void opcode_CE(); void opcode_DE();
+        void opcode_09(); void opcode_19(); void opcode_29(); void opcode_39(); void opcode_E8();
 
         // --Increment and decrement opcodes--
         void opcode_03(); void opcode_13(); void opcode_23(); void opcode_33();
