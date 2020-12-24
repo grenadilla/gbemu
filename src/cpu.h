@@ -57,15 +57,15 @@ class CPU {
 
         // --Loads--
         void load_reg_to_mem(const Register16& ptr, const Register8& data);
-        void load_reg_to_mem_inc(Register16& ptr, const Register8& data);
-        void load_reg_to_mem_dec(Register16& ptr, const Register8& data);
+        void load_reg_to_mem_inc(const Register8& data);
+        void load_reg_to_mem_dec(const Register8& data);
 
         void load_mem_to_reg(Register8& reg, const Register16& ptr);
-        void load_mem_to_reg_inc(Register8& reg, Register16& ptr);
-        void load_mem_to_reg_dec(Register8& reg, Register16& ptr);
+        void load_mem_to_reg_inc(Register8& reg);
+        void load_mem_to_reg_dec(Register8& reg);
 
         void load_imm_to_reg(Register8& reg);
-        void load_imm_to_mem(const Register16& ptr);
+        void load_imm_to_mem();
 
         void load_reg_to_reg(Register8& reg, const Register8& data);
 
@@ -84,22 +84,22 @@ class CPU {
         // Arithmetic on accumulator register
         void add(Register8& dest, uint8_t val);
         void add_reg(const Register8& reg);
-        void add_mem(const Register16& ptr);
+        void add_mem();
         void add_imm();
 
         void addc(Register8& dest, uint8_t val);
         void addc_reg(const Register8& reg);
-        void addc_mem(const Register16& ptr);
+        void addc_mem();
         void addc_imm();
 
         void sub(Register8& dest, uint8_t val);
         void sub_reg(const Register8& reg);
-        void sub_mem(const Register16& ptr);
+        void sub_mem();
         void sub_imm();
 
         void subc(Register8& dest, uint8_t val);
         void subc_reg(const Register8& reg);
-        void subc_mem(const Register16& ptr);
+        void subc_mem();
         void subc_imm();
 
         void add_HL(const Register16& reg);
@@ -110,10 +110,10 @@ class CPU {
         // Increments and decrements
         void inc_reg8(Register8& reg);
         void inc_reg16(Register16& reg);
-        void inc_mem(const Register16& ptr);
+        void inc_mem();
         void dec_reg8(Register8& reg);
         void dec_reg16(Register16& reg);
-        void dec_mem(const Register16& ptr);
+        void dec_mem();
 
         // --opcodes--
         // --NOP--
