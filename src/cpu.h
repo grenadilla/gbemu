@@ -81,6 +81,27 @@ class CPU {
         void load_imm_to_reg16(Register16& reg);
         void load_sp_to_mem();
 
+        // Arithmetic on accumulator register
+        void add_A(uint8_t val);
+        void add_reg(const Register8& reg);
+        void add_mem(const Register16& ptr);
+        void add_imm();
+
+        void addc_A(uint8_t val);
+        void addc_reg(const Register8& reg);
+        void addc_mem(const Register16& ptr);
+        void addc_imm();
+
+        void sub_A(uint8_t val);
+        void sub_reg(const Register8& reg);
+        void sub_mem(const Register16& ptr);
+        void sub_imm();
+
+        void subc_A(uint8_t val);
+        void subc_reg(const Register8& reg);
+        void subc_mem(const Register16& ptr);
+        void subc_imm();
+
         // Increments and decrements
         void inc_reg8(Register8& reg);
         void inc_reg16(Register16& reg);

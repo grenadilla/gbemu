@@ -135,3 +135,90 @@ void CPU::dec_mem(const Register16& ptr) {
 
     RAM[ptr.get()] = val - 1;
 }
+
+void CPU::add_A(uint8_t val) {
+    F.set_subtract(false);
+    F.set_half_carry(((A.get() & 0x0F) + (val & 0x0F)) & 0x10);
+    uint8_t result = A.get() + val;
+    F.set_carry(result < A.get() && result < val);
+    F.set_zero(result == 0);
+    A.set(result);
+}
+
+void CPU::add_reg(const Register8& reg) {
+    add_A(reg.get());
+}
+
+void CPU::add_mem(const Register16& ptr) {
+    add_A(RAM[ptr.get()]);
+}
+
+void CPU::add_imm() {
+    add_A(RAM[PC + 1]);
+}
+
+void CPU::addc_A(uint8_t val) {
+    bool carry = F.get_carry();
+    F.set_subtract(false);
+    F.set_half_carry(((A.get() & 0x0F) + (val & 0x0F) + carry) & 0x10);
+    uint8_t result = A.get() + val + carry;
+    F.set_carry(result < A.get() && result < val);
+    F.set_zero(result == 0);
+    A.set(result);
+}
+
+void CPU::addc_reg(const Register8& reg) {
+    addc_A(reg.get());
+}
+
+void CPU::addc_mem(const Register16& ptr) {
+    addc_A(RAM[ptr.get()]);
+}
+
+void CPU::addc_imm() {
+    addc_A(RAM[PC + 1]);
+}
+
+void CPU::sub_A(uint8_t val) {
+    F.set_subtract(true);
+    F.set_half_carry((A.get() & 0x0F) < (val & 0x0F));
+    F.set_carry(A.get() < val);
+    uint8_t result = A.get() - val;
+    F.set_zero(result == 0);
+    A.set(result);
+}
+
+void CPU::sub_reg(const Register8& reg) {
+    sub_A(reg.get());
+}
+
+void CPU::sub_mem(const Register16& ptr) {
+    sub_A(RAM[ptr.get()]);
+}
+
+void CPU::sub_imm() {
+    sub_A(RAM[PC + 1]);
+}
+
+void CPU::subc_A(uint8_t val) {
+    bool carry = F.get_carry();
+    F.set_subtract(true);
+    F.set_half_carry((A.get() & 0x0F) < (val & 0x0F) + carry);
+    F.set_carry(A.get() < val + carry);
+    uint8_t result = A.get() - val - carry;
+    F.set_zero(result == 0);
+    A.set(result);
+}
+
+void CPU::subc_reg(const Register8& reg) {
+    subc_A(reg.get());
+}
+
+void CPU::subc_mem(const Register16& ptr) {
+    subc_A(RAM[ptr.get()]);
+}
+
+void CPU::subc_imm() {
+    subc_A(RAM[PC + 1]);
+}
+
