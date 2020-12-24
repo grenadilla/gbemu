@@ -245,3 +245,51 @@ void CPU::add_SP() {
 
     SP += val;
 }
+
+void CPU::and_reg(const Register8& reg) {
+    A.set(A.get() & reg.get());
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(true);
+    F.set_carry(false);
+}
+
+void CPU::and_mem() {
+    A.set(A.get() & RAM[HL.get()]);
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(true);
+    F.set_carry(false);
+}
+
+void CPU::xor_reg(const Register8& reg) {
+    A.set(A.get() ^ reg.get());
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
+
+void CPU::xor_mem() {
+    A.set(A.get() ^ RAM[HL.get()]);
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
+
+void CPU::or_reg(const Register8& reg) {
+    A.set(A.get() | reg.get());
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
+
+void CPU::or_mem() {
+    A.set(A.get() | RAM[HL.get()]);
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
