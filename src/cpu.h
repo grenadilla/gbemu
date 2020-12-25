@@ -122,6 +122,10 @@ class CPU {
         void xor_mem();
         void or_reg(const Register8& reg);
         void or_mem();
+
+        // Compare with accumulator register
+        void cp_reg(const Register8& reg);
+        void cp_mem();
         
         // --opcodes--
         // --NOP--

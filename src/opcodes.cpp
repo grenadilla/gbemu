@@ -202,3 +202,13 @@ void CPU::opcode_B4() { or_reg(H); }
 void CPU::opcode_B5() { or_reg(L); }
 void CPU::opcode_B6() { or_mem(); }
 void CPU::opcode_B7() { or_reg(A); }
+
+// Compare
+void CPU::opcode_B8() { cp_reg(B); }
+void CPU::opcode_B9() { cp_reg(C); }
+void CPU::opcode_BA() { cp_reg(D); }
+void CPU::opcode_BB() { cp_reg(E); }
+void CPU::opcode_BC() { cp_reg(H); }
+void CPU::opcode_BD() { cp_reg(L); }
+void CPU::opcode_BE() { cp_mem(); }
+void CPU::opcode_BF() { cp_reg(A); }

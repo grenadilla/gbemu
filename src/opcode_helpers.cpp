@@ -293,3 +293,15 @@ void CPU::or_mem() {
     F.set_half_carry(false);
     F.set_carry(false);
 }
+
+void CPU::cp_reg(const Register8& reg) {
+    uint8_t before = A.get();
+    sub_reg(reg);
+    A.set(before);
+}
+
+void CPU::cp_mem() {
+    uint8_t before = A.get();
+    sub_mem();
+    A.set(before);
+}
