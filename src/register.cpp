@@ -17,9 +17,22 @@ uint16_t Register16::get() const {
     return ((static_cast<uint16_t>(high->get())) << 8) + low->get();
 }
 
+uint8_t Register16::get_high() const {
+    return high->get();
+}
+
+uint8_t Register16::get_low() const {
+    return low->get();
+}
+
 void Register16::set(uint16_t val) {
     high->set(val >> 8);
     low->set(val & 0xff);
+}
+
+void Register16::set(uint8_t high_val, uint8_t low_val) {
+    high->set(high_val);
+    low->set(low_val);
 }
 
 void RegisterF::set(uint8_t val) {

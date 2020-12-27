@@ -223,8 +223,8 @@ void CPU::subc_imm() {
 }
 
 void CPU::add_HL(const Register16& reg) {
-    add(L, reg.low->get());
-    add(H, reg.high->get());
+    add(L, reg.get_low());
+    add(H, reg.get_high());
 }
 
 void CPU::add_HL(uint16_t val) {
@@ -304,4 +304,37 @@ void CPU::cp_mem() {
     uint8_t before = A.get();
     sub_mem();
     A.set(before);
+}
+
+void CPU::load_HL() {
+    // Uses signed two's complement
+    int8_t val = static_cast<int8_t>(RAM[PC + 1]);
+
+    F.set_zero(false);
+    F.set_subtract(false);
+    uint8_t lower_sp = SP & 0xFF;
+    F.set_half_carry(((lower_sp & 0x0F) + (val & 0x0F)) & 0x10);
+    uint8_t lower_result = lower_sp + val;
+    F.set_carry(lower_result < lower_sp && lower_result < val);
+
+    HL.set(SP + val);
+}
+
+void CPU::pop_stack(Register16& reg) {
+    uint8_t lower = RAM[SP];
+    SP += sizeof(uint8_t);
+    uint8_t upper = RAM[SP];
+    SP += sizeof(uint8_t);
+    reg.set(upper, lower);
+}
+
+void CPU::push_stack(Register16& reg) {
+    SP -= sizeof(uint8_t);
+    RAM[SP] = reg.get_high();
+    SP -= sizeof(uint8_t);
+    RAM[SP] = reg.get_low();
+}
+
+void CPU::load_SP() {
+    SP = HL.get();
 }

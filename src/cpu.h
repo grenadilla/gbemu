@@ -126,6 +126,12 @@ class CPU {
         // Compare with accumulator register
         void cp_reg(const Register8& reg);
         void cp_mem();
+
+        // Stack opcodes
+        void load_HL();
+        void pop_stack(Register16& reg);
+        void push_stack(Register16& reg);
+        void load_SP();
         
         // --opcodes--
         // --NOP--
@@ -182,4 +188,8 @@ class CPU {
         // --Compare opcodes--
         void opcode_B8(); void opcode_B9(); void opcode_BA(); void opcode_BB(); void opcode_BC(); 
         void opcode_BD(); void opcode_BE(); void opcode_BF();
+
+        // --Stack opcodes--
+        void opcode_C1(); void opcode_D1(); void opcode_E1(); void opcode_F1(); void opcode_F8();
+        void opcode_C5(); void opcode_D5(); void opcode_E5(); void opcode_F5(); void opcode_F9();
 };

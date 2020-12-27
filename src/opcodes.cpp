@@ -212,3 +212,15 @@ void CPU::opcode_BC() { cp_reg(H); }
 void CPU::opcode_BD() { cp_reg(L); }
 void CPU::opcode_BE() { cp_mem(); }
 void CPU::opcode_BF() { cp_reg(A); }
+
+// Stack
+void CPU::opcode_C1() { pop_stack(BC); }
+void CPU::opcode_D1() { pop_stack(DE); }
+void CPU::opcode_E1() { pop_stack(HL); }
+void CPU::opcode_F1() { pop_stack(AF); }
+void CPU::opcode_C5() { push_stack(BC); }
+void CPU::opcode_D5() { push_stack(DE); }
+void CPU::opcode_E5() { push_stack(HL); }
+void CPU::opcode_F5() { push_stack(AF); }
+void CPU::opcode_F8() { load_HL(); }
+void CPU::opcode_F9() { load_SP(); }

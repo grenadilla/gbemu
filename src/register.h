@@ -14,7 +14,11 @@ class Register16 {
     public:
         Register16(Register8* hi, Register8* lo);
         uint16_t get() const;
+        uint8_t get_high() const;
+        uint8_t get_low() const;
         void set(uint16_t val);
+        void set(uint8_t high_val, uint8_t low_val);
+    private:
         Register8* high;
         Register8* low;
 };
