@@ -338,3 +338,50 @@ void CPU::push_stack(Register16& reg) {
 void CPU::load_SP() {
     SP = HL.get();
 }
+
+void CPU::jump(uint16_t pos) {
+    jump_taken = true;
+    PC = pos;
+}
+
+void CPU::call(bool condition) {
+    if (condition) {
+        jump_taken = true;
+        PC = retrieve_imm16();
+        SP -= sizeof(uint8_t);
+
+        // CALL instruction is 3 bytes long
+        uint16_t next_instr = PC + 3 * sizeof(uint8_t);
+        RAM[SP] = (next_instr & 0xFF00) >> 8;
+        SP -= sizeof(uint8_t);
+        RAM[SP] = next_instr & 0x00FF;
+    }
+}
+
+void CPU::ret(bool condition) {
+    if (condition) {
+        uint8_t lower = RAM[SP];
+        SP += sizeof(uint8_t);
+        uint8_t upper = RAM[SP];
+        SP += sizeof(uint8_t);
+        PC = (upper << 8) & lower;
+        jump_taken = true;
+    }
+}
+
+void CPU::jr(bool condition) {
+    if (condition) {
+        int8_t val = static_cast<int8_t>(RAM[PC + 1]);
+        jump(PC + val);
+    }
+}
+
+void CPU::jp(bool condition) {
+    if (condition) {
+        jump(retrieve_imm16());
+    }
+}
+
+void CPU::jp_mem() {
+    jump(HL.get());
+}

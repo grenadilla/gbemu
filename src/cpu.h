@@ -25,6 +25,8 @@ class CPU {
         uint16_t PC;
         uint16_t SP;
 
+        bool jump_taken = false;
+
         // TODO add memory mappings and change from simple array
         uint8_t RAM[65536] = {0};
 
@@ -132,6 +134,15 @@ class CPU {
         void pop_stack(Register16& reg);
         void push_stack(Register16& reg);
         void load_SP();
+
+        // Control opcodes
+        void jump(uint16_t to);
+        void call(bool condition = true);
+        void ret(bool condition = true);
+        void jr(bool condition = true);
+        void jp(bool condition = true);
+        void jp_mem();
+        // TODO RETI opcode
         
         // --opcodes--
         // --NOP--
@@ -192,4 +203,12 @@ class CPU {
         // --Stack opcodes--
         void opcode_C1(); void opcode_D1(); void opcode_E1(); void opcode_F1(); void opcode_F8();
         void opcode_C5(); void opcode_D5(); void opcode_E5(); void opcode_F5(); void opcode_F9();
+
+        // --Control opcodes--
+        void opcode_20(); void opcode_30(); void opcode_18(); void opcode_28(); void opcode_38();
+        void opcode_C0(); void opcode_D0(); void opcode_C8(); void opcode_D8(); void opcode_C9();
+        void opcode_D9();
+        void opcode_C2(); void opcode_D2(); void opcode_C3(); void opcode_CA(); void opcode_DA();
+        void opcode_E9();
+        void opcode_C4(); void opcode_D4(); void opcode_CC(); void opcode_DC(); void opcode_CD();
 };

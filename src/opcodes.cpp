@@ -224,3 +224,31 @@ void CPU::opcode_E5() { push_stack(HL); }
 void CPU::opcode_F5() { push_stack(AF); }
 void CPU::opcode_F8() { load_HL(); }
 void CPU::opcode_F9() { load_SP(); }
+
+// Control
+void CPU::opcode_20() { jr(!F.get_zero()); }
+void CPU::opcode_30() { jr(!F.get_carry()); }
+void CPU::opcode_18() { jr(); }
+void CPU::opcode_28() { jr(F.get_zero()); }
+void CPU::opcode_38() { jr(F.get_carry()); }
+
+void CPU::opcode_C0() { ret(!F.get_zero()); }
+void CPU::opcode_D0() { ret(!F.get_carry()); }
+void CPU::opcode_C8() { ret(F.get_zero()); }
+void CPU::opcode_D8() { ret(F.get_carry()); }
+void CPU::opcode_C9() { ret(); }
+// TODO implement
+//void CPU::opcode_D9() {}
+
+void CPU::opcode_C2() { jp(!F.get_zero()); }
+void CPU::opcode_D2() { jp(!F.get_carry()); }
+void CPU::opcode_C3() { jp(); }
+void CPU::opcode_CA() { jp(F.get_zero()); }
+void CPU::opcode_DA() { jp(F.get_carry()); }
+void CPU::opcode_E9() { jp_mem(); }
+
+void CPU::opcode_C4() { call(!F.get_zero()); }
+void CPU::opcode_D4() { call(!F.get_carry()); }
+void CPU::opcode_CC() { call(F.get_zero()); }
+void CPU::opcode_DC() { call(F.get_carry()); }
+void CPU::opcode_CD() { call(); }
