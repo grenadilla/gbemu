@@ -3,10 +3,6 @@
 static const uint8_t MAX_8BIT = 255;
 static const uint8_t MAX_4BIT = 15;
 
-uint16_t CPU::retrieve_imm16() {
-    return static_cast<uint16_t>((RAM[PC + 2] << 8) | RAM[PC + 1]);
-}
-
 void CPU::load_reg_to_mem(const Register16& ptr, const Register8& data) {
     RAM[ptr.get()] = data.get();
 }
@@ -40,11 +36,11 @@ void CPU::load_mem_to_reg_dec(Register8& reg) {
 }
 
 void CPU::load_imm_to_reg(Register8& reg) {
-    reg.set(RAM[PC + 1]);
+    reg.set(retrieve_imm8());
 }
 
 void CPU::load_imm_to_mem() {
-    RAM[HL.get()] = RAM[PC + 1];
+    RAM[HL.get()] = retrieve_imm8();
 }
 
 void CPU::load_reg_to_reg(Register8& reg, const Register8& data) {
@@ -62,12 +58,12 @@ void CPU::load_mem_imm_to_reg(Register8& reg) {
 }
 
 void CPU::load_reg_to_upper_mem_imm(const Register8& data) {
-    uint16_t address = 0xff00 | RAM[PC + 1];
+    uint16_t address = 0xff00 | retrieve_imm8();
     RAM[address] = data.get();
 }
 
 void CPU::load_upper_mem_imm_to_reg(Register8& reg) {
-    uint16_t address = 0xff00 | RAM[PC + 1];
+    uint16_t address = 0xff00 | retrieve_imm8();
     reg.set(RAM[address]);
 }
 
@@ -154,7 +150,7 @@ void CPU::add_mem() {
 }
 
 void CPU::add_imm() {
-    add(A, RAM[PC + 1]);
+    add(A, retrieve_imm8());
 }
 
 void CPU::addc(Register8& dest, uint8_t val) {
@@ -176,7 +172,7 @@ void CPU::addc_mem() {
 }
 
 void CPU::addc_imm() {
-    addc(A, RAM[PC + 1]);
+    addc(A, retrieve_imm8());
 }
 
 void CPU::sub(Register8& dest, uint8_t val) {
@@ -197,7 +193,7 @@ void CPU::sub_mem() {
 }
 
 void CPU::sub_imm() {
-    sub(A, RAM[PC + 1]);
+    sub(A, retrieve_imm8());
 }
 
 void CPU::subc(Register8& dest, uint8_t val) {
@@ -219,7 +215,7 @@ void CPU::subc_mem() {
 }
 
 void CPU::subc_imm() {
-    subc(A, RAM[PC + 1]);
+    subc(A, retrieve_imm8());
 }
 
 void CPU::add_HL(const Register16& reg) {
@@ -320,19 +316,12 @@ void CPU::load_HL() {
     HL.set(SP + val);
 }
 
-void CPU::pop_stack(Register16& reg) {
-    uint8_t lower = RAM[SP];
-    SP += sizeof(uint8_t);
-    uint8_t upper = RAM[SP];
-    SP += sizeof(uint8_t);
-    reg.set(upper, lower);
+void CPU::pop(Register16& reg) {
+    reg.set(pop_stack());
 }
 
-void CPU::push_stack(Register16& reg) {
-    SP -= sizeof(uint8_t);
-    RAM[SP] = reg.get_high();
-    SP -= sizeof(uint8_t);
-    RAM[SP] = reg.get_low();
+void CPU::push(Register16& reg) {
+    push_stack(reg.get());
 }
 
 void CPU::load_SP() {
@@ -348,30 +337,20 @@ void CPU::call(bool condition) {
     if (condition) {
         jump_taken = true;
         PC = retrieve_imm16();
-        SP -= sizeof(uint8_t);
-
-        // CALL instruction is 3 bytes long
-        uint16_t next_instr = PC + 3 * sizeof(uint8_t);
-        RAM[SP] = (next_instr & 0xFF00) >> 8;
-        SP -= sizeof(uint8_t);
-        RAM[SP] = next_instr & 0x00FF;
+        push_stack(PC + 1);
     }
 }
 
 void CPU::ret(bool condition) {
     if (condition) {
-        uint8_t lower = RAM[SP];
-        SP += sizeof(uint8_t);
-        uint8_t upper = RAM[SP];
-        SP += sizeof(uint8_t);
-        PC = (upper << 8) & lower;
+        PC = pop_stack();
         jump_taken = true;
     }
 }
 
 void CPU::jr(bool condition) {
     if (condition) {
-        int8_t val = static_cast<int8_t>(RAM[PC + 1]);
+        int8_t val = static_cast<int8_t>(retrieve_imm8());
         jump(PC + val);
     }
 }
@@ -384,4 +363,10 @@ void CPU::jp(bool condition) {
 
 void CPU::jp_mem() {
     jump(HL.get());
+}
+
+void CPU::rst(uint8_t val) {
+    jump_taken = true;
+    push_stack(PC);
+    PC = val * 0x08;
 }

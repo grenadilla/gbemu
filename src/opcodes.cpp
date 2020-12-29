@@ -214,14 +214,14 @@ void CPU::opcode_BE() { cp_mem(); }
 void CPU::opcode_BF() { cp_reg(A); }
 
 // Stack
-void CPU::opcode_C1() { pop_stack(BC); }
-void CPU::opcode_D1() { pop_stack(DE); }
-void CPU::opcode_E1() { pop_stack(HL); }
-void CPU::opcode_F1() { pop_stack(AF); }
-void CPU::opcode_C5() { push_stack(BC); }
-void CPU::opcode_D5() { push_stack(DE); }
-void CPU::opcode_E5() { push_stack(HL); }
-void CPU::opcode_F5() { push_stack(AF); }
+void CPU::opcode_C1() { pop(BC); }
+void CPU::opcode_D1() { pop(DE); }
+void CPU::opcode_E1() { pop(HL); }
+void CPU::opcode_F1() { pop(AF); }
+void CPU::opcode_C5() { push(BC); }
+void CPU::opcode_D5() { push(DE); }
+void CPU::opcode_E5() { push(HL); }
+void CPU::opcode_F5() { push(AF); }
 void CPU::opcode_F8() { load_HL(); }
 void CPU::opcode_F9() { load_SP(); }
 
@@ -252,3 +252,12 @@ void CPU::opcode_D4() { call(!F.get_carry()); }
 void CPU::opcode_CC() { call(F.get_zero()); }
 void CPU::opcode_DC() { call(F.get_carry()); }
 void CPU::opcode_CD() { call(); }
+
+void CPU::opcode_C7() { rst(0); }
+void CPU::opcode_CF() { rst(1); }
+void CPU::opcode_D7() { rst(2); }
+void CPU::opcode_DF() { rst(3); }
+void CPU::opcode_E7() { rst(4); }
+void CPU::opcode_EF() { rst(5); }
+void CPU::opcode_F7() { rst(6); }
+void CPU::opcode_FF() { rst(7); }

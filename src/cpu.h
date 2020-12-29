@@ -37,8 +37,6 @@ class CPU {
             uint16_t opcode;
             // Debug string with human readable formatting
             std::string debug;
-            // Number of bytes opcode takes including prefix and parameters
-            unsigned bytes;
             // Number of machine cycles opcode takes
             // For control opcodes this is if taken
             unsigned cycles;
@@ -55,7 +53,10 @@ class CPU {
         //(this->*(opcode_table[0]))();
         
         // --opcode Helper Functions--
+        uint8_t retrieve_imm8();
         uint16_t retrieve_imm16();
+        void push_stack(uint16_t val);
+        uint16_t pop_stack();
 
         // --Loads--
         void load_reg_to_mem(const Register16& ptr, const Register8& data);
@@ -131,8 +132,8 @@ class CPU {
 
         // Stack opcodes
         void load_HL();
-        void pop_stack(Register16& reg);
-        void push_stack(Register16& reg);
+        void pop(Register16& reg);
+        void push(Register16& reg);
         void load_SP();
 
         // Control opcodes
@@ -143,6 +144,9 @@ class CPU {
         void jp(bool condition = true);
         void jp_mem();
         // TODO RETI opcode
+
+        // Restart opcodes
+        void rst(uint8_t val);
         
         // --opcodes--
         // --NOP--
@@ -211,4 +215,6 @@ class CPU {
         void opcode_C2(); void opcode_D2(); void opcode_C3(); void opcode_CA(); void opcode_DA();
         void opcode_E9();
         void opcode_C4(); void opcode_D4(); void opcode_CC(); void opcode_DC(); void opcode_CD();
+        void opcode_C7(); void opcode_CF(); void opcode_D7(); void opcode_DF();
+        void opcode_E7(); void opcode_EF(); void opcode_F7(); void opcode_FF();
 };
