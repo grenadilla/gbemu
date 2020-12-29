@@ -370,3 +370,49 @@ void CPU::rst(uint8_t val) {
     push_stack(PC);
     PC = val * 0x08;
 }
+
+void CPU::daa() {
+    // From https://forums.nesdev.com/viewtopic.php?t=15944
+    if (!F.get_subtract()) {  
+        // after an addition, adjust if (half-)carry occurred or if result is out of bounds
+        if (F.get_carry() || A.get() > 0x99) { 
+            A.set(A.get() + 0x60);
+            F.set_carry(true);
+        }
+        if (F.get_half_carry() || (A.get() & 0x0F) > 0x09) {
+            A.set(A.get() + 0x06);
+            F.set_carry(false);
+        }
+    } else {  
+        // after a subtraction, only adjust if (half-)carry occurred
+        if (F.get_carry()) {
+            A.set(A.get() - 0x60);
+            F.set_carry(false);
+        }
+        if (F.get_half_carry()) {
+            A.set(A.get() - 0x06);
+            F.set_carry(false);
+        }
+    }
+    // these flags are always updated
+    F.set_zero(A.get() == 0);
+    F.set_half_carry(false);
+}
+
+void CPU::scf() {
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(true);
+}
+
+void CPU::cpl() {
+    A.set(~A.get());
+    F.set_subtract(true);
+    F.set_half_carry(true);
+}
+
+void CPU::ccf() {
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(!F.get_half_carry());
+}

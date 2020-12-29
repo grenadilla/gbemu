@@ -147,12 +147,18 @@ class CPU {
 
         // Restart opcodes
         void rst(uint8_t val);
+
+        // Misc
+        void daa();
+        void scf();
+        void cpl();
+        void ccf();
         
         // --opcodes--
         // --NOP--
         void opcode_00();
 
-        // --Load opcodes--
+        // --Loads--
         void opcode_02(); void opcode_06(); void opcode_0A(); void opcode_0E(); void opcode_12();
         void opcode_16(); void opcode_1A(); void opcode_1E(); void opcode_22(); void opcode_26();
         void opcode_2A(); void opcode_2E(); void opcode_32(); void opcode_36(); void opcode_3A();
@@ -174,7 +180,7 @@ class CPU {
 
         void opcode_01(); void opcode_11(); void opcode_21(); void opcode_31(); void opcode_08();
 
-        // --Increment and decrement opcodes--
+        // --Increment and decrement--
         void opcode_03(); void opcode_13(); void opcode_23(); void opcode_33();
         void opcode_04(); void opcode_14(); void opcode_24(); void opcode_34();
         void opcode_05(); void opcode_15(); void opcode_25(); void opcode_35();
@@ -182,7 +188,7 @@ class CPU {
         void opcode_0C(); void opcode_1C(); void opcode_2C(); void opcode_3C();
         void opcode_0D(); void opcode_1D(); void opcode_2D(); void opcode_3D();
 
-        // --Arithmetic opcodes--
+        // --Arithmetic--
         void opcode_80(); void opcode_81(); void opcode_82(); void opcode_83(); void opcode_84();
         void opcode_85(); void opcode_86(); void opcode_87(); void opcode_88(); void opcode_89();
         void opcode_8A(); void opcode_8B(); void opcode_8C(); void opcode_8D(); void opcode_8E();
@@ -193,28 +199,33 @@ class CPU {
         void opcode_C6(); void opcode_D6(); void opcode_CE(); void opcode_DE();
         void opcode_09(); void opcode_19(); void opcode_29(); void opcode_39(); void opcode_E8();
 
-        // --Logical opcodes--
+        // --Logical--
         void opcode_A0(); void opcode_A1(); void opcode_A2(); void opcode_A3(); void opcode_A4();
         void opcode_A5(); void opcode_A6(); void opcode_A7(); void opcode_A8(); void opcode_A9();
         void opcode_AA(); void opcode_AB(); void opcode_AC(); void opcode_AD(); void opcode_AE();
         void opcode_AF(); void opcode_B0(); void opcode_B1(); void opcode_B2(); void opcode_B3();
         void opcode_B4(); void opcode_B5(); void opcode_B6(); void opcode_B7(); 
 
-        // --Compare opcodes--
+        // --Compare--
         void opcode_B8(); void opcode_B9(); void opcode_BA(); void opcode_BB(); void opcode_BC(); 
         void opcode_BD(); void opcode_BE(); void opcode_BF();
 
-        // --Stack opcodes--
+        // --Stack--
         void opcode_C1(); void opcode_D1(); void opcode_E1(); void opcode_F1(); void opcode_F8();
         void opcode_C5(); void opcode_D5(); void opcode_E5(); void opcode_F5(); void opcode_F9();
 
-        // --Control opcodes--
+        // --Control--
         void opcode_20(); void opcode_30(); void opcode_18(); void opcode_28(); void opcode_38();
         void opcode_C0(); void opcode_D0(); void opcode_C8(); void opcode_D8(); void opcode_C9();
         void opcode_D9();
         void opcode_C2(); void opcode_D2(); void opcode_C3(); void opcode_CA(); void opcode_DA();
         void opcode_E9();
+
+        // --Restart--
         void opcode_C4(); void opcode_D4(); void opcode_CC(); void opcode_DC(); void opcode_CD();
         void opcode_C7(); void opcode_CF(); void opcode_D7(); void opcode_DF();
         void opcode_E7(); void opcode_EF(); void opcode_F7(); void opcode_FF();
+
+        // --Misc--
+        void opcode_27(); void opcode_37(); void opcode_2F(); void opcode_3F();
 };

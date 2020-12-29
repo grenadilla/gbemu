@@ -261,3 +261,9 @@ void CPU::opcode_E7() { rst(4); }
 void CPU::opcode_EF() { rst(5); }
 void CPU::opcode_F7() { rst(6); }
 void CPU::opcode_FF() { rst(7); }
+
+// Misc
+void CPU::opcode_27() { daa(); }
+void CPU::opcode_37() { scf(); }
+void CPU::opcode_2F() { cpl(); }
+void CPU::opcode_3F() { ccf(); }
