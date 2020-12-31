@@ -267,3 +267,45 @@ void CPU::opcode_27() { daa(); }
 void CPU::opcode_37() { scf(); }
 void CPU::opcode_2F() { cpl(); }
 void CPU::opcode_3F() { ccf(); }
+
+// Bit manipulation
+void CPU::opcode_07() { rlc_a(); }
+void CPU::opcode_17() { rl_a(); }
+void CPU::opcode_0F() { rrc_a(); }
+void CPU::opcode_1F() { rr_a(); }
+
+void CPU::opcode_CB00() { rlc_reg(B); }
+void CPU::opcode_CB01() { rlc_reg(C); }
+void CPU::opcode_CB02() { rlc_reg(D); }
+void CPU::opcode_CB03() { rlc_reg(E); }
+void CPU::opcode_CB04() { rlc_reg(H); }
+void CPU::opcode_CB05() { rlc_reg(L); }
+void CPU::opcode_CB06() { rlc_mem(); }
+void CPU::opcode_CB07() { rlc_reg(A); }
+
+void CPU::opcode_CB08() { rrc_reg(B); }
+void CPU::opcode_CB09() { rrc_reg(C); }
+void CPU::opcode_CB0A() { rrc_reg(D); }
+void CPU::opcode_CB0B() { rrc_reg(E); }
+void CPU::opcode_CB0C() { rrc_reg(H); }
+void CPU::opcode_CB0D() { rrc_reg(L); }
+void CPU::opcode_CB0E() { rrc_mem(); }
+void CPU::opcode_CB0F() { rrc_reg(A); }
+
+void CPU::opcode_CB10() { rl_reg(B); }
+void CPU::opcode_CB11() { rl_reg(C); }
+void CPU::opcode_CB12() { rl_reg(D); }
+void CPU::opcode_CB13() { rl_reg(E); }
+void CPU::opcode_CB14() { rl_reg(H); }
+void CPU::opcode_CB15() { rl_reg(L); }
+void CPU::opcode_CB16() { rl_mem(); }
+void CPU::opcode_CB17() { rl_reg(A); }
+
+void CPU::opcode_CB18() { rr_reg(B); }
+void CPU::opcode_CB19() { rr_reg(C); }
+void CPU::opcode_CB1A() { rr_reg(D); }
+void CPU::opcode_CB1B() { rr_reg(E); }
+void CPU::opcode_CB1C() { rr_reg(H); }
+void CPU::opcode_CB1D() { rr_reg(L); }
+void CPU::opcode_CB1E() { rr_mem(); }
+void CPU::opcode_CB1F() { rr_reg(A); }

@@ -416,3 +416,95 @@ void CPU::ccf() {
     F.set_half_carry(false);
     F.set_carry(!F.get_half_carry());
 }
+
+uint8_t CPU::rlc(uint8_t val) {
+    uint8_t bit7 = (val & 0x80) >> 7;
+    uint8_t result = (val << 1) | bit7;
+    F.set_carry(bit7);
+    F.set_zero(result == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    return result;
+}
+
+uint8_t CPU::rl(uint8_t val) {
+    uint8_t bit7 = (val & 0x80) >> 7;
+    uint8_t result = (val << 1) | F.get_carry();
+    F.set_carry(bit7);
+    F.set_zero(result == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    return result;
+}
+
+uint8_t CPU::rrc(uint8_t val) {
+    uint8_t bit0 = val & 0x01;
+    uint8_t result = (val >> 1) | (bit0 << 7);
+    F.set_carry(bit0);
+    F.set_zero(result == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    return result;
+}
+
+uint8_t CPU::rr(uint8_t val) {
+    uint8_t bit0 = val & 0x01;
+    uint8_t result = (val >> 1) | (F.get_carry() << 7);
+    F.set_carry(bit0);
+    F.set_zero(result == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    return result;
+}
+
+void CPU::rlc_a() {
+    A.set(rlc(A.get()));
+    F.set_zero(false);
+}
+
+void CPU::rl_a() {
+    A.set(rl(A.get()));
+    F.set_zero(false);
+}
+
+void CPU::rrc_a() {
+    A.set(rrc(A.get()));
+    F.set_zero(false);
+}
+
+void CPU::rr_a() {
+    A.set(rr(A.get()));
+    F.set_zero(false);
+}
+
+void CPU::rlc_reg(Register8& reg) {
+    reg.set(rlc(reg.get()));
+}
+
+void CPU::rl_reg(Register8& reg) {
+    reg.set(rl(reg.get()));
+}
+
+void CPU::rrc_reg(Register8& reg) {
+    reg.set(rrc(reg.get()));
+}
+
+void CPU::rr_reg(Register8& reg) {
+    reg.set(rr(reg.get()));
+}
+
+void CPU::rlc_mem() {
+    RAM[HL.get()] = rlc(RAM[HL.get()]);
+}
+
+void CPU::rl_mem() {
+    RAM[HL.get()] = rl(RAM[HL.get()]);
+}
+
+void CPU::rrc_mem() {
+    RAM[HL.get()] = rrc(RAM[HL.get()]);
+}
+
+void CPU::rr_mem() {
+    RAM[HL.get()] = rr(RAM[HL.get()]);
+}

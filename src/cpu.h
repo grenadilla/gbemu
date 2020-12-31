@@ -153,6 +153,27 @@ class CPU {
         void scf();
         void cpl();
         void ccf();
+
+        // Bit manipulation
+        uint8_t rlc(uint8_t val);
+        uint8_t rl(uint8_t val);
+        uint8_t rrc(uint8_t val);
+        uint8_t rr(uint8_t val);
+
+        void rlc_a();
+        void rl_a();
+        void rrc_a();
+        void rr_a();
+
+        void rlc_reg(Register8& reg);
+        void rl_reg(Register8& reg);
+        void rrc_reg(Register8& reg);
+        void rr_reg(Register8& reg);
+
+        void rlc_mem();
+        void rl_mem();
+        void rrc_mem();
+        void rr_mem();
         
         // --opcodes--
         // --NOP--
@@ -228,4 +249,15 @@ class CPU {
 
         // --Misc--
         void opcode_27(); void opcode_37(); void opcode_2F(); void opcode_3F();
+
+        // --Bit manipulation--
+        void opcode_07(); void opcode_17(); void opcode_0F(); void opcode_1F();
+        void opcode_CB00(); void opcode_CB01(); void opcode_CB02(); void opcode_CB03();
+        void opcode_CB04(); void opcode_CB05(); void opcode_CB06(); void opcode_CB07();
+        void opcode_CB08(); void opcode_CB09(); void opcode_CB0A(); void opcode_CB0B();
+        void opcode_CB0C(); void opcode_CB0D(); void opcode_CB0E(); void opcode_CB0F();
+        void opcode_CB10(); void opcode_CB11(); void opcode_CB12(); void opcode_CB13();
+        void opcode_CB14(); void opcode_CB15(); void opcode_CB16(); void opcode_CB17();
+        void opcode_CB18(); void opcode_CB19(); void opcode_CB1A(); void opcode_CB1B();
+        void opcode_CB1C(); void opcode_CB1D(); void opcode_CB1E(); void opcode_CB1F();
 };
