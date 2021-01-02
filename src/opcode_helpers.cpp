@@ -508,3 +508,82 @@ void CPU::rrc_mem() {
 void CPU::rr_mem() {
     RAM[HL.get()] = rr(RAM[HL.get()]);
 }
+
+void CPU::sla_reg(Register8& reg) {
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(reg.get() & 0x80);
+    reg.set(reg.get() << 1);
+    F.set_zero(reg.get() == 0);
+}
+
+void CPU::sla_mem() {
+    uint8_t val = RAM[HL.get()];
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(val & 0x80);
+    val = val << 1;
+    F.set_zero(val == 0);
+    RAM[HL.get()] = val;
+}
+
+void CPU::sra_reg(Register8& reg) {
+    uint8_t val = static_cast<int8_t>(reg.get());
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(val & 0x01);
+    // Ensure arithmetic shift
+    val = val < 0 ? ~(~val >> 1) : val >> 1;
+    F.set_zero(val == 0);
+    reg.set(static_cast<uint8_t>(val));
+}
+
+void CPU::sra_mem() {
+    uint8_t val = static_cast<int8_t>(RAM[HL.get()]);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(val & 0x01);
+    // Ensure arithmetic shift
+    val = val < 0 ? ~(~val >> 1) : val >> 1;
+    F.set_zero(val == 0);
+    RAM[HL.get()] = static_cast<uint8_t>(val);
+}
+
+void CPU::swap_reg(Register8& reg) {
+    uint8_t new_upper = (reg.get() & 0x0F) << 4;
+    uint8_t new_lower = (reg.get() & 0xF0) >> 4;
+    reg.set(new_upper | new_lower);
+    F.set_zero(reg.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
+
+void CPU::swap_mem() {
+    uint8_t val = RAM[HL.get()];
+    uint8_t new_upper = (val & 0x0F) << 4;
+    uint8_t new_lower = (val & 0xF0) >> 4;
+    RAM[HL.get()] = new_upper | new_lower;
+    F.set_zero(val == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
+
+void CPU::srl_reg(Register8& reg) {
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(reg.get() & 0x01);
+    reg.set(reg.get() >> 1);
+    F.set_zero(reg.get() == 0);
+}
+
+void CPU::srl_mem() {
+    uint8_t val = RAM[HL.get()];
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(val & 0x01);
+    val = val >> 1;
+    F.set_zero(val == 0);
+    RAM[HL.get()] = val;
+}

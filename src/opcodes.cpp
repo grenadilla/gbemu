@@ -309,3 +309,39 @@ void CPU::opcode_CB1C() { rr_reg(H); }
 void CPU::opcode_CB1D() { rr_reg(L); }
 void CPU::opcode_CB1E() { rr_mem(); }
 void CPU::opcode_CB1F() { rr_reg(A); }
+
+void CPU::opcode_CB20() { sla_reg(B); }
+void CPU::opcode_CB21() { sla_reg(C); }
+void CPU::opcode_CB22() { sla_reg(D); }
+void CPU::opcode_CB23() { sla_reg(E); }
+void CPU::opcode_CB24() { sla_reg(H); }
+void CPU::opcode_CB25() { sla_reg(L); }
+void CPU::opcode_CB26() { sla_mem(); }
+void CPU::opcode_CB27() { sla_reg(A); }
+
+void CPU::opcode_CB28() { sra_reg(B); }
+void CPU::opcode_CB29() { sra_reg(C); }
+void CPU::opcode_CB2A() { sra_reg(D); }
+void CPU::opcode_CB2B() { sra_reg(E); }
+void CPU::opcode_CB2C() { sra_reg(H); }
+void CPU::opcode_CB2D() { sra_reg(L); }
+void CPU::opcode_CB2E() { sra_mem(); }
+void CPU::opcode_CB2F() { sra_reg(A); }
+
+void CPU::opcode_CB30() { swap_reg(B); }
+void CPU::opcode_CB31() { swap_reg(C); }
+void CPU::opcode_CB32() { swap_reg(D); }
+void CPU::opcode_CB33() { swap_reg(E); }
+void CPU::opcode_CB34() { swap_reg(H); }
+void CPU::opcode_CB35() { swap_reg(L); }
+void CPU::opcode_CB36() { swap_mem(); }
+void CPU::opcode_CB37() { swap_reg(A); }
+
+void CPU::opcode_CB38() { srl_reg(B); }
+void CPU::opcode_CB39() { srl_reg(C); }
+void CPU::opcode_CB3A() { srl_reg(D); }
+void CPU::opcode_CB3B() { srl_reg(E); }
+void CPU::opcode_CB3C() { srl_reg(H); }
+void CPU::opcode_CB3D() { srl_reg(L); }
+void CPU::opcode_CB3E() { srl_mem(); }
+void CPU::opcode_CB3F() { srl_reg(A); }
