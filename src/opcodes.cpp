@@ -345,3 +345,75 @@ void CPU::opcode_CB3C() { srl_reg(H); }
 void CPU::opcode_CB3D() { srl_reg(L); }
 void CPU::opcode_CB3E() { srl_mem(); }
 void CPU::opcode_CB3F() { srl_reg(A); }
+
+void CPU::opcode_CB40() { test_bit(B, 0); }
+void CPU::opcode_CB41() { test_bit(C, 0); }
+void CPU::opcode_CB42() { test_bit(D, 0); }
+void CPU::opcode_CB43() { test_bit(E, 0); }
+void CPU::opcode_CB44() { test_bit(H, 0); }
+void CPU::opcode_CB45() { test_bit(L, 0); }
+void CPU::opcode_CB46() { test_bit(0); }
+void CPU::opcode_CB47() { test_bit(A, 0); }
+
+void CPU::opcode_CB48() { test_bit(B, 1); }
+void CPU::opcode_CB49() { test_bit(C, 1); }
+void CPU::opcode_CB4A() { test_bit(D, 1); }
+void CPU::opcode_CB4B() { test_bit(E, 1); }
+void CPU::opcode_CB4C() { test_bit(H, 1); }
+void CPU::opcode_CB4D() { test_bit(L, 1); }
+void CPU::opcode_CB4E() { test_bit(1); }
+void CPU::opcode_CB4F() { test_bit(A, 1); }
+
+void CPU::opcode_CB50() { test_bit(B, 2); }
+void CPU::opcode_CB51() { test_bit(C, 2); }
+void CPU::opcode_CB52() { test_bit(D, 2); }
+void CPU::opcode_CB53() { test_bit(E, 2); }
+void CPU::opcode_CB54() { test_bit(H, 2); }
+void CPU::opcode_CB55() { test_bit(L, 2); }
+void CPU::opcode_CB56() { test_bit(2); }
+void CPU::opcode_CB57() { test_bit(A, 2); }
+
+void CPU::opcode_CB58() { test_bit(B, 3); }
+void CPU::opcode_CB59() { test_bit(C, 3); }
+void CPU::opcode_CB5A() { test_bit(D, 3); }
+void CPU::opcode_CB5B() { test_bit(E, 3); }
+void CPU::opcode_CB5C() { test_bit(H, 3); }
+void CPU::opcode_CB5D() { test_bit(L, 3); }
+void CPU::opcode_CB5E() { test_bit(3); }
+void CPU::opcode_CB5F() { test_bit(A, 3); }
+
+void CPU::opcode_CB60() { test_bit(B, 4); }
+void CPU::opcode_CB61() { test_bit(C, 4); }
+void CPU::opcode_CB62() { test_bit(D, 4); }
+void CPU::opcode_CB63() { test_bit(E, 4); }
+void CPU::opcode_CB64() { test_bit(H, 4); }
+void CPU::opcode_CB65() { test_bit(L, 4); }
+void CPU::opcode_CB66() { test_bit(4); }
+void CPU::opcode_CB67() { test_bit(A, 4); }
+
+void CPU::opcode_CB68() { test_bit(B, 5); }
+void CPU::opcode_CB69() { test_bit(C, 5); }
+void CPU::opcode_CB6A() { test_bit(D, 5); }
+void CPU::opcode_CB6B() { test_bit(E, 5); }
+void CPU::opcode_CB6C() { test_bit(H, 5); }
+void CPU::opcode_CB6D() { test_bit(L, 5); }
+void CPU::opcode_CB6E() { test_bit(5); }
+void CPU::opcode_CB6F() { test_bit(A, 5); }
+
+void CPU::opcode_CB70() { test_bit(B, 6); }
+void CPU::opcode_CB71() { test_bit(C, 6); }
+void CPU::opcode_CB72() { test_bit(D, 6); }
+void CPU::opcode_CB73() { test_bit(E, 6); }
+void CPU::opcode_CB74() { test_bit(H, 6); }
+void CPU::opcode_CB75() { test_bit(L, 6); }
+void CPU::opcode_CB76() { test_bit(6); }
+void CPU::opcode_CB77() { test_bit(A, 6); }
+
+void CPU::opcode_CB78() { test_bit(B, 7); }
+void CPU::opcode_CB79() { test_bit(C, 7); }
+void CPU::opcode_CB7A() { test_bit(D, 7); }
+void CPU::opcode_CB7B() { test_bit(E, 7); }
+void CPU::opcode_CB7C() { test_bit(H, 7); }
+void CPU::opcode_CB7D() { test_bit(L, 7); }
+void CPU::opcode_CB7E() { test_bit(7); }
+void CPU::opcode_CB7F() { test_bit(A, 7); }

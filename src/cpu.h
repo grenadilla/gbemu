@@ -183,6 +183,10 @@ class CPU {
         void swap_mem();
         void srl_reg(Register8& reg);
         void srl_mem();
+
+        // Bit test
+        void test_bit(Register8& reg, uint8_t bit_num);
+        void test_bit(uint8_t bit_num);
         
         // --opcodes--
         // --NOP--
@@ -281,4 +285,25 @@ class CPU {
         void opcode_CB34(); void opcode_CB35(); void opcode_CB36(); void opcode_CB37();
         void opcode_CB38(); void opcode_CB39(); void opcode_CB3A(); void opcode_CB3B();
         void opcode_CB3C(); void opcode_CB3D(); void opcode_CB3E(); void opcode_CB3F();
+
+        void opcode_CB40(); void opcode_CB41(); void opcode_CB42(); void opcode_CB43();
+        void opcode_CB44(); void opcode_CB45(); void opcode_CB46(); void opcode_CB47();
+        void opcode_CB48(); void opcode_CB49(); void opcode_CB4A(); void opcode_CB4B();
+        void opcode_CB4C(); void opcode_CB4D(); void opcode_CB4E(); void opcode_CB4F();
+
+        void opcode_CB50(); void opcode_CB51(); void opcode_CB52(); void opcode_CB53();
+        void opcode_CB54(); void opcode_CB55(); void opcode_CB56(); void opcode_CB57();
+        void opcode_CB58(); void opcode_CB59(); void opcode_CB5A(); void opcode_CB5B();
+        void opcode_CB5C(); void opcode_CB5D(); void opcode_CB5E(); void opcode_CB5F();
+
+        void opcode_CB60(); void opcode_CB61(); void opcode_CB62(); void opcode_CB63();
+        void opcode_CB64(); void opcode_CB65(); void opcode_CB66(); void opcode_CB67();
+        void opcode_CB68(); void opcode_CB69(); void opcode_CB6A(); void opcode_CB6B();
+        void opcode_CB6C(); void opcode_CB6D(); void opcode_CB6E(); void opcode_CB6F();
+
+        void opcode_CB70(); void opcode_CB71(); void opcode_CB72(); void opcode_CB73();
+        void opcode_CB74(); void opcode_CB75(); void opcode_CB76(); void opcode_CB77();
+        void opcode_CB78(); void opcode_CB79(); void opcode_CB7A(); void opcode_CB7B();
+        void opcode_CB7C(); void opcode_CB7D(); void opcode_CB7E(); void opcode_CB7F();
+
 };

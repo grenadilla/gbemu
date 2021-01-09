@@ -587,3 +587,17 @@ void CPU::srl_mem() {
     F.set_zero(val == 0);
     RAM[HL.get()] = val;
 }
+
+void CPU::test_bit(Register8& reg, uint8_t bit_num) {
+    uint8_t mask = 1 << bit_num;
+    F.set_zero(reg.get() & mask);
+    F.set_subtract(false);
+    F.set_half_carry(true);
+}
+
+void CPU::test_bit(uint8_t bit_num) {
+    uint8_t mask = 1 << bit_num;
+    F.set_zero(RAM[HL.get()] & mask);
+    F.set_subtract(false);
+    F.set_half_carry(true);
+}
