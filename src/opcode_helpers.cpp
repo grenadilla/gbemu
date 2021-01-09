@@ -588,7 +588,7 @@ void CPU::srl_mem() {
     RAM[HL.get()] = val;
 }
 
-void CPU::test_bit(Register8& reg, uint8_t bit_num) {
+void CPU::test_bit(const Register8& reg, uint8_t bit_num) {
     uint8_t mask = 1 << bit_num;
     F.set_zero(reg.get() & mask);
     F.set_subtract(false);
@@ -600,4 +600,24 @@ void CPU::test_bit(uint8_t bit_num) {
     F.set_zero(RAM[HL.get()] & mask);
     F.set_subtract(false);
     F.set_half_carry(true);
+}
+
+void CPU::res_bit(Register8& reg, uint8_t bit_num) {
+    uint8_t mask = ~(1 << bit_num);
+    reg.set(reg.get() & mask);
+}
+
+void CPU::res_bit(uint8_t bit_num) {
+    uint8_t mask = ~(1 << bit_num);
+    RAM[HL.get()] &= mask;
+}
+
+void CPU::set_bit(Register8& reg, uint8_t bit_num) {
+    uint8_t mask = 1 << bit_num;
+    reg.set(reg.get() | mask);
+}
+
+void CPU::set_bit(uint8_t bit_num) {
+    uint8_t mask = 1 << bit_num;
+    RAM[HL.get()] |= mask;
 }
