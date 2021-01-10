@@ -59,18 +59,18 @@ class CPU {
         uint16_t pop_stack();
 
         // --Loads--
-        void load_reg_to_mem(const Register16& ptr, const Register8& data);
-        void load_reg_to_mem_inc(const Register8& data);
-        void load_reg_to_mem_dec(const Register8& data);
+        void load_reg(Register8& reg, const Register8& data);
+        void load_reg(const Register16& ptr, const Register8& data);
+        void load_reg_inc(const Register8& data);
+        void load_reg_dec(const Register8& data);
 
-        void load_mem_to_reg(Register8& reg, const Register16& ptr);
-        void load_mem_to_reg_inc(Register8& reg);
-        void load_mem_to_reg_dec(Register8& reg);
+        void load_mem(Register8& reg, const Register16& ptr);
+        void load_mem_inc(Register8& reg);
+        void load_mem_dec(Register8& reg);
 
-        void load_imm_to_reg(Register8& reg);
-        void load_imm_to_mem();
-
-        void load_reg_to_reg(Register8& reg, const Register8& data);
+        void load_imm(Register8& reg);
+        void load_imm(Register16& reg);
+        void load_imm();
 
         void load_reg_to_mem_imm(const Register8& data);
         void load_mem_imm_to_reg(Register8& reg);
@@ -81,36 +81,35 @@ class CPU {
         void load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data);
         void load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr);
 
-        void load_imm_to_reg16(Register16& reg);
-        void load_sp_to_mem();
+        void load_sp();
 
         // Increments and decrements
-        void inc_reg8(Register8& reg);
-        void inc_reg16(Register16& reg);
-        void inc_mem();
-        void dec_reg8(Register8& reg);
-        void dec_reg16(Register16& reg);
-        void dec_mem();
+        void inc(Register8& reg);
+        void inc(Register16& reg);
+        void inc();
+        void dec(Register8& reg);
+        void dec(Register16& reg);
+        void dec();
 
         // Arithmetic on accumulator register
         void add(Register8& dest, uint8_t val);
-        void add_reg(const Register8& reg);
-        void add_mem();
+        void add(const Register8& reg);
+        void add();
         void add_imm();
 
         void addc(Register8& dest, uint8_t val);
-        void addc_reg(const Register8& reg);
-        void addc_mem();
+        void addc(const Register8& reg);
+        void addc();
         void addc_imm();
 
         void sub(Register8& dest, uint8_t val);
-        void sub_reg(const Register8& reg);
-        void sub_mem();
+        void sub(const Register8& reg);
+        void sub();
         void sub_imm();
 
         void subc(Register8& dest, uint8_t val);
-        void subc_reg(const Register8& reg);
-        void subc_mem();
+        void subc(const Register8& reg);
+        void subc();
         void subc_imm();
 
         void add_HL(const Register16& reg);
@@ -119,16 +118,16 @@ class CPU {
         void add_SP();
 
         // Logic on accumulator register
-        void and_reg(const Register8& reg);
-        void and_mem();
-        void xor_reg(const Register8& reg);
-        void xor_mem();
-        void or_reg(const Register8& reg);
-        void or_mem();
+        void op_and(const Register8& reg);
+        void op_and();
+        void op_xor(const Register8& reg);
+        void op_xor();
+        void op_or(const Register8& reg);
+        void op_or();
 
         // Compare with accumulator register
-        void cp_reg(const Register8& reg);
-        void cp_mem();
+        void cp(const Register8& reg);
+        void cp();
 
         // Stack opcodes
         void load_HL();
@@ -165,24 +164,24 @@ class CPU {
         void rrc_a();
         void rr_a();
 
-        void rlc_reg(Register8& reg);
-        void rl_reg(Register8& reg);
-        void rrc_reg(Register8& reg);
-        void rr_reg(Register8& reg);
+        void rlc(Register8& reg);
+        void rl(Register8& reg);
+        void rrc(Register8& reg);
+        void rr(Register8& reg);
 
-        void rlc_mem();
-        void rl_mem();
-        void rrc_mem();
-        void rr_mem();
+        void rlc();
+        void rl();
+        void rrc();
+        void rr();
 
-        void sla_reg(Register8& reg);
-        void sla_mem();
-        void sra_reg(Register8& reg);
-        void sra_mem();
-        void swap_reg(Register8& reg);
-        void swap_mem();
-        void srl_reg(Register8& reg);
-        void srl_mem();
+        void sla(Register8& reg);
+        void sla();
+        void sra(Register8& reg);
+        void sra();
+        void swap(Register8& reg);
+        void swap();
+        void srl(Register8& reg);
+        void srl();
 
         // Bit test and set
         void test_bit(const Register8& reg, uint8_t bit_num);

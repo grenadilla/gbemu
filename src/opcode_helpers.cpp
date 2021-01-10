@@ -3,48 +3,53 @@
 static const uint8_t MAX_8BIT = 255;
 static const uint8_t MAX_4BIT = 15;
 
-void CPU::load_reg_to_mem(const Register16& ptr, const Register8& data) {
+void CPU::load_reg(Register8& reg, const Register8& data) {
+    reg.set(data.get());
+}
+
+void CPU::load_reg(const Register16& ptr, const Register8& data) {
     RAM[ptr.get()] = data.get();
 }
 
-void CPU::load_reg_to_mem_inc(const Register8& data) {
+void CPU::load_reg_inc(const Register8& data) {
     uint16_t address = HL.get();
     RAM[address] = data.get();
     HL.set(address + 1);
 }
 
-void CPU::load_reg_to_mem_dec(const Register8& data) {
+void CPU::load_reg_dec(const Register8& data) {
     uint16_t address = HL.get();
     RAM[address] = data.get();
     HL.set(address - 1);
 }
 
-void CPU::load_mem_to_reg(Register8& reg, const Register16& ptr) {
+void CPU::load_mem(Register8& reg, const Register16& ptr) {
     reg.set(RAM[ptr.get()]);
 }
 
-void CPU::load_mem_to_reg_inc(Register8& reg) {
+void CPU::load_mem_inc(Register8& reg) {
     uint16_t address = HL.get();
     reg.set(RAM[address]);
     HL.set(address + 1);
 }
 
-void CPU::load_mem_to_reg_dec(Register8& reg) {
+void CPU::load_mem_dec(Register8& reg) {
     uint16_t address = HL.get();
     reg.set(RAM[address]);
     HL.set(address - 1);
 }
 
-void CPU::load_imm_to_reg(Register8& reg) {
+void CPU::load_imm(Register8& reg) {
     reg.set(retrieve_imm8());
 }
 
-void CPU::load_imm_to_mem() {
-    RAM[HL.get()] = retrieve_imm8();
+void CPU::load_imm(Register16& reg) {
+    uint16_t imm = retrieve_imm16();
+    reg.set(imm);
 }
 
-void CPU::load_reg_to_reg(Register8& reg, const Register8& data) {
-    reg.set(data.get());
+void CPU::load_imm() {
+    RAM[HL.get()] = retrieve_imm8();
 }
 
 void CPU::load_reg_to_mem_imm(const Register8& data) {
@@ -77,18 +82,13 @@ void CPU::load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr) {
     reg.set(RAM[address]);
 }
 
-void CPU::load_imm_to_reg16(Register16& reg) {
-    uint16_t imm = retrieve_imm16();
-    reg.set(imm);
-}
-
-void CPU::load_sp_to_mem() {
+void CPU::load_sp() {
     uint16_t ptr = retrieve_imm16();
     RAM[ptr] = SP & 0x00FF;
     RAM[ptr] = (SP & 0xFF00) >> 8;
 }
 
-void CPU::inc_reg8(Register8& reg) {
+void CPU::inc(Register8& reg) {
     F.set_zero(reg.get() == MAX_8BIT);
     F.set_subtract(false);
     F.set_half_carry(reg.get() == MAX_4BIT);
@@ -96,12 +96,12 @@ void CPU::inc_reg8(Register8& reg) {
     reg.set(reg.get() + 1);
 }
 
-void CPU::inc_reg16(Register16& reg) {
+void CPU::inc(Register16& reg) {
     // No flags for these
     reg.set(reg.get() + 1);
 }
 
-void CPU::inc_mem() {
+void CPU::inc() {
     uint8_t val = RAM[HL.get()];
     F.set_zero(val == MAX_8BIT);
     F.set_subtract(false);
@@ -110,7 +110,7 @@ void CPU::inc_mem() {
     RAM[HL.get()] = val + 1;
 }
 
-void CPU::dec_reg8(Register8& reg) {
+void CPU::dec(Register8& reg) {
     F.set_zero(reg.get() == 1);
     F.set_subtract(true);
     F.set_half_carry(reg.get() == MAX_4BIT + 1);
@@ -118,12 +118,12 @@ void CPU::dec_reg8(Register8& reg) {
     reg.set(reg.get() - 1);
 }
 
-void CPU::dec_reg16(Register16& reg) {
+void CPU::dec(Register16& reg) {
     // No flags for these
     reg.set(reg.get() - 1);
 }
 
-void CPU::dec_mem() {
+void CPU::dec() {
     uint8_t val = RAM[HL.get()];
     F.set_zero(val == 1);
     F.set_subtract(true);
@@ -141,11 +141,11 @@ void CPU::add(Register8& dest, uint8_t val) {
     dest.set(result);
 }
 
-void CPU::add_reg(const Register8& reg) {
+void CPU::add(const Register8& reg) {
     add(A, reg.get());
 }
 
-void CPU::add_mem() {
+void CPU::add() {
     add(A, RAM[HL.get()]);
 }
 
@@ -163,11 +163,11 @@ void CPU::addc(Register8& dest, uint8_t val) {
     dest.set(result);
 }
 
-void CPU::addc_reg(const Register8& reg) {
+void CPU::addc(const Register8& reg) {
     addc(A, reg.get());
 }
 
-void CPU::addc_mem() {
+void CPU::addc() {
     addc(A, RAM[HL.get()]);
 }
 
@@ -184,11 +184,11 @@ void CPU::sub(Register8& dest, uint8_t val) {
     dest.set(result);
 }
 
-void CPU::sub_reg(const Register8& reg) {
+void CPU::sub(const Register8& reg) {
     sub(A, reg.get());
 }
 
-void CPU::sub_mem() {
+void CPU::sub() {
     sub(A, RAM[HL.get()]);
 }
 
@@ -206,11 +206,11 @@ void CPU::subc(Register8& dest, uint8_t val) {
     dest.set(result);
 }
 
-void CPU::subc_reg(const Register8& reg) {
+void CPU::subc(const Register8& reg) {
     subc(A, reg.get());
 }
 
-void CPU::subc_mem() {
+void CPU::subc() {
     subc(A, RAM[HL.get()]);
 }
 
@@ -242,7 +242,7 @@ void CPU::add_SP() {
     SP += val;
 }
 
-void CPU::and_reg(const Register8& reg) {
+void CPU::op_and(const Register8& reg) {
     A.set(A.get() & reg.get());
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
@@ -250,7 +250,7 @@ void CPU::and_reg(const Register8& reg) {
     F.set_carry(false);
 }
 
-void CPU::and_mem() {
+void CPU::op_and() {
     A.set(A.get() & RAM[HL.get()]);
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
@@ -258,7 +258,7 @@ void CPU::and_mem() {
     F.set_carry(false);
 }
 
-void CPU::xor_reg(const Register8& reg) {
+void CPU::op_xor(const Register8& reg) {
     A.set(A.get() ^ reg.get());
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
@@ -266,7 +266,7 @@ void CPU::xor_reg(const Register8& reg) {
     F.set_carry(false);
 }
 
-void CPU::xor_mem() {
+void CPU::op_xor() {
     A.set(A.get() ^ RAM[HL.get()]);
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
@@ -274,7 +274,7 @@ void CPU::xor_mem() {
     F.set_carry(false);
 }
 
-void CPU::or_reg(const Register8& reg) {
+void CPU::op_or(const Register8& reg) {
     A.set(A.get() | reg.get());
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
@@ -282,7 +282,7 @@ void CPU::or_reg(const Register8& reg) {
     F.set_carry(false);
 }
 
-void CPU::or_mem() {
+void CPU::op_or() {
     A.set(A.get() | RAM[HL.get()]);
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
@@ -290,15 +290,15 @@ void CPU::or_mem() {
     F.set_carry(false);
 }
 
-void CPU::cp_reg(const Register8& reg) {
+void CPU::cp(const Register8& reg) {
     uint8_t before = A.get();
-    sub_reg(reg);
+    sub(reg);
     A.set(before);
 }
 
-void CPU::cp_mem() {
+void CPU::cp() {
     uint8_t before = A.get();
-    sub_mem();
+    sub();
     A.set(before);
 }
 
@@ -477,39 +477,39 @@ void CPU::rr_a() {
     F.set_zero(false);
 }
 
-void CPU::rlc_reg(Register8& reg) {
+void CPU::rlc(Register8& reg) {
     reg.set(rlc(reg.get()));
 }
 
-void CPU::rl_reg(Register8& reg) {
+void CPU::rl(Register8& reg) {
     reg.set(rl(reg.get()));
 }
 
-void CPU::rrc_reg(Register8& reg) {
+void CPU::rrc(Register8& reg) {
     reg.set(rrc(reg.get()));
 }
 
-void CPU::rr_reg(Register8& reg) {
+void CPU::rr(Register8& reg) {
     reg.set(rr(reg.get()));
 }
 
-void CPU::rlc_mem() {
+void CPU::rlc() {
     RAM[HL.get()] = rlc(RAM[HL.get()]);
 }
 
-void CPU::rl_mem() {
+void CPU::rl() {
     RAM[HL.get()] = rl(RAM[HL.get()]);
 }
 
-void CPU::rrc_mem() {
+void CPU::rrc() {
     RAM[HL.get()] = rrc(RAM[HL.get()]);
 }
 
-void CPU::rr_mem() {
+void CPU::rr() {
     RAM[HL.get()] = rr(RAM[HL.get()]);
 }
 
-void CPU::sla_reg(Register8& reg) {
+void CPU::sla(Register8& reg) {
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(reg.get() & 0x80);
@@ -517,7 +517,7 @@ void CPU::sla_reg(Register8& reg) {
     F.set_zero(reg.get() == 0);
 }
 
-void CPU::sla_mem() {
+void CPU::sla() {
     uint8_t val = RAM[HL.get()];
     F.set_subtract(false);
     F.set_half_carry(false);
@@ -527,7 +527,7 @@ void CPU::sla_mem() {
     RAM[HL.get()] = val;
 }
 
-void CPU::sra_reg(Register8& reg) {
+void CPU::sra(Register8& reg) {
     uint8_t val = static_cast<int8_t>(reg.get());
     F.set_subtract(false);
     F.set_half_carry(false);
@@ -538,7 +538,7 @@ void CPU::sra_reg(Register8& reg) {
     reg.set(static_cast<uint8_t>(val));
 }
 
-void CPU::sra_mem() {
+void CPU::sra() {
     uint8_t val = static_cast<int8_t>(RAM[HL.get()]);
     F.set_subtract(false);
     F.set_half_carry(false);
@@ -549,7 +549,7 @@ void CPU::sra_mem() {
     RAM[HL.get()] = static_cast<uint8_t>(val);
 }
 
-void CPU::swap_reg(Register8& reg) {
+void CPU::swap(Register8& reg) {
     uint8_t new_upper = (reg.get() & 0x0F) << 4;
     uint8_t new_lower = (reg.get() & 0xF0) >> 4;
     reg.set(new_upper | new_lower);
@@ -559,7 +559,7 @@ void CPU::swap_reg(Register8& reg) {
     F.set_carry(false);
 }
 
-void CPU::swap_mem() {
+void CPU::swap() {
     uint8_t val = RAM[HL.get()];
     uint8_t new_upper = (val & 0x0F) << 4;
     uint8_t new_lower = (val & 0xF0) >> 4;
@@ -570,7 +570,7 @@ void CPU::swap_mem() {
     F.set_carry(false);
 }
 
-void CPU::srl_reg(Register8& reg) {
+void CPU::srl(Register8& reg) {
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(reg.get() & 0x01);
@@ -578,7 +578,7 @@ void CPU::srl_reg(Register8& reg) {
     F.set_zero(reg.get() == 0);
 }
 
-void CPU::srl_mem() {
+void CPU::srl() {
     uint8_t val = RAM[HL.get()];
     F.set_subtract(false);
     F.set_half_carry(false);
