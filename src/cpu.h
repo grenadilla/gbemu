@@ -32,9 +32,8 @@ class CPU {
 
         typedef void (CPU::*MemFuncPtr)();
         struct Opcode {
-            // Opcode including prefix 
-            // 0x00xx if no prefix, 0xCBxx if has prefix
-            uint16_t opcode;
+            uint8_t opcode;
+            bool extended;
             // Debug string with human readable formatting
             std::string debug;
             // Number of machine cycles opcode takes
@@ -120,14 +119,18 @@ class CPU {
         // Logic on accumulator register
         void op_and(const Register8& reg);
         void op_and();
+        void op_and_imm();
         void op_xor(const Register8& reg);
         void op_xor();
+        void op_xor_imm();
         void op_or(const Register8& reg);
         void op_or();
+        void op_or_imm();
 
         // Compare with accumulator register
         void cp(const Register8& reg);
         void cp();
+        void cp_imm();
 
         // Stack opcodes
         void load_HL();
@@ -193,7 +196,8 @@ class CPU {
         
         // --opcodes--
         // --NOP--
-        void opcode_00();
+        void opcode_00(); void opcode_10(); void opcode_76(); void opcode_F3(); void opcode_FB();
+        void opcode_prefix(); void opcode_illegal();
 
         // --Loads--
         void opcode_02(); void opcode_06(); void opcode_0A(); void opcode_0E(); void opcode_12();
@@ -242,6 +246,8 @@ class CPU {
         void opcode_AA(); void opcode_AB(); void opcode_AC(); void opcode_AD(); void opcode_AE();
         void opcode_AF(); void opcode_B0(); void opcode_B1(); void opcode_B2(); void opcode_B3();
         void opcode_B4(); void opcode_B5(); void opcode_B6(); void opcode_B7(); 
+
+        void opcode_E6(); void opcode_F6(); void opcode_EE(); void opcode_FE();
 
         // --Compare--
         void opcode_B8(); void opcode_B9(); void opcode_BA(); void opcode_BB(); void opcode_BC(); 

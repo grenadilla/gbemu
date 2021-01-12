@@ -3,6 +3,8 @@
 static const uint8_t MAX_8BIT = 255;
 static const uint8_t MAX_4BIT = 15;
 
+void CPU::opcode_illegal() {}
+
 void CPU::load_reg(Register8& reg, const Register8& data) {
     reg.set(data.get());
 }
@@ -258,6 +260,14 @@ void CPU::op_and() {
     F.set_carry(false);
 }
 
+void CPU::op_and_imm() {
+    A.set(A.get() & retrieve_imm8());
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(true);
+    F.set_carry(false);
+}
+
 void CPU::op_xor(const Register8& reg) {
     A.set(A.get() ^ reg.get());
     F.set_zero(A.get() == 0);
@@ -272,6 +282,15 @@ void CPU::op_xor() {
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(false);
+}
+
+void CPU::op_xor_imm() {
+    A.set(A.get() ^ retrieve_imm8());
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+
 }
 
 void CPU::op_or(const Register8& reg) {
@@ -290,6 +309,14 @@ void CPU::op_or() {
     F.set_carry(false);
 }
 
+void CPU::op_or_imm() {
+    A.set(A.get() | retrieve_imm8());
+    F.set_zero(A.get() == 0);
+    F.set_subtract(false);
+    F.set_half_carry(false);
+    F.set_carry(false);
+}
+
 void CPU::cp(const Register8& reg) {
     uint8_t before = A.get();
     sub(reg);
@@ -299,6 +326,12 @@ void CPU::cp(const Register8& reg) {
 void CPU::cp() {
     uint8_t before = A.get();
     sub();
+    A.set(before);
+}
+
+void CPU::cp_imm() {
+    uint8_t before = A.get();
+    sub_imm();
     A.set(before);
 }
 

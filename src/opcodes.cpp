@@ -1,5 +1,15 @@
 #include "cpu.h"
 
+void CPU::opcode_00() {}
+// TODO STOP Ignored
+void CPU::opcode_10() {}
+// TODO HALT
+void CPU::opcode_76() {}
+// TODO DI
+void CPU::opcode_F3() {}
+// TODO EI
+void CPU::opcode_FB() {}
+
 // Loads
 void CPU::opcode_02() { load_reg(BC, A); }
 void CPU::opcode_06() { load_imm(B); }
@@ -201,6 +211,12 @@ void CPU::opcode_B4() { op_or(H); }
 void CPU::opcode_B5() { op_or(L); }
 void CPU::opcode_B6() { op_or(); }
 void CPU::opcode_B7() { op_or(A); }
+
+// Immediate logic
+void CPU::opcode_E6() { op_and_imm(); }
+void CPU::opcode_F6() { op_or_imm(); }
+void CPU::opcode_EE() { op_xor_imm(); }
+void CPU::opcode_FE() { sub_imm(); }
 
 // Compare
 void CPU::opcode_B8() { cp(B); }
