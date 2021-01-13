@@ -3,10 +3,11 @@
 #include <cstdint>
 #include <string>
 #include "register.h"
+#include "memory.h"
 
 class CPU {
     public:
-        CPU();
+        CPU(Memory& mem);
     private:
         Register8 A;
         Register8 B;
@@ -27,8 +28,7 @@ class CPU {
 
         bool jump_taken = false;
 
-        // TODO add memory mappings and change from simple array
-        uint8_t RAM[65536] = {0};
+        Memory& mem;
 
         typedef void (CPU::*MemFuncPtr)();
         struct Opcode {

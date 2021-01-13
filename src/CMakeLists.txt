@@ -8,5 +8,7 @@ target_sources(srcfiles PRIVATE
     opcodes.cpp
     opcode_helpers.cpp
     opcode_mappings.cpp
+    memory.h
+    memory.cpp
 )
 target_include_directories(srcfiles PUBLIC ${CMAKE_CURRENT_LIST_DIR})
