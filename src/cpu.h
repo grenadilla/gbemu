@@ -7,7 +7,7 @@
 
 class CPU {
     public:
-        CPU(Memory& mem);
+        CPU(Memory* mem);
     private:
         Register8 A;
         Register8 B;
@@ -28,7 +28,8 @@ class CPU {
 
         bool jump_taken = false;
 
-        Memory& mem;
+        // TODO make shared pointer?
+        Memory* mem;
 
         typedef void (CPU::*MemFuncPtr)();
         struct Opcode {

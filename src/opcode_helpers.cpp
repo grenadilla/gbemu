@@ -10,34 +10,34 @@ void CPU::load_reg(Register8& reg, const Register8& data) {
 }
 
 void CPU::load_reg(const Register16& ptr, const Register8& data) {
-    mem.write(ptr.get(), data.get());
+    mem->write(ptr.get(), data.get());
 }
 
 void CPU::load_reg_inc(const Register8& data) {
     uint16_t address = HL.get();
-    mem.write(address, data.get());
+    mem->write(address, data.get());
     HL.set(address + 1);
 }
 
 void CPU::load_reg_dec(const Register8& data) {
     uint16_t address = HL.get();
-    mem.write(address, data.get());
+    mem->write(address, data.get());
     HL.set(address - 1);
 }
 
 void CPU::load_mem(Register8& reg, const Register16& ptr) {
-    reg.set(mem.read(ptr.get()));
+    reg.set(mem->read(ptr.get()));
 }
 
 void CPU::load_mem_inc(Register8& reg) {
     uint16_t address = HL.get();
-    reg.set(mem.read(address));
+    reg.set(mem->read(address));
     HL.set(address + 1);
 }
 
 void CPU::load_mem_dec(Register8& reg) {
     uint16_t address = HL.get();
-    reg.set(mem.read(address));
+    reg.set(mem->read(address));
     HL.set(address - 1);
 }
 
@@ -51,43 +51,43 @@ void CPU::load_imm(Register16& reg) {
 }
 
 void CPU::load_imm() {
-    mem.write(HL.get(), retrieve_imm8());
+    mem->write(HL.get(), retrieve_imm8());
 }
 
 void CPU::load_reg_to_mem_imm(const Register8& data) {
     uint16_t ptr = retrieve_imm16();
-    mem.write(ptr, data.get());
+    mem->write(ptr, data.get());
 }
 
 void CPU::load_mem_imm_to_reg(Register8& reg) {
     uint16_t ptr = retrieve_imm16();
-    reg.set(mem.read(ptr));
+    reg.set(mem->read(ptr));
 }
 
 void CPU::load_reg_to_upper_mem_imm(const Register8& data) {
     uint16_t address = 0xff00 | retrieve_imm8();
-    mem.write(address, data.get());
+    mem->write(address, data.get());
 }
 
 void CPU::load_upper_mem_imm_to_reg(Register8& reg) {
     uint16_t address = 0xff00 | retrieve_imm8();
-    reg.set(mem.read(address));
+    reg.set(mem->read(address));
 }
 
 void CPU::load_reg_to_upper_mem_reg(Register8& upper_ptr, Register8& data) {
     uint16_t address = 0xff00 | upper_ptr.get();
-    mem.write(address, data.get());
+    mem->write(address, data.get());
 }
 
 void CPU::load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr) {
     uint16_t address = 0xff00 | upper_ptr.get();
-    reg.set(mem.read(address));
+    reg.set(mem->read(address));
 }
 
 void CPU::load_sp() {
     uint16_t ptr = retrieve_imm16();
-    mem.write(ptr, SP & 0x00FF);
-    mem.write(ptr, (SP & 0xFF00) >> 8);
+    mem->write(ptr, SP & 0x00FF);
+    mem->write(ptr, (SP & 0xFF00) >> 8);
 }
 
 void CPU::inc(Register8& reg) {
@@ -104,12 +104,12 @@ void CPU::inc(Register16& reg) {
 }
 
 void CPU::inc() {
-    uint8_t val = mem.read(HL.get());
+    uint8_t val = mem->read(HL.get());
     F.set_zero(val == MAX_8BIT);
     F.set_subtract(false);
     F.set_half_carry(val == MAX_4BIT);
 
-    mem.write(HL.get(), val + 1);
+    mem->write(HL.get(), val + 1);
 }
 
 void CPU::dec(Register8& reg) {
@@ -126,12 +126,12 @@ void CPU::dec(Register16& reg) {
 }
 
 void CPU::dec() {
-    uint8_t val = mem.read(HL.get());
+    uint8_t val = mem->read(HL.get());
     F.set_zero(val == 1);
     F.set_subtract(true);
     F.set_half_carry(val == MAX_4BIT + 1);
 
-    mem.write(HL.get(), val - 1);
+    mem->write(HL.get(), val - 1);
 }
 
 void CPU::add(Register8& dest, uint8_t val) {
@@ -148,7 +148,7 @@ void CPU::add(const Register8& reg) {
 }
 
 void CPU::add() {
-    add(A, mem.read(HL.get()));
+    add(A, mem->read(HL.get()));
 }
 
 void CPU::add_imm() {
@@ -170,7 +170,7 @@ void CPU::addc(const Register8& reg) {
 }
 
 void CPU::addc() {
-    addc(A, mem.read(HL.get()));
+    addc(A, mem->read(HL.get()));
 }
 
 void CPU::addc_imm() {
@@ -191,7 +191,7 @@ void CPU::sub(const Register8& reg) {
 }
 
 void CPU::sub() {
-    sub(A, mem.read(HL.get()));
+    sub(A, mem->read(HL.get()));
 }
 
 void CPU::sub_imm() {
@@ -213,7 +213,7 @@ void CPU::subc(const Register8& reg) {
 }
 
 void CPU::subc() {
-    subc(A, mem.read(HL.get()));
+    subc(A, mem->read(HL.get()));
 }
 
 void CPU::subc_imm() {
@@ -232,7 +232,7 @@ void CPU::add_HL(uint16_t val) {
 
 void CPU::add_SP() {
     // Uses signed two's complement
-    int8_t val = static_cast<int8_t>(mem.read(PC + 1));
+    int8_t val = static_cast<int8_t>(mem->read(PC + 1));
 
     F.set_zero(false);
     F.set_subtract(false);
@@ -253,7 +253,7 @@ void CPU::op_and(const Register8& reg) {
 }
 
 void CPU::op_and() {
-    A.set(A.get() & mem.read(HL.get()));
+    A.set(A.get() & mem->read(HL.get()));
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
     F.set_half_carry(true);
@@ -277,7 +277,7 @@ void CPU::op_xor(const Register8& reg) {
 }
 
 void CPU::op_xor() {
-    A.set(A.get() ^ mem.read(HL.get()));
+    A.set(A.get() ^ mem->read(HL.get()));
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
     F.set_half_carry(false);
@@ -302,7 +302,7 @@ void CPU::op_or(const Register8& reg) {
 }
 
 void CPU::op_or() {
-    A.set(A.get() | mem.read(HL.get()));
+    A.set(A.get() | mem->read(HL.get()));
     F.set_zero(A.get() == 0);
     F.set_subtract(false);
     F.set_half_carry(false);
@@ -337,7 +337,7 @@ void CPU::cp_imm() {
 
 void CPU::load_HL() {
     // Uses signed two's complement
-    int8_t val = static_cast<int8_t>(mem.read(PC + 1));
+    int8_t val = static_cast<int8_t>(mem->read(PC + 1));
 
     F.set_zero(false);
     F.set_subtract(false);
@@ -527,19 +527,19 @@ void CPU::rr(Register8& reg) {
 }
 
 void CPU::rlc() {
-    mem.write(HL.get(), rlc(mem.read(HL.get())));
+    mem->write(HL.get(), rlc(mem->read(HL.get())));
 }
 
 void CPU::rl() {
-    mem.write(HL.get(), rl(mem.read(HL.get())));
+    mem->write(HL.get(), rl(mem->read(HL.get())));
 }
 
 void CPU::rrc() {
-    mem.write(HL.get(), rrc(mem.read(HL.get())));
+    mem->write(HL.get(), rrc(mem->read(HL.get())));
 }
 
 void CPU::rr() {
-    mem.write(HL.get(), rr(mem.read(HL.get())));
+    mem->write(HL.get(), rr(mem->read(HL.get())));
 }
 
 void CPU::sla(Register8& reg) {
@@ -551,13 +551,13 @@ void CPU::sla(Register8& reg) {
 }
 
 void CPU::sla() {
-    uint8_t val = mem.read(HL.get());
+    uint8_t val = mem->read(HL.get());
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(val & 0x80);
     val = val << 1;
     F.set_zero(val == 0);
-    mem.write(HL.get(), val);
+    mem->write(HL.get(), val);
 }
 
 void CPU::sra(Register8& reg) {
@@ -572,14 +572,14 @@ void CPU::sra(Register8& reg) {
 }
 
 void CPU::sra() {
-    uint8_t val = static_cast<int8_t>(mem.read(HL.get()));
+    uint8_t val = static_cast<int8_t>(mem->read(HL.get()));
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(val & 0x01);
     // Ensure arithmetic shift
     val = val < 0 ? ~(~val >> 1) : val >> 1;
     F.set_zero(val == 0);
-    mem.write(HL.get(), static_cast<uint8_t>(val));
+    mem->write(HL.get(), static_cast<uint8_t>(val));
 }
 
 void CPU::swap(Register8& reg) {
@@ -593,10 +593,10 @@ void CPU::swap(Register8& reg) {
 }
 
 void CPU::swap() {
-    uint8_t val = mem.read(HL.get());
+    uint8_t val = mem->read(HL.get());
     uint8_t new_upper = (val & 0x0F) << 4;
     uint8_t new_lower = (val & 0xF0) >> 4;
-    mem.write(HL.get(), new_upper | new_lower);
+    mem->write(HL.get(), new_upper | new_lower);
     F.set_zero(val == 0);
     F.set_subtract(false);
     F.set_half_carry(false);
@@ -612,13 +612,13 @@ void CPU::srl(Register8& reg) {
 }
 
 void CPU::srl() {
-    uint8_t val = mem.read(HL.get());
+    uint8_t val = mem->read(HL.get());
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(val & 0x01);
     val = val >> 1;
     F.set_zero(val == 0);
-    mem.write(HL.get(), val);
+    mem->write(HL.get(), val);
 }
 
 void CPU::test_bit(const Register8& reg, uint8_t bit_num) {
@@ -630,7 +630,7 @@ void CPU::test_bit(const Register8& reg, uint8_t bit_num) {
 
 void CPU::test_bit(uint8_t bit_num) {
     uint8_t mask = 1 << bit_num;
-    F.set_zero(mem.read(HL.get()) & mask);
+    F.set_zero(mem->read(HL.get()) & mask);
     F.set_subtract(false);
     F.set_half_carry(true);
 }
@@ -642,7 +642,7 @@ void CPU::res_bit(Register8& reg, uint8_t bit_num) {
 
 void CPU::res_bit(uint8_t bit_num) {
     uint8_t mask = ~(1 << bit_num);
-    mem.write(HL.get(), mem.read(HL.get()) & mask);
+    mem->write(HL.get(), mem->read(HL.get()) & mask);
 }
 
 void CPU::set_bit(Register8& reg, uint8_t bit_num) {
@@ -652,5 +652,5 @@ void CPU::set_bit(Register8& reg, uint8_t bit_num) {
 
 void CPU::set_bit(uint8_t bit_num) {
     uint8_t mask = 1 << bit_num;
-    mem.write(HL.get(), mem.read(HL.get()) | mask);
+    mem->write(HL.get(), mem->read(HL.get()) | mask);
 }
