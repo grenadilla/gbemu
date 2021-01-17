@@ -8,6 +8,7 @@
 class CPU {
     public:
         CPU(Memory* mem);
+        void main_loop();
     private:
         Register8 A;
         Register8 B;
@@ -51,6 +52,10 @@ class CPU {
         //MemFuncPtr opcode_table[1] = {&CPU::set_a};
         // Calling a function in the table
         //(this->*(opcode_table[0]))();
+       
+        void tick();
+        void run_opcode();
+        void run_opcode_prefix();
         
         // --opcode Helper Functions--
         uint8_t retrieve_imm8();
@@ -198,7 +203,7 @@ class CPU {
         // --opcodes--
         // --NOP--
         void opcode_00(); void opcode_10(); void opcode_76(); void opcode_F3(); void opcode_FB();
-        void opcode_prefix(); void opcode_illegal();
+        void opcode_illegal();
 
         // --Loads--
         void opcode_02(); void opcode_06(); void opcode_0A(); void opcode_0E(); void opcode_12();

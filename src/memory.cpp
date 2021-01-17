@@ -17,7 +17,7 @@ Memory::Memory(const std::string rom_path) {
         std::istreambuf_iterator<char>());
 }
 
-uint8_t Memory::read(uint8_t address) const {
+uint8_t Memory::read(uint16_t address) const {
     /* --Memory Map--
     0000 	3FFF 	16KB ROM bank 00 	From cartridge, usually a fixed bank
     4000 	7FFF 	16KB ROM Bank 01~NN 	From cartridge, switchable bank via MBC (if any)
@@ -74,7 +74,7 @@ uint8_t Memory::read(uint8_t address) const {
     }
 }
 
-void Memory::write(uint8_t address, uint8_t value) {
+void Memory::write(uint16_t address, uint8_t value) {
     if (address <= 0x3FFF) {
         // Cartridge fixed bank
         std::cerr << "Invalid write into fixed bank ROM of " << hexify << value
@@ -109,6 +109,10 @@ void Memory::write(uint8_t address, uint8_t value) {
             << " at memory address " << hexify << address << std::endl;
     } else if (address <= 0xFF7F) {
         // TODO IO registers
+        if (address == 0xFF01) {
+            // Serial port
+            std::cerr << (char) value;
+        }
     } else if (address <= 0xFFFE) {
         // High RAM
         hram[address - 0xFF80] = value;
@@ -119,11 +123,11 @@ void Memory::write(uint8_t address, uint8_t value) {
 
 MBC0::MBC0(const std::string rom_path) : Memory(rom_path) {}
 
-uint8_t MBC0::rom_read(uint8_t address) const {
+uint8_t MBC0::rom_read(uint16_t address) const {
     return rom_data[address];
 }
 
-void MBC0::rom_write(uint8_t address, uint8_t value) {
+void MBC0::rom_write(uint16_t address, uint8_t value) {
     std::cerr << "Attempted write into ROM of " << hexify << value 
         << " at ROM address " << hexify << address << " (memory address "
         << hexify << address + 0x4000 << ")" << std::endl;

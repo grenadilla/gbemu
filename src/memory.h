@@ -7,14 +7,14 @@ constexpr int KILOBYTE = 1024;
 class Memory {
     public:
         Memory(const std::string rom_path);
-        uint8_t read(uint8_t address) const;
-        void write(uint8_t address, uint8_t value);
+        uint8_t read(uint16_t address) const;
+        void write(uint16_t address, uint8_t value);
     protected:
         // The address used for rom_read and rom_write
         // are relative to the ROM, not the memory map
         // In practicality this is ptr - 0x4000
-        virtual uint8_t rom_read(uint8_t address) const = 0;
-        virtual void rom_write(uint8_t address, uint8_t value) = 0;
+        virtual uint8_t rom_read(uint16_t address) const = 0;
+        virtual void rom_write(uint16_t address, uint8_t value) = 0;
 
         std::vector<uint8_t> rom_data;
         uint8_t vram[8 * KILOBYTE];
@@ -29,6 +29,6 @@ class Memory {
 class MBC0 : public Memory {
     public:
         MBC0(const std::string rom_path);
-        uint8_t rom_read(const uint8_t address) const;
-        void rom_write(const uint8_t address, uint8_t value);
+        uint8_t rom_read(const uint16_t address) const;
+        void rom_write(const uint16_t address, uint8_t value);
 };

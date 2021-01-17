@@ -18,6 +18,7 @@ void CPU::opcode_0E() { load_imm(C); }
 void CPU::opcode_12() { load_reg(DE, A); }
 void CPU::opcode_16() { load_imm(D); }
 void CPU::opcode_1A() { load_mem(A, DE); }
+void CPU::opcode_1E() { load_imm(E); }
 void CPU::opcode_22() { load_reg_inc(A); }
 void CPU::opcode_26() { load_imm(H); }
 void CPU::opcode_2A() { load_mem_inc(A); }
@@ -253,7 +254,7 @@ void CPU::opcode_C8() { ret(F.get_zero()); }
 void CPU::opcode_D8() { ret(F.get_carry()); }
 void CPU::opcode_C9() { ret(); }
 // TODO implement
-//void CPU::opcode_D9() {}
+void CPU::opcode_D9() {}
 
 void CPU::opcode_C2() { jp(!F.get_zero()); }
 void CPU::opcode_D2() { jp(!F.get_carry()); }
