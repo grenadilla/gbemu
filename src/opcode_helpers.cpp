@@ -367,9 +367,10 @@ void CPU::jump(uint16_t pos) {
 }
 
 void CPU::call(bool condition) {
+    uint16_t addr = retrieve_imm16();
     if (condition) {
         jump_taken = true;
-        PC = retrieve_imm16();
+        PC = addr;
         push_stack(PC + 1);
     }
 }
@@ -382,15 +383,16 @@ void CPU::ret(bool condition) {
 }
 
 void CPU::jr(bool condition) {
+    int8_t offset = static_cast<int8_t>(retrieve_imm8());
     if (condition) {
-        int8_t val = static_cast<int8_t>(retrieve_imm8());
-        jump(PC + val);
+        jump(PC + offset);
     }
 }
 
 void CPU::jp(bool condition) {
+    uint16_t addr = retrieve_imm16();
     if (condition) {
-        jump(retrieve_imm16());
+        jump(addr);
     }
 }
 
