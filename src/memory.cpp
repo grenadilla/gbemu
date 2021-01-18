@@ -36,7 +36,7 @@ uint8_t Memory::read(uint16_t address) const {
         // Cartridge fixed bank
         return rom_data[address];
     } else if (address <= 0x7FFF) {
-        return rom_read(address - 0x4000);
+        return rom_read(address);
     } else if (address <= 0x9FFF) {
         // VRAM
         return vram[address - 0x8000];
@@ -80,7 +80,7 @@ void Memory::write(uint16_t address, uint8_t value) {
         std::cerr << "Invalid write into fixed bank ROM of " << hexify << value
             << " at memory address " << hexify << address << std::endl;
     } else if (address <= 0x7FFF) {
-        rom_write(address - 0x4000, value);
+        rom_write(address, value);
     } else if (address <= 0x9FFF) {
         // VRAM
         vram[address - 0x8000] = value;
@@ -129,6 +129,5 @@ uint8_t MBC0::rom_read(uint16_t address) const {
 
 void MBC0::rom_write(uint16_t address, uint8_t value) {
     std::cerr << "Attempted write into ROM of " << hexify << value 
-        << " at ROM address " << hexify << address << " (memory address "
-        << hexify << address + 0x4000 << ")" << std::endl;
+        << " at address " << hexify << address << std::endl;
 }

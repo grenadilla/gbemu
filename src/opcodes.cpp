@@ -217,7 +217,7 @@ void CPU::opcode_B7() { op_or(A); }
 void CPU::opcode_E6() { op_and_imm(); }
 void CPU::opcode_F6() { op_or_imm(); }
 void CPU::opcode_EE() { op_xor_imm(); }
-void CPU::opcode_FE() { sub_imm(); }
+void CPU::opcode_FE() { cp_imm(); }
 
 // Compare
 void CPU::opcode_B8() { cp(B); }

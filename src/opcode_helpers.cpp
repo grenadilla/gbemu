@@ -370,8 +370,8 @@ void CPU::call(bool condition) {
     uint16_t addr = retrieve_imm16();
     if (condition) {
         jump_taken = true;
+        push_stack(PC);
         PC = addr;
-        push_stack(PC + 1);
     }
 }
 
