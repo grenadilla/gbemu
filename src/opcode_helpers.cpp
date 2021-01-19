@@ -87,7 +87,7 @@ void CPU::load_upper_mem_reg_to_reg(Register8& reg, Register8& upper_ptr) {
 void CPU::load_sp() {
     uint16_t ptr = retrieve_imm16();
     mem->write(ptr, SP & 0x00FF);
-    mem->write(ptr, (SP & 0xFF00) >> 8);
+    mem->write(ptr + 1, (SP & 0xFF00) >> 8);
 }
 
 void CPU::inc(Register8& reg) {

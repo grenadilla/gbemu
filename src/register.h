@@ -5,7 +5,7 @@
 class Register8 {
     public:
         uint8_t get() const;
-        void set(uint8_t val);
+        virtual void set(uint8_t val);
     protected:
         uint8_t value = 0;
 };

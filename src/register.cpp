@@ -36,7 +36,7 @@ void Register16::set(uint8_t high_val, uint8_t low_val) {
 }
 
 void RegisterF::set(uint8_t val) {
-    set(val & 0xf0);
+    value = val & 0xf0;
 }
 
 bool RegisterF::get_zero() const {
@@ -67,7 +67,7 @@ void RegisterF::set_subtract(bool val) {
 
 void RegisterF::set_half_carry(bool val) {
     value &= 0xDF;
-    value |- (val << 5);
+    value |= (val << 5);
 }
 
 void RegisterF::set_carry(bool val) {

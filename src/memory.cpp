@@ -51,10 +51,10 @@ uint8_t Memory::read(uint16_t address) const {
         return wram1[address - 0xD000];
     } else if (address <= 0xFDFF) {
         // Echo RAM for WRAM, usually not used
-        if (address <= 0xCFFF) {
-            return wram0[address - 0xC000];
+        if (address <= 0xEFFF) {
+            return wram0[address - 0xE000];
         } else {
-            return wram1[address - 0xD000];
+            return wram1[address - 0xF000];
         }
     } else if (address <= 0xFE9F) {
         // Sprite attribute table (OAM)
@@ -95,10 +95,10 @@ void Memory::write(uint16_t address, uint8_t value) {
         wram1[address - 0xD000] = value;
     } else if (address <= 0xFDFF) {
         // Echo RAM for WRAM, usually not used
-        if (address <= 0xCFFF) {
-            wram0[address - 0xC000] = value;
+        if (address <= 0xEFFF) {
+            wram0[address - 0xE000] = value;
         } else {
-            wram1[address - 0xD000] = value;
+            wram1[address - 0xF000] = value;
         }
     } else if (address <= 0xFE9F) {
         // Sprite attribute table (OAM)
