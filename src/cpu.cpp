@@ -1,4 +1,8 @@
 #include "cpu.h"
+#include "utils.h"
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
 CPU::CPU(Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E), 
     HL(&H, &L), PC(0x100), SP(0xFFFE), mem(mem) {
@@ -8,6 +12,11 @@ CPU::CPU(Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E),
     BC.set(0x0013);
     DE.set(0x00D8);
     HL.set(0x014D);
+}
+
+std::ostream& operator<<(std::ostream& out, const CPU::Opcode& op_data) {
+    //return out << utils::hexify << op_data.opcode << ' ' << op_data.debug;
+    return out << utils::hexify8 << +op_data.opcode << ' ' << op_data.debug;
 }
 
 uint8_t CPU::retrieve_imm8() {
@@ -62,8 +71,44 @@ void CPU::tick() {
     run_opcode();
 }
 
-void CPU::main_loop() {
+void CPU::main_loop(bool debug) {
+    std::string user_input;
+    char action;
+    unsigned num;
+
     while (true) {
-        tick();
+        if (!debug) {
+            tick();
+            continue;
+        }
+
+        uint8_t opcode = mem->read(PC);
+        std::cout << opcode_table[opcode] << std::endl;
+        std::cout << "> ";
+        std::getline(std::cin, user_input);
+        std::istringstream iss(user_input);
+        iss >> action >> num;
+
+        if (action == 'c') {
+            num = num == 0 ? 1 : num;
+            for (unsigned i = 0; i < num; i++) {
+                tick();
+            }
+        } else if (action == 'b') {
+            while (opcode != mem->read(PC)) {
+                tick();
+            }
+        } else if (action == 'd') {
+            std::cout << opcode_table[opcode] << '\n'
+                << "PC: " << utils::hexify16 << PC << '\n'
+                << "SP: " << utils::hexify16 << SP << '\n'
+                << "Registers: \n"
+                << "AF: " << AF << '\n'
+                << "BC: " << BC << '\n'
+                << "DE: " << DE << '\n'
+                << "HL: " << HL << '\n' << std::endl;
+        } else if (action == 'q') {
+            break;
+        }
     }
 }

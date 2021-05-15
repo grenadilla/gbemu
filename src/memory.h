@@ -9,6 +9,7 @@ class Memory {
         Memory(const std::string rom_path);
         uint8_t read(uint16_t address) const;
         void write(uint16_t address, uint8_t value);
+        bool is_loaded() const;
     protected:
         // The address used for rom_read and rom_write
         // are relative to the ROM, not the memory map

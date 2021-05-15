@@ -1,20 +1,19 @@
 #include "memory.h"
+#include "utils.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
-// TODO move to utils
-// Helper function to display hex addresses
-std::ostream& hexify(std::ostream& out, uint8_t val) {
-    out << "0x" << std::setfill('0') << std::setw(4) 
-        << std::right << std::hex << val;
-    return out;
-}
-
 Memory::Memory(const std::string rom_path) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
-    rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
-        std::istreambuf_iterator<char>());
+    if (file.is_open()) {
+        rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
+            std::istreambuf_iterator<char>());
+    }
+}
+
+bool Memory::is_loaded() const {
+    return !rom_data.empty();
 }
 
 uint8_t Memory::read(uint16_t address) const {
@@ -61,7 +60,7 @@ uint8_t Memory::read(uint16_t address) const {
         return sprite_attr_table[address - 0xFE00];
     } else if (address <= 0xFEFF) {
         // Not usable
-        std::cerr << "Attempted access to unusable memory at " << hexify << address << std::endl;
+        std::cerr << "Attempted access to unusable memory at " << utils::hexify16 << address << std::endl;
         return 0;
     } else if (address <= 0xFF7F) {
         // TODO IO registers
@@ -77,8 +76,8 @@ uint8_t Memory::read(uint16_t address) const {
 void Memory::write(uint16_t address, uint8_t value) {
     if (address <= 0x3FFF) {
         // Cartridge fixed bank
-        std::cerr << "Invalid write into fixed bank ROM of " << hexify << value
-            << " at memory address " << hexify << address << std::endl;
+        std::cerr << "Invalid write into fixed bank ROM of " << utils::hexify8 << +value
+            << " at memory address " << utils::hexify16 << address << std::endl;
     } else if (address <= 0x7FFF) {
         rom_write(address, value);
     } else if (address <= 0x9FFF) {
@@ -105,8 +104,8 @@ void Memory::write(uint16_t address, uint8_t value) {
         sprite_attr_table[address - 0xFE00] = value;
     } else if (address <= 0xFEFF) {
         // Not usable
-        std::cerr << "Attempted write to unusable memory of " << hexify << value
-            << " at memory address " << hexify << address << std::endl;
+        std::cerr << "Attempted write to unusable memory of " << utils::hexify8 << +value
+            << " at memory address " << utils::hexify16 << address << std::endl;
     } else if (address <= 0xFF7F) {
         // TODO IO registers
         if (address == 0xFF01) {
@@ -128,6 +127,6 @@ uint8_t MBC0::rom_read(uint16_t address) const {
 }
 
 void MBC0::rom_write(uint16_t address, uint8_t value) {
-    std::cerr << "Attempted write into ROM of " << hexify << value 
-        << " at address " << hexify << address << std::endl;
+    std::cerr << "Attempted write into ROM of " << utils::hexify8 << +value 
+        << " at address " << utils::hexify16 << address << std::endl;
 }

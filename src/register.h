@@ -1,11 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 
 class Register8 {
     public:
         uint8_t get() const;
         virtual void set(uint8_t val);
+        friend std::ostream& operator<<(std::ostream& out, const Register8& reg);
     protected:
         uint8_t value = 0;
 };
@@ -18,6 +20,7 @@ class Register16 {
         uint8_t get_low() const;
         void set(uint16_t val);
         void set(uint8_t high_val, uint8_t low_val);
+        friend std::ostream& operator<<(std::ostream& out, const Register16& reg);
     private:
         Register8* high;
         Register8* low;

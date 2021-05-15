@@ -1,6 +1,8 @@
 add_library(srcfiles "")
 # CMAKE_CURRENT_SOURCE_DIR
 target_sources(srcfiles PRIVATE 
+    utils.h
+    utils.cpp
     cpu.h
     cpu.cpp
     register.cpp

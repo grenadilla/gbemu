@@ -8,7 +8,7 @@
 class CPU {
     public:
         CPU(Memory* mem);
-        void main_loop();
+        void main_loop(bool debug);
     private:
         Register8 A;
         Register8 B;
@@ -46,6 +46,8 @@ class CPU {
             // Pointer to opcode function
             MemFuncPtr func;
         };
+
+        friend std::ostream& operator<<(std::ostream& out, const Opcode& op);
 
         static Opcode opcode_table[256];
         static Opcode opcode_prefixed_table[256];

@@ -1,4 +1,14 @@
 #include "register.h"
+#include "utils.h"
+#include <iomanip>
+
+std::ostream& operator<<(std::ostream& out, const Register8& reg) {
+    return out << utils::hexify8 << +reg.value;
+}
+
+std::ostream& operator<<(std::ostream& out, const Register16& reg) {
+    return out << utils::hexify16 << +reg.get();
+}
 
 uint8_t Register8::get() const {
     return value;
