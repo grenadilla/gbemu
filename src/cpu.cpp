@@ -74,7 +74,6 @@ void CPU::tick() {
 void CPU::main_loop(bool debug) {
     std::string user_input;
     char action;
-    unsigned num;
 
     while (true) {
         if (!debug) {
@@ -83,19 +82,39 @@ void CPU::main_loop(bool debug) {
         }
 
         uint8_t opcode = mem->read(PC);
-        std::cout << opcode_table[opcode] << std::endl;
+        std::cout << utils::hexify16 << PC << ' ' << opcode_table[opcode] << std::endl;
         std::cout << "> ";
         std::getline(std::cin, user_input);
         std::istringstream iss(user_input);
-        iss >> action >> num;
-
-        if (action == 'c') {
+        iss >> action;
+        
+        if (action == 'h') {
+            std::cout << "Command help:\n"
+                << "c [num]         - Steps through [num] opcodes\n"
+                << "o [hex opcode]  - Runs until the specified opcode is reached\n"
+                << "b [PC value]    - Runs until the program counter reaches the specified value \n"
+                << "d               - Debug information\n"
+                << "m [hex address] - Reads 16 bits from the specified address\n"
+                << "q               - Quit\n"
+                << std::endl;
+        } else if (action == 'c') {
+            unsigned num;
+            iss >> num;
             num = num == 0 ? 1 : num;
             for (unsigned i = 0; i < num; i++) {
                 tick();
             }
+        } else if (action == 'o') {
+            unsigned num;
+            iss >> std::hex >> num;
+            uint8_t break_op = num & 0xff;
+            while (break_op != mem->read(PC)) {
+                tick();
+            }
         } else if (action == 'b') {
-            while (opcode != mem->read(PC)) {
+            uint16_t pc_break;
+            iss >> std::hex >> pc_break;
+            while (pc_break != PC) {
                 tick();
             }
         } else if (action == 'd') {
@@ -107,6 +126,11 @@ void CPU::main_loop(bool debug) {
                 << "BC: " << BC << '\n'
                 << "DE: " << DE << '\n'
                 << "HL: " << HL << '\n' << std::endl;
+        } else if (action == 'm') {
+            uint16_t address;
+            iss >> std::hex >> address;
+            uint16_t data = mem->read(address);
+            std::cout << utils::hexify16 << data << " - " << std::dec << data << '\n' << std::endl;
         } else if (action == 'q') {
             break;
         }
