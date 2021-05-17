@@ -105,12 +105,10 @@ void CPU::inc(Register16& reg) {
 }
 
 void CPU::inc() {
-    uint8_t val = mem->read(HL.get());
-    F.set_zero(val == MAX_8BIT);
+    mem->write(HL.get(), mem->read(HL.get()) + 1);
+    F.set_zero(mem->read(HL.get()) == 0);
     F.set_subtract(false);
-    F.set_half_carry(val == MAX_4BIT);
-
-    mem->write(HL.get(), val + 1);
+    F.set_half_carry(!(mem->read(HL.get()) & 0x0f));
 }
 
 void CPU::dec(Register8& reg) {
@@ -127,12 +125,11 @@ void CPU::dec(Register16& reg) {
 }
 
 void CPU::dec() {
-    uint8_t val = mem->read(HL.get());
-    F.set_zero(val == 1);
+    mem->write(HL.get(), mem->read(HL.get()) - 1);
+    F.set_zero(mem->read(HL.get()) == 0);
     F.set_subtract(true);
-    F.set_half_carry(val == MAX_4BIT + 1);
+    F.set_half_carry((mem->read(HL.get()) & 0x0f) == 0x0f);
 
-    mem->write(HL.get(), val - 1);
 }
 
 void CPU::add(Register8& dest, uint8_t val) {
@@ -655,14 +652,14 @@ void CPU::srl() {
 
 void CPU::test_bit(const Register8& reg, uint8_t bit_num) {
     uint8_t mask = 1 << bit_num;
-    F.set_zero(reg.get() & mask);
+    F.set_zero(!(reg.get() & mask));
     F.set_subtract(false);
     F.set_half_carry(true);
 }
 
 void CPU::test_bit(uint8_t bit_num) {
     uint8_t mask = 1 << bit_num;
-    F.set_zero(mem->read(HL.get()) & mask);
+    F.set_zero(!(mem->read(HL.get()) & mask));
     F.set_subtract(false);
     F.set_half_carry(true);
 }

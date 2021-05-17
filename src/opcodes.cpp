@@ -506,14 +506,14 @@ void CPU::opcode_CBBD() { res_bit(L, 7); }
 void CPU::opcode_CBBE() { res_bit(7); }
 void CPU::opcode_CBBF() { res_bit(A, 7); }
 
-void CPU::opcode_CBC0() { res_bit(B, 0); }
-void CPU::opcode_CBC1() { res_bit(C, 0); }
-void CPU::opcode_CBC2() { res_bit(D, 0); }
-void CPU::opcode_CBC3() { res_bit(E, 0); }
-void CPU::opcode_CBC4() { res_bit(H, 0); }
-void CPU::opcode_CBC5() { res_bit(L, 0); }
-void CPU::opcode_CBC6() { res_bit(0); }
-void CPU::opcode_CBC7() { res_bit(A, 0); }
+void CPU::opcode_CBC0() { set_bit(B, 0); }
+void CPU::opcode_CBC1() { set_bit(C, 0); }
+void CPU::opcode_CBC2() { set_bit(D, 0); }
+void CPU::opcode_CBC3() { set_bit(E, 0); }
+void CPU::opcode_CBC4() { set_bit(H, 0); }
+void CPU::opcode_CBC5() { set_bit(L, 0); }
+void CPU::opcode_CBC6() { set_bit(0); }
+void CPU::opcode_CBC7() { set_bit(A, 0); }
 
 void CPU::opcode_CBC8() { set_bit(B, 1); }
 void CPU::opcode_CBC9() { set_bit(C, 1); }
