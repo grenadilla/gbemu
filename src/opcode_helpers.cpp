@@ -92,11 +92,11 @@ void CPU::load_sp() {
 }
 
 void CPU::inc(Register8& reg) {
-    F.set_zero(reg.get() == MAX_8BIT);
-    F.set_subtract(false);
-    F.set_half_carry(reg.get() == MAX_4BIT);
-
     reg.set(reg.get() + 1);
+    F.set_zero(reg.get() == 0);
+    F.set_subtract(false);
+    // Ex: 0110 1111 becomes 0111 0000
+    F.set_half_carry(!(reg.get() & 0x0f));
 }
 
 void CPU::inc(Register16& reg) {
@@ -114,11 +114,11 @@ void CPU::inc() {
 }
 
 void CPU::dec(Register8& reg) {
-    F.set_zero(reg.get() == 1);
-    F.set_subtract(true);
-    F.set_half_carry(reg.get() == MAX_4BIT + 1);
-
     reg.set(reg.get() - 1);
+    F.set_zero(reg.get() == 0);
+    F.set_subtract(true);
+    // Ex 0111 0000 becomes 0110 1111
+    F.set_half_carry((reg.get() & 0x0f) == 0x0f);
 }
 
 void CPU::dec(Register16& reg) {
@@ -468,7 +468,7 @@ void CPU::cpl() {
 void CPU::ccf() {
     F.set_subtract(false);
     F.set_half_carry(false);
-    F.set_carry(!F.get_half_carry());
+    F.set_carry(!F.get_carry());
 }
 
 uint8_t CPU::rlc(uint8_t val) {
@@ -582,25 +582,36 @@ void CPU::sla() {
 }
 
 void CPU::sra(Register8& reg) {
-    uint8_t val = static_cast<int8_t>(reg.get());
     F.set_subtract(false);
     F.set_half_carry(false);
-    F.set_carry(val & 0x01);
-    // Ensure arithmetic shift
-    val = val < 0 ? ~(~val >> 1) : val >> 1;
-    F.set_zero(val == 0);
-    reg.set(static_cast<uint8_t>(val));
+    F.set_carry(reg.get() & 0x01);
+
+    uint8_t result = reg.get() >> 1;
+    if (reg.get() & 0x80) {
+        result |= 0x80;
+    } else {
+        result &= 0x7f;
+    }
+
+    F.set_zero(result == 0);
+    reg.set(result);
 }
 
 void CPU::sra() {
-    uint8_t val = static_cast<int8_t>(mem->read(HL.get()));
+    uint8_t val = mem->read(HL.get());
     F.set_subtract(false);
     F.set_half_carry(false);
     F.set_carry(val & 0x01);
-    // Ensure arithmetic shift
-    val = val < 0 ? ~(~val >> 1) : val >> 1;
-    F.set_zero(val == 0);
-    mem->write(HL.get(), static_cast<uint8_t>(val));
+
+    uint8_t result = val >> 1;
+    if (val & 0x80) {
+        result |= 0x80;
+    } else {
+        result &= 0x7f;
+    }
+
+    F.set_zero(result == 0);
+    mem->write(HL.get(), result);
 }
 
 void CPU::swap(Register8& reg) {
