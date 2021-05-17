@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "utils.h"
 
 static const uint8_t MAX_8BIT = 255;
 static const uint8_t MAX_4BIT = 15;
@@ -157,11 +158,11 @@ void CPU::add_imm() {
 
 void CPU::addc(Register8& dest, uint8_t val) {
     bool carry = F.get_carry();
-    F.set_subtract(false);
+     F.set_subtract(false);
     F.set_half_carry(((dest.get() & 0x0F) + (val & 0x0F) + carry) & 0x10);
-    uint8_t result = dest.get() + val + carry;
-    unsigned full = dest.get() + val + carry;
-    F.set_carry(full > 0xff);
+    unsigned full_result = dest.get() + val + carry;
+    F.set_carry(full_result > 0xff);
+    uint8_t result = static_cast<uint8_t>(full_result);
     F.set_zero(result == 0);
     dest.set(result);
 }
@@ -222,13 +223,28 @@ void CPU::subc_imm() {
 }
 
 void CPU::add_HL(const Register16& reg) {
-    add(L, reg.get_low());
-    add(H, reg.get_high());
+    unsigned full_result = HL.get() + reg.get();
+
+    // Note - zero flag is not touched here!
+    F.set_subtract(false);
+    F.set_half_carry((HL.get() & 0xfff) + (reg.get() & 0xfff) > 0xfff);
+    F.set_carry((full_result & 0x10000) != 0);
+
+    HL.set(static_cast<uint16_t>(full_result));
 }
 
 void CPU::add_HL(uint16_t val) {
-    add(L, val & 0x00FF);
-    add(H, (val & 0xFF00) >> 8);
+    //add(L, val & 0x00FF);
+    //addc(H, (val & 0xFF00) >> 8);
+
+    unsigned full_result = HL.get() + val;
+
+    // Note - zero flag is not touched here!
+    F.set_subtract(false);
+    F.set_half_carry((HL.get() & 0xfff) + (val & 0xfff) > 0xfff);
+    F.set_carry((full_result & 0x10000) != 0);
+
+    HL.set(static_cast<uint16_t>(full_result));
 }
 
 void CPU::add_SP() {
