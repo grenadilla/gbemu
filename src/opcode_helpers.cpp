@@ -138,7 +138,7 @@ void CPU::add(Register8& dest, uint8_t val) {
     F.set_subtract(false);
     F.set_half_carry(((dest.get() & 0x0F) + (val & 0x0F)) & 0x10);
     uint8_t result = dest.get() + val;
-    F.set_carry(result < dest.get() && result < val);
+    F.set_carry(result < dest.get() || result < val);
     F.set_zero(result == 0);
     dest.set(result);
 }
@@ -160,7 +160,8 @@ void CPU::addc(Register8& dest, uint8_t val) {
     F.set_subtract(false);
     F.set_half_carry(((dest.get() & 0x0F) + (val & 0x0F) + carry) & 0x10);
     uint8_t result = dest.get() + val + carry;
-    F.set_carry(result < dest.get() && result < val);
+    unsigned full = dest.get() + val + carry;
+    F.set_carry(full > 0xff);
     F.set_zero(result == 0);
     dest.set(result);
 }
@@ -239,6 +240,8 @@ void CPU::add_SP() {
     uint8_t lower_sp = SP & 0xFF;
     F.set_half_carry(((lower_sp & 0x0F) + (val & 0x0F)) & 0x10);
     uint8_t lower_result = lower_sp + val;
+
+    // TODO figure out if I'm doing overflow here correctly
     F.set_carry(lower_result < lower_sp && lower_result < val);
 
     SP += val;
