@@ -423,30 +423,24 @@ void CPU::rst(uint8_t val) {
 }
 
 void CPU::daa() {
+    // https://ehaskins.com/2018-01-30%20Z80%20DAA/
     // From https://forums.nesdev.com/viewtopic.php?t=15944
-    if (!F.get_subtract()) {  
-        // after an addition, adjust if (half-)carry occurred or if result is out of bounds
-        if (F.get_carry() || A.get() > 0x99) { 
-            A.set(A.get() + 0x60);
-            F.set_carry(true);
-        }
-        if (F.get_half_carry() || (A.get() & 0x0F) > 0x09) {
-            A.set(A.get() + 0x06);
-            F.set_carry(false);
-        }
-    } else {  
-        // after a subtraction, only adjust if (half-)carry occurred
-        if (F.get_carry()) {
-            A.set(A.get() - 0x60);
-            F.set_carry(false);
-        }
-        if (F.get_half_carry()) {
-            A.set(A.get() - 0x06);
-            F.set_carry(false);
-        }
+    uint8_t correction = 0;
+
+    if (F.get_half_carry() || (!F.get_subtract() && (A.get() & 0x0f) > 9)) {
+        correction |= 0x06;
     }
-    // these flags are always updated
-    F.set_zero(A.get() == 0);
+
+    if (F.get_carry() || (!F.get_subtract() && A.get() > 0x99)) {
+        correction |= 0x60;
+        F.set_carry(true);
+    }
+
+    uint8_t result = A.get() + (F.get_subtract() ? -1 * correction : correction);
+    result &= 0xff;
+
+    A.set(result);
+    F.set_zero(result == 0);
     F.set_half_carry(false);
 }
 
