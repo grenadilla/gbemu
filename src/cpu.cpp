@@ -15,8 +15,7 @@ CPU::CPU(Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E),
 }
 
 std::ostream& operator<<(std::ostream& out, const CPU::Opcode& op_data) {
-    //return out << utils::hexify << op_data.opcode << ' ' << op_data.debug;
-    return out << utils::hexify8 << +op_data.opcode << ' ' << op_data.debug;
+    return out << utils::hexify8 << +(op_data.opcode) << ' ' << op_data.debug;
 }
 
 uint8_t CPU::retrieve_imm8() {
@@ -72,65 +71,94 @@ void CPU::tick() {
 }
 
 void CPU::main_loop(bool debug) {
+    if (debug) {
+        main_loop_debug();
+    } else {
+        while (true) {
+            tick();
+        }
+    }
+}
+
+void CPU::main_loop_debug() {
     std::string user_input;
     char action;
 
     while (true) {
-        if (!debug) {
-            tick();
-            continue;
-        }
-
         uint8_t opcode = mem->read(PC);
-        std::cout << utils::hexify16 << PC << ' ' << opcode_table[opcode] << std::endl;
-        std::cout << "> ";
+        std::cout << utils::hexify16 << PC << ' ' << opcode_table[opcode] << "\n> ";
         std::getline(std::cin, user_input);
         std::istringstream iss(user_input);
         iss >> action;
         
         if (action == 'h') {
             std::cout << "Command help:\n"
-                << "c [num]         - Steps through [num] opcodes\n"
-                << "o [hex opcode]  - Runs until the specified opcode is reached\n"
-                << "b [PC value]    - Runs until the program counter reaches the specified value \n"
-                << "d               - Debug information\n"
-                << "m [hex address] - Reads 16 bits from the specified address\n"
-                << "q               - Quit\n"
+                << "c [num]              - Steps through [num] opcodes\n"
+                << "o [hex opcode] [num] - Runs until the specified opcode is reached, optionally [num] times\n"
+                << "b [PC value] [num]   - Runs until the program counter reaches the specified value, optionally [num] times\n"
+                << "d                    - Debug information\n"
+                << "m [hex address]      - Reads 8 bits from the specified address\n"
+                << "r                    - Reads 8 bits from the address stored in HL\n"
+                << "i                    - Reads 8 bit immediate after the program counter\n"
+                << "q                    - Quit\n"
                 << std::endl;
         } else if (action == 'c') {
-            unsigned num;
+            unsigned num = 1;
             iss >> num;
-            num = num == 0 ? 1 : num;
             for (unsigned i = 0; i < num; i++) {
                 tick();
             }
         } else if (action == 'o') {
-            unsigned num;
-            iss >> std::hex >> num;
-            uint8_t break_op = num & 0xff;
-            while (break_op != mem->read(PC)) {
+            unsigned raw_op;
+            unsigned num = 1;
+            iss >> std::hex >> raw_op >> std::dec >> num;
+            uint8_t break_op = raw_op & 0xff;
+
+            for (unsigned i = 0; i < num; i++) {
+                // tick once to go past breakpoint
                 tick();
+                while (break_op != mem->read(PC)) {
+                    tick();
+                }
             }
         } else if (action == 'b') {
             uint16_t pc_break;
-            iss >> std::hex >> pc_break;
-            while (pc_break != PC) {
+            unsigned num = 1;
+            iss >> std::hex >> pc_break >> std::dec >> num;
+
+            for (unsigned i = 0; i < num; i++) {
+                // tick once to go past breakpoint
                 tick();
+                while (pc_break != PC) {
+                    tick();
+                }
             }
         } else if (action == 'd') {
             std::cout << opcode_table[opcode] << '\n'
                 << "PC: " << utils::hexify16 << PC << '\n'
-                << "SP: " << utils::hexify16 << SP << '\n'
+                << "SP: " << utils::hexify16 << SP << "\n\n"
                 << "Registers: \n"
                 << "AF: " << AF << '\n'
                 << "BC: " << BC << '\n'
                 << "DE: " << DE << '\n'
-                << "HL: " << HL << '\n' << std::endl;
+                << "HL: " << HL << "\n\n"
+                << "Flags: \n"
+                << "Zero: " << F.get_zero() << '\n' 
+                << "Subtract: " << F.get_subtract() << '\n'
+                << "Half Carry: " << F.get_half_carry() << '\n'
+                << "Carry " << F.get_carry() << '\n' 
+                << std::endl;
         } else if (action == 'm') {
             uint16_t address;
             iss >> std::hex >> address;
             uint16_t data = mem->read(address);
-            std::cout << utils::hexify16 << data << " - " << std::dec << data << '\n' << std::endl;
+            std::cout << utils::hexify8 << +data << " - " << std::dec << +data << '\n' << std::endl;
+        } else if (action == 'r') {
+            uint16_t data = mem->read(HL.get());
+            std::cout << utils::hexify8 << +data << " - " << std::dec << +data << '\n' << std::endl;
+        } else if (action == 'i') {
+            uint8_t imm = mem->read(PC + 1);
+            std::cout << utils::hexify8 << +imm << " - " << std::dec << +imm << '\n' << std::endl;
         } else if (action == 'q') {
             break;
         }

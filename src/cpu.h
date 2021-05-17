@@ -55,6 +55,7 @@ class CPU {
         // Calling a function in the table
         //(this->*(opcode_table[0]))();
        
+        void main_loop_debug();
         void tick();
         void run_opcode();
         void run_opcode_prefix();
