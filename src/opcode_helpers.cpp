@@ -231,9 +231,6 @@ void CPU::add_HL(const Register16& reg) {
 }
 
 void CPU::add_HL(uint16_t val) {
-    //add(L, val & 0x00FF);
-    //addc(H, (val & 0xFF00) >> 8);
-
     unsigned full_result = HL.get() + val;
 
     // Note - zero flag is not touched here!
@@ -246,18 +243,17 @@ void CPU::add_HL(uint16_t val) {
 
 void CPU::add_SP() {
     // Uses signed two's complement
-    int8_t val = static_cast<int8_t>(mem->read(PC + 1));
+    uint8_t val = retrieve_imm8();
 
     F.set_zero(false);
     F.set_subtract(false);
+
     uint8_t lower_sp = SP & 0xFF;
     F.set_half_carry(((lower_sp & 0x0F) + (val & 0x0F)) & 0x10);
     uint8_t lower_result = lower_sp + val;
+    F.set_carry(lower_result < lower_sp || lower_result < val);
 
-    // TODO figure out if I'm doing overflow here correctly
-    F.set_carry(lower_result < lower_sp && lower_result < val);
-
-    SP += val;
+    SP += static_cast<int8_t>(val);
 }
 
 void CPU::op_and(const Register8& reg) {
@@ -353,16 +349,17 @@ void CPU::cp_imm() {
 
 void CPU::load_HL() {
     // Uses signed two's complement
-    int8_t val = static_cast<int8_t>(mem->read(PC + 1));
+    uint8_t val = retrieve_imm8();
 
     F.set_zero(false);
     F.set_subtract(false);
+
     uint8_t lower_sp = SP & 0xFF;
     F.set_half_carry(((lower_sp & 0x0F) + (val & 0x0F)) & 0x10);
     uint8_t lower_result = lower_sp + val;
-    F.set_carry(lower_result < lower_sp && lower_result < val);
+    F.set_carry(lower_result < lower_sp || lower_result < val);
 
-    HL.set(SP + val);
+    HL.set(SP + static_cast<int8_t>(val));
 }
 
 void CPU::pop(Register16& reg) {
