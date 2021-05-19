@@ -5,4 +5,4 @@ target_sources(memory PRIVATE
     memory.cpp
 )
 target_include_directories(memory PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(memory utils)
+target_link_libraries(memory PRIVATE utils)
