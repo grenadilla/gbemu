@@ -27,7 +27,11 @@ class CPU {
         uint16_t PC;
         uint16_t SP;
 
-        bool jump_taken = false;
+        // EI is delayed - see https://gbdev.gg8.se/wiki/articles/Interrupts
+        bool ime_delay;
+        bool ime;
+
+        bool jump_taken;
 
         // TODO make shared pointer?
         Memory* mem;
@@ -59,6 +63,9 @@ class CPU {
         void tick();
         void run_opcode();
         void run_opcode_prefix();
+
+        // --interrupts--
+        void interrupt();
         
         // --opcode Helper Functions--
         uint8_t retrieve_imm8();

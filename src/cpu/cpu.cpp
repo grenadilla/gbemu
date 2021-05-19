@@ -65,8 +65,44 @@ void CPU::run_opcode_prefix() {
     (this->*(op_data.func))();
 }
 
+/* INTERRUPT EXECUTION
+ * https://gbdev.gg8.se/wiki/articles/Interrupts
+ * IME is set to false to prevent other interrupts
+ * Corresponding bit in IF is reset
+ * 2 NOPS occur (machine cycles where nothing happens)
+ * PC is pushed to stack (2 cycles)
+ * High byte of PC set to zero, low byte set to handler address (1 cycle)
+ * Total 5 cycles
+ * Handler addresses: $40,$48,$50,$58,$60
+ * v-blank, lcd-stat, timer, serial, joypad
+ */
+void CPU::interrupt() {
+    // TODO track cycles
+    uint8_t interrupts = mem->get_IE() & mem->get_IF() & 0x1F;
+    for (uint8_t i = 0; i < 5; i++) {
+        uint8_t mask = 0x01 << i;
+        if (interrupts & mask) {
+            // Reset interrupt
+            mem->set_IF(mem->get_IF() & ~mask);
+            ime = false;
+            push_stack(PC);
+            PC = (i * 0x08) + 0x40;
+            break;
+        }
+    }
+}
+
 void CPU::tick() {
-    // TODO take care of interrupts
+    if (ime) {
+        // Check interrupts
+        interrupt();
+    }
+    
+    if (ime_delay) {
+        ime = true;
+        ime_delay = false;
+    }
+
     run_opcode();
 }
 
@@ -112,7 +148,7 @@ void CPU::main_loop_debug() {
             unsigned raw_op;
             unsigned num = 1;
             iss >> std::hex >> raw_op >> std::dec >> num;
-            uint8_t break_op = raw_op & 0xff;
+            uint8_t break_op = raw_op & 0xFF;
 
             for (unsigned i = 0; i < num; i++) {
                 // tick once to go past breakpoint

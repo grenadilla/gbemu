@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iomanip>
 
-Memory::Memory(const std::string rom_path) {
+Memory::Memory(const std::string rom_path) : interrupt_flag(0xE0) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
         rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
@@ -14,6 +14,22 @@ Memory::Memory(const std::string rom_path) {
 
 bool Memory::is_loaded() const {
     return !rom_data.empty();
+}
+
+uint8_t Memory::get_IE() const {
+    return interrupt_enable;
+}
+
+uint8_t Memory::get_IF() const {
+    return interrupt_flag;
+}
+
+void Memory::set_IE(uint8_t value) {
+    interrupt_enable = value;
+}
+
+void Memory::set_IF(uint8_t value) {
+    interrupt_flag = value;
 }
 
 uint8_t Memory::read(uint16_t address) const {
@@ -64,6 +80,13 @@ uint8_t Memory::read(uint16_t address) const {
         return 0;
     } else if (address <= 0xFF7F) {
         // TODO IO registers
+        if (address == 0xFF0F) {
+            // Interrupt Flag
+            return interrupt_flag;
+        } else if (address == 0xFFFF) {
+            // Interrupt Enable
+            return interrupt_enable; 
+        } 
         return 0xFF;
     } else if (address <= 0xFFFE) {
         // High RAM
@@ -111,7 +134,13 @@ void Memory::write(uint16_t address, uint8_t value) {
         if (address == 0xFF01) {
             // Serial port
             std::cerr << (char) value;
-        }
+        } else if (address == 0xFF0F) {
+            // Interrupt Flag
+            interrupt_flag = value;
+        } else if (address == 0xFFFF) {
+            // Interrupt Enable
+            interrupt_enable = value;
+        } 
     } else if (address <= 0xFFFE) {
         // High RAM
         hram[address - 0xFF80] = value;

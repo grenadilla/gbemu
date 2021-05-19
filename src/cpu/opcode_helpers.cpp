@@ -424,7 +424,7 @@ void CPU::daa() {
     // From https://forums.nesdev.com/viewtopic.php?t=15944
     uint8_t correction = 0;
 
-    if (F.get_half_carry() || (!F.get_subtract() && (A.get() & 0x0f) > 9)) {
+    if (F.get_half_carry() || (!F.get_subtract() && (A.get() & 0x0F) > 9)) {
         correction |= 0x06;
     }
 
@@ -434,7 +434,7 @@ void CPU::daa() {
     }
 
     uint8_t result = A.get() + (F.get_subtract() ? -1 * correction : correction);
-    result &= 0xff;
+    result &= 0xFF;
 
     A.set(result);
     F.set_zero(result == 0);
