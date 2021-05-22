@@ -16,22 +16,6 @@ bool Memory::is_loaded() const {
     return !rom_data.empty();
 }
 
-uint8_t Memory::get_IE() const {
-    return interrupt_enable;
-}
-
-uint8_t Memory::get_IF() const {
-    return interrupt_flag;
-}
-
-void Memory::set_IE(uint8_t value) {
-    interrupt_enable = value;
-}
-
-void Memory::set_IF(uint8_t value) {
-    interrupt_flag = value;
-}
-
 uint8_t Memory::read(uint16_t address) const {
     /* --Memory Map--
     0000 	3FFF 	16KB ROM bank 00 	From cartridge, usually a fixed bank
@@ -79,15 +63,7 @@ uint8_t Memory::read(uint16_t address) const {
         std::cerr << "Attempted access to unusable memory at " << utils::hexify16 << address << std::endl;
         return 0;
     } else if (address <= 0xFF7F) {
-        // TODO IO registers
-        if (address == 0xFF0F) {
-            // Interrupt Flag
-            return interrupt_flag;
-        } else if (address == 0xFFFF) {
-            // Interrupt Enable
-            return interrupt_enable; 
-        } 
-        return 0xFF;
+        return hardware_read(address);
     } else if (address <= 0xFFFE) {
         // High RAM
         return hram[address - 0xFF80];
@@ -130,17 +106,7 @@ void Memory::write(uint16_t address, uint8_t value) {
         std::cerr << "Attempted write to unusable memory of " << utils::hexify8 << +value
             << " at memory address " << utils::hexify16 << address << std::endl;
     } else if (address <= 0xFF7F) {
-        // TODO IO registers
-        if (address == 0xFF01) {
-            // Serial port
-            std::cerr << (char) value;
-        } else if (address == 0xFF0F) {
-            // Interrupt Flag
-            interrupt_flag = value;
-        } else if (address == 0xFFFF) {
-            // Interrupt Enable
-            interrupt_enable = value;
-        } 
+        hardware_write(address, value);
     } else if (address <= 0xFFFE) {
         // High RAM
         hram[address - 0xFF80] = value;

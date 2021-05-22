@@ -204,7 +204,8 @@ CPU::Opcode CPU::opcode_table[] = {
     {0xC8, false, "RET Z", 20, 8, &CPU::opcode_C8},
     {0xC9, false, "RET", 16, 16, &CPU::opcode_C9},
     {0xCA, false, "JP Z a16", 16, 12, &CPU::opcode_CA},
-    {0xCB, false, "PREFIX", 4, 4, &CPU::run_opcode_prefix},
+    // Prefix opcode
+    {0xCB, false, "PREFIX", 4, 4, &CPU::opcode_illegal},
     {0xCC, false, "CALL Z a16", 24, 12, &CPU::opcode_CC},
     {0xCD, false, "CALL a16", 24, 24, &CPU::opcode_CD},
     {0xCE, false, "ADC A d8", 8, 8, &CPU::opcode_CE},

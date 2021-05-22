@@ -46,23 +46,22 @@ uint16_t CPU::pop_stack() {
     return static_cast<uint16_t>((upper << 8) | lower);
 }
 
-void CPU::run_opcode() {
+unsigned CPU::run_opcode() {
     uint16_t curr_PC = PC;
     uint8_t opcode = retrieve_imm8();
     Opcode op_data = opcode_table[opcode];
     unsigned cycles = jump_taken ? op_data.cycles : op_data.not_taken_cycles;
     jump_taken = false;
-    // Call opcode function
-    (this->*(op_data.func))();
-}
 
-void CPU::run_opcode_prefix() {
-    uint8_t opcode = retrieve_imm8();
-    Opcode op_data = opcode_prefixed_table[opcode];
-    // The cycle length in the table include sthe CB prefix, so we subtract it
-    unsigned cycles = op_data.cycles - 4;
     // Call opcode function
+    if (opcode == 0xCB) {
+        opcode = retrieve_imm8();
+        op_data = opcode_prefixed_table[opcode];
+        cycles = op_data.cycles;
+    }
+
     (this->*(op_data.func))();
+    return cycles;
 }
 
 /* INTERRUPT EXECUTION
@@ -76,7 +75,7 @@ void CPU::run_opcode_prefix() {
  * Handler addresses: $40,$48,$50,$58,$60
  * v-blank, lcd-stat, timer, serial, joypad
  */
-void CPU::interrupt() {
+unsigned CPU::interrupt() {
     // TODO track cycles
     uint8_t interrupts = mem->get_IE() & mem->get_IF() & 0x1F;
     for (uint8_t i = 0; i < 5; i++) {
@@ -87,15 +86,17 @@ void CPU::interrupt() {
             ime = false;
             push_stack(PC);
             PC = (i * 0x08) + 0x40;
-            break;
+            return 5;
         }
     }
+    return 0;
 }
 
 void CPU::tick() {
+    unsigned cycles = 0;
     if (ime) {
         // Check interrupts
-        interrupt();
+        cycles += interrupt();
     }
     
     if (ime_delay) {
@@ -103,7 +104,9 @@ void CPU::tick() {
         ime_delay = false;
     }
 
-    run_opcode();
+    cycles += run_opcode();
+
+    mem->update_timers(cycles);
 }
 
 void CPU::main_loop(bool debug) {

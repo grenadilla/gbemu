@@ -61,12 +61,12 @@ class CPU {
        
         void main_loop_debug();
         void tick();
-        void run_opcode();
-        void run_opcode_prefix();
+        unsigned run_opcode();
 
         // --interrupts--
-        void interrupt();
-        
+        // Returns number of cycles
+        unsigned interrupt();
+
         // --opcode Helper Functions--
         uint8_t retrieve_imm8();
         uint16_t retrieve_imm16();
