@@ -23,47 +23,50 @@ void Memory::update_timers(unsigned cycles) {
     // See detailed schematics: https://gbdev.io/pandocs/Timer_Obscure_Behaviour.html
 
     // Falling edge detection
-    bool previous_div_bit = 0;
-    switch (timer.speed) {
-        case 0:
-            previous_div_bit = timer.divider & 0x0200;
-            break;
-        case 1:
-            previous_div_bit = timer.divider & 0x0008;
-            break;
-        case 2:
-            previous_div_bit = timer.divider & 0x0020;
-            break;
-        case 3:
-            previous_div_bit = timer.divider & 0x0080;
-    }
+    // TODO simplify and make more efficient
+    for (unsigned i = 0; i < cycles; i += 4) {
+        bool previous_div_bit = 0;
+        switch (timer.speed) {
+            case 0:
+                previous_div_bit = timer.divider & 0x0200;
+                break;
+            case 1:
+                previous_div_bit = timer.divider & 0x0008;
+                break;
+            case 2:
+                previous_div_bit = timer.divider & 0x0020;
+                break;
+            case 3:
+                previous_div_bit = timer.divider & 0x0080;
+        }
 
-    timer.divider += cycles;
+        timer.divider += 4;
 
-    bool next_div_bit = 0;
-    switch (timer.speed) {
-        case 0:
-            next_div_bit = timer.divider & 0x0200;
-            break;
-        case 1:
-            next_div_bit = timer.divider & 0x0008;
-            break;
-        case 2:
-            next_div_bit = timer.divider & 0x0020;
-            break;
-        case 3:
-            next_div_bit = timer.divider & 0x0080;
-    }
+        bool next_div_bit = 0;
+        switch (timer.speed) {
+            case 0:
+                next_div_bit = timer.divider & 0x0200;
+                break;
+            case 1:
+                next_div_bit = timer.divider & 0x0008;
+                break;
+            case 2:
+                next_div_bit = timer.divider & 0x0020;
+                break;
+            case 3:
+                next_div_bit = timer.divider & 0x0080;
+        }
 
-    bool previous = previous_div_bit & timer.running;
-    bool after = next_div_bit & timer.running;
+        bool previous = previous_div_bit & timer.running;
+        bool after = next_div_bit & timer.running;
 
-    if (previous && !after) {
-        timer.counter++;
-        if (timer.counter == 0) {
-            // Interrupt!
-            interrupt_flag |= 0x04;
-            timer.counter = timer.modulo;
+        if (previous && !after) {
+            timer.counter++;
+            if (timer.counter == 0) {
+                // Interrupt!
+                interrupt_flag |= 0x04;
+                timer.counter = timer.modulo;
+            }
         }
     }
 }
