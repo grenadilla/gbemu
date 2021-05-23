@@ -4,7 +4,7 @@ void CPU::opcode_00() {}
 // TODO STOP Ignored
 void CPU::opcode_10() {}
 // TODO HALT
-void CPU::opcode_76() {}
+void CPU::opcode_76() { halt(); }
 // TODO DI
 void CPU::opcode_F3() { ime = false; }
 // TODO EI

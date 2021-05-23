@@ -49,18 +49,26 @@ uint16_t CPU::pop_stack() {
 unsigned CPU::run_opcode() {
     uint16_t curr_PC = PC;
     uint8_t opcode = retrieve_imm8();
+
+    // See HALT bug, PC not incremented
+    if (halt_bug) {
+        PC--;
+        halt_bug = false;
+    }
+
     Opcode op_data = opcode_table[opcode];
-    unsigned cycles = jump_taken ? op_data.cycles : op_data.not_taken_cycles;
-    jump_taken = false;
+    unsigned cycles;
 
     // Call opcode function
     if (opcode == 0xCB) {
         opcode = retrieve_imm8();
         op_data = opcode_prefixed_table[opcode];
-        cycles = op_data.cycles;
     }
 
     (this->*(op_data.func))();
+    
+    cycles = jump_taken ? op_data.cycles : op_data.not_taken_cycles;
+    jump_taken = false;
     return cycles;
 }
 
@@ -71,7 +79,7 @@ unsigned CPU::run_opcode() {
  * 2 NOPS occur (machine cycles where nothing happens)
  * PC is pushed to stack (2 cycles)
  * High byte of PC set to zero, low byte set to handler address (1 cycle)
- * Total 5 cycles
+ * Total 5 cycles (20 T-cycles)
  * Handler addresses: $40,$48,$50,$58,$60
  * v-blank, lcd-stat, timer, serial, joypad
  */
@@ -86,7 +94,7 @@ unsigned CPU::interrupt() {
             ime = false;
             push_stack(PC);
             PC = (i * 0x08) + 0x40;
-            return 5;
+            return 20;
         }
     }
     return 0;
@@ -94,6 +102,12 @@ unsigned CPU::interrupt() {
 
 void CPU::tick() {
     unsigned cycles = 0;
+
+    // Clear HALT if an interrupt is received
+    if (mem->get_IE() & mem->get_IF() & 0x1F) {
+        halted = false;
+    }
+
     if (ime) {
         // Check interrupts
         cycles += interrupt();
@@ -104,7 +118,11 @@ void CPU::tick() {
         ime_delay = false;
     }
 
-    cycles += run_opcode();
+    if (!halted) {
+        cycles += run_opcode();
+    } else {
+        cycles += 4;
+    }
 
     mem->update_timers(cycles);
 }
@@ -139,6 +157,7 @@ void CPU::main_loop_debug() {
                 << "m [hex address]      - Reads 8 bits from the specified address\n"
                 << "r                    - Reads 8 bits from the address stored in HL\n"
                 << "i                    - Reads 8 bit immediate after the program counter\n"
+                << "t                    - Outputs timer debug information\n"
                 << "q                    - Quit\n"
                 << std::endl;
         } else if (action == 'c') {
@@ -198,6 +217,8 @@ void CPU::main_loop_debug() {
         } else if (action == 'i') {
             uint8_t imm = mem->read(PC + 1);
             std::cout << utils::hexify8 << +imm << " - " << std::dec << +imm << '\n' << std::endl;
+        } else if (action == 't') {
+            mem->timer_debug(std::cout);
         } else if (action == 'q') {
             break;
         }

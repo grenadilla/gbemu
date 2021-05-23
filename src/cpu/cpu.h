@@ -33,6 +33,9 @@ class CPU {
 
         bool jump_taken;
 
+        bool halted;
+        bool halt_bug;
+
         // TODO make shared pointer?
         Memory* mem;
 
@@ -72,6 +75,8 @@ class CPU {
         uint16_t retrieve_imm16();
         void push_stack(uint16_t val);
         uint16_t pop_stack();
+
+        void halt();
 
         // --Loads--
         void load_reg(Register8& reg, const Register8& data);

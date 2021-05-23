@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <ostream>
 
 constexpr int KILOBYTE = 1024;
 
@@ -19,6 +20,7 @@ class Memory {
         void set_IF(uint8_t value);
 
         void update_timers(unsigned cycles);
+        void timer_debug(std::ostream& out);
     protected:
         // The address used for rom_read and rom_write
         // are relative to the ROM, not the memory map
@@ -42,19 +44,15 @@ class Memory {
         uint8_t interrupt_flag;
 
         struct {
-            uint8_t divider;
+            // Note: DIV is implemented internally as uint16_t,
+            // DIV register is upper 8 bits
+            // Divider starts at this value after boot ROM
+            uint16_t divider = 0xABCC;
             uint8_t counter;
             uint8_t modulo;
-            // Speed (see utils::TIMER_SPEED):
             // 00: 4096Hz, 01: 262144Hz, 10: 65536Hz, 11: 16384Hz
             uint8_t speed;
             bool running;
-            // Storing unused bits 3-7 if for some reason it's needed
-            uint8_t unused;
-
-            // Keep track of timings
-            unsigned div_fill;
-            unsigned counter_fill;
         } timer;
 
         uint8_t get_timer_control() const;

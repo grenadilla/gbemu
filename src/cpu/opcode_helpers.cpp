@@ -674,3 +674,13 @@ void CPU::set_bit(uint8_t bit_num) {
     uint8_t mask = 1 << bit_num;
     mem->write(HL.get(), mem->read(HL.get()) | mask);
 }
+
+void CPU::halt() {
+    // HALT bug with DI - see http://www.devrs.com/gb/files/gbspec.txt
+    // low power mode
+    if (!ime && (mem->get_IE() & mem->get_IF() & 0x1F) != 0) {
+        halt_bug = true;
+    } else {
+        halted = true;
+    }
+}
