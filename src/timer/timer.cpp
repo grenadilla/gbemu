@@ -82,12 +82,12 @@ void Timer::update_timers(unsigned cycles) {
     }
 }
 
-uint8_t Timer::get_timer_control() const {
+uint8_t Timer::get_control() const {
     uint8_t result = 0xF8 | ((uint8_t) running << 2) | speed;
     return result;
 }
 
-void Timer::set_timer_control(uint8_t val) {
+void Timer::set_control(uint8_t val) {
     speed = val & 0x3;
     running = val & 0x4;
 }
@@ -112,7 +112,7 @@ void Timer::timer_debug(std::ostream& out) {
     out << "0xFF04 (Divider) : " << utils::hexify16 << divider << '\n'
         << "0xFF05 (Counter) : " << utils::hexify8 << +counter << '\n'
         << "0xFF06 (Modulo)  : " << utils::hexify8 << +modulo << '\n'
-        << "0xFF07 (Control) : " << utils::hexify8 << +get_timer_control() << '\n'
+        << "0xFF07 (Control) : " << utils::hexify8 << +get_control() << '\n'
         << "Speed: " << std::dec << clocks << ", Running: " << running 
         << '\n' << std::endl;
 }

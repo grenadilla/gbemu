@@ -42,7 +42,7 @@ class Memory {
 
 class MBC0 : public Memory {
     public:
-        MBC0(const std::string rom_path, Interrupts*, Timer* new_timer);
+        MBC0(const std::string rom_path, Interrupts*, Timer* timer);
         uint8_t rom_read(const uint16_t address) const;
         void rom_write(const uint16_t address, uint8_t value);
 };

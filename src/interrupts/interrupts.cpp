@@ -1,18 +1,18 @@
 #include "interrupts.h"
 
-uint8_t Interrupts::get_interrupt_flags() const {
+uint8_t Interrupts::get_IF() const {
     return interrupt_flags;
 }
 
-void Interrupts::set_interrupt_flags(uint8_t value) {
+void Interrupts::set_IF(uint8_t value) {
     interrupt_flags = value;
 }
 
-uint8_t Interrupts::get_interrupt_enable() const {
+uint8_t Interrupts::get_IE() const {
     return interrupt_enable;
 }
 
-void Interrupts::set_interrupt_enable(uint8_t value) {
+void Interrupts::set_IE(uint8_t value) {
     interrupt_enable = value;
 }
 
@@ -27,6 +27,10 @@ void Interrupts::disable_interrupts() {
 
 void Interrupts::set_interrupt(uint8_t flag) {
     interrupt_flags |= flag;
+}
+
+bool Interrupts::get_IME() const {
+    return ime;
 }
 
 /* INTERRUPT EXECUTION
@@ -57,6 +61,7 @@ uint8_t Interrupts::get_interrupt() {
         }
     }
 
+    // TODO see how EI interacts with interrupts right after
     if (ime_delay) {
         ime = true;
         ime_delay = false;

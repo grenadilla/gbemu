@@ -12,7 +12,7 @@ target_include_directories(cpu PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 add_subdirectory(register)
 target_link_libraries(cpu
     PUBLIC register
-    PUBLIC interrupts
+    PRIVATE interrupts
     PRIVATE utils
     PRIVATE memory 
 )

@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iomanip>
 
-Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* new_timer) : interrupts(interrupts), timer(new_timer) {
+Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* timer) : interrupts(interrupts), timer(timer) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
         rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
@@ -119,7 +119,7 @@ void Memory::write(uint16_t address, uint8_t value) {
     }
 }
 
-MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* new_timer) : Memory(rom_path, interrupts, new_timer) {}
+MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* timer) : Memory(rom_path, interrupts, timer) {}
 
 uint8_t MBC0::rom_read(uint16_t address) const {
     return rom_data[address];

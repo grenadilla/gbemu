@@ -7,16 +7,15 @@ class Interrupts {
         // Interrupt flags
         static constexpr uint8_t TIMER = 0x04;
 
-        uint8_t get_interrupt_flags() const;
-        void set_interrupt_flags(uint8_t value);
+        uint8_t get_IF() const;
+        void set_IF(uint8_t value);
 
-        uint8_t get_interrupt_enable() const;
-        void set_interrupt_enable(uint8_t value);
-
-        void halt_bug();
+        uint8_t get_IE() const;
+        void set_IE(uint8_t value);
 
         void enable_interrupts();
         void disable_interrupts();
+        bool get_IME() const;
 
         uint8_t get_interrupt();
 

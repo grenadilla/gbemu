@@ -26,13 +26,13 @@ class CPU {
         Register16 DE;
         Register16 HL;
 
-        uint16_t PC;
-        uint16_t SP;
+        uint16_t PC = 0x0100;
+        uint16_t SP = 0xFFFE;
 
-        bool jump_taken;
+        bool jump_taken = false;
 
-        bool halted;
-        bool halt_bug;
+        bool halted = false;
+        bool halt_bug = false;
 
         // TODO make shared pointer?
         Interrupts* interrupts;

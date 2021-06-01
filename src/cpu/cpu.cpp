@@ -6,8 +6,8 @@
 #include <sstream>
 #include <iomanip>
 
-CPU::CPU(Interrupts* interrupts, Timer* new_timer, Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E), 
-    HL(&H, &L), PC(0x100), SP(0xFFFE), halted(false), interrupts(interrupts), mem(mem), timer(new_timer) {
+CPU::CPU(Interrupts* interrupts, Timer* timer, Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E), 
+    HL(&H, &L), interrupts(interrupts), mem(mem), timer(timer) {
     // From http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
     // registers are set to certain values
     AF.set(0x01B0);
@@ -78,7 +78,7 @@ void CPU::tick() {
     unsigned cycles = 0;
 
     // Clear HALT if an interrupt is received
-    if (interrupts->get_interrupt_enable() & interrupts->get_interrupt_flags() & 0x1F) {
+    if (interrupts->get_IE() & interrupts->get_IF() & 0x1F) {
         halted = false;
     }
 

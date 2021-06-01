@@ -9,8 +9,9 @@ class Timer {
     public:
         Timer(Interrupts* interrupts);
         
-        uint8_t get_timer_control() const;
-        void set_timer_control(uint8_t val);
+        uint8_t get_control() const;
+        void set_control(uint8_t val);
+
         void update_timers(unsigned cycles);
         void timer_debug(std::ostream& out);
 
@@ -27,11 +28,11 @@ class Timer {
         // DIV register is upper 8 bits
         // Divider starts at this value after boot ROM
         uint16_t divider = 0xABCC;
-        uint8_t counter;
-        uint8_t modulo;
+        uint8_t counter = 0;
+        uint8_t modulo = 0;
         // 00: 4096Hz, 01: 262144Hz, 10: 65536Hz, 11: 16384Hz
-        uint8_t speed;
-        bool running;
+        uint8_t speed = 0;
+        bool running = false;
 
         Interrupts* interrupts;
 };
