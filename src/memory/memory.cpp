@@ -1,10 +1,12 @@
 #include "memory.h"
+
 #include "utils.h"
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
-Memory::Memory(const std::string rom_path) : interrupt_flag(0xE0) {
+Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* new_timer) : interrupts(interrupts), timer(new_timer) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
         rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
@@ -67,8 +69,10 @@ uint8_t Memory::read(uint16_t address) const {
     } else if (address <= 0xFFFE) {
         // High RAM
         return hram[address - 0xFF80];
+    } else if (address == 0xFFFF) {
+        return hardware_read(address);   
     } else {
-        return interrupt_enable;
+        return 0xFF;
     }
 }
 
@@ -110,12 +114,12 @@ void Memory::write(uint16_t address, uint8_t value) {
     } else if (address <= 0xFFFE) {
         // High RAM
         hram[address - 0xFF80] = value;
-    } else {
-        interrupt_enable = value;
+    } else if (address == 0xFFFF) {
+        hardware_write(address, value);
     }
 }
 
-MBC0::MBC0(const std::string rom_path) : Memory(rom_path) {}
+MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* new_timer) : Memory(rom_path, interrupts, new_timer) {}
 
 uint8_t MBC0::rom_read(uint16_t address) const {
     return rom_data[address];

@@ -1,13 +1,15 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
 #include "register.h"
 #include "memory.h"
+#include "interrupts.h"
+
+#include <cstdint>
+#include <string>
 
 class CPU {
     public:
-        CPU(Memory* mem);
+        CPU(Interrupts* interrupts, Timer* timer, Memory* mem);
         void main_loop(bool debug);
     private:
         Register8 A;
@@ -27,17 +29,15 @@ class CPU {
         uint16_t PC;
         uint16_t SP;
 
-        // EI is delayed - see https://gbdev.gg8.se/wiki/articles/Interrupts
-        bool ime_delay;
-        bool ime;
-
         bool jump_taken;
 
         bool halted;
         bool halt_bug;
 
         // TODO make shared pointer?
+        Interrupts* interrupts;
         Memory* mem;
+        Timer* timer;
 
         typedef void (CPU::*MemFuncPtr)();
         struct Opcode {
@@ -65,10 +65,6 @@ class CPU {
         void main_loop_debug();
         void tick();
         unsigned run_opcode();
-
-        // --interrupts--
-        // Returns number of cycles
-        unsigned interrupt();
 
         // --opcode Helper Functions--
         uint8_t retrieve_imm8();

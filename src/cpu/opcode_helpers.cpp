@@ -678,9 +678,10 @@ void CPU::set_bit(uint8_t bit_num) {
 void CPU::halt() {
     // HALT bug with DI - see http://www.devrs.com/gb/files/gbspec.txt
     // low power mode
-    if (!ime && (mem->get_IE() & mem->get_IF() & 0x1F) != 0) {
+    /*if (!ime && (mem->get_IE() & mem->get_IF() & 0x1F) != 0) {
         halt_bug = true;
     } else {
         halted = true;
-    }
+    }*/
+    halted = true;
 }

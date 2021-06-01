@@ -1,11 +1,13 @@
 #include "cpu.h"
+
 #include "utils.h"
+
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-CPU::CPU(Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E), 
-    HL(&H, &L), PC(0x100), SP(0xFFFE), mem(mem) {
+CPU::CPU(Interrupts* interrupts, Timer* new_timer, Memory* mem) : AF(&A, &F), BC(&B, &C), DE(&D, &E), 
+    HL(&H, &L), PC(0x100), SP(0xFFFE), halted(false), interrupts(interrupts), mem(mem), timer(new_timer) {
     // From http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
     // registers are set to certain values
     AF.set(0x01B0);
@@ -72,50 +74,19 @@ unsigned CPU::run_opcode() {
     return cycles;
 }
 
-/* INTERRUPT EXECUTION
- * https://gbdev.gg8.se/wiki/articles/Interrupts
- * IME is set to false to prevent other interrupts
- * Corresponding bit in IF is reset
- * 2 NOPS occur (machine cycles where nothing happens)
- * PC is pushed to stack (2 cycles)
- * High byte of PC set to zero, low byte set to handler address (1 cycle)
- * Total 5 cycles (20 T-cycles)
- * Handler addresses: $40,$48,$50,$58,$60
- * v-blank, lcd-stat, timer, serial, joypad
- */
-unsigned CPU::interrupt() {
-    // TODO track cycles
-    uint8_t interrupts = mem->get_IE() & mem->get_IF() & 0x1F;
-    for (uint8_t i = 0; i < 5; i++) {
-        uint8_t mask = 0x01 << i;
-        if (interrupts & mask) {
-            // Reset interrupt
-            mem->set_IF(mem->get_IF() & ~mask);
-            ime = false;
-            push_stack(PC);
-            PC = (i * 0x08) + 0x40;
-            return 20;
-        }
-    }
-    return 0;
-}
-
 void CPU::tick() {
     unsigned cycles = 0;
 
     // Clear HALT if an interrupt is received
-    if (mem->get_IE() & mem->get_IF() & 0x1F) {
+    if (interrupts->get_interrupt_enable() & interrupts->get_interrupt_flags() & 0x1F) {
         halted = false;
     }
 
-    if (ime) {
-        // Check interrupts
-        cycles += interrupt();
-    }
-    
-    if (ime_delay) {
-        ime = true;
-        ime_delay = false;
+    uint8_t interrupt_address = interrupts->get_interrupt();
+    if (interrupt_address) {
+        push_stack(PC);
+        PC = interrupt_address;
+        cycles += 20;
     }
 
     if (!halted) {
@@ -124,7 +95,7 @@ void CPU::tick() {
         cycles += 4;
     }
 
-    mem->update_timers(cycles);
+    timer->update_timers(cycles);
 }
 
 void CPU::main_loop(bool debug) {
@@ -218,7 +189,7 @@ void CPU::main_loop_debug() {
             uint8_t imm = mem->read(PC + 1);
             std::cout << utils::hexify8 << +imm << " - " << std::dec << +imm << '\n' << std::endl;
         } else if (action == 't') {
-            mem->timer_debug(std::cout);
+            timer->timer_debug(std::cout);
         } else if (action == 'q') {
             break;
         }

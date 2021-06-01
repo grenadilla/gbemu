@@ -6,9 +6,9 @@ void CPU::opcode_10() {}
 // TODO HALT
 void CPU::opcode_76() { halt(); }
 // TODO DI
-void CPU::opcode_F3() { ime = false; }
+void CPU::opcode_F3() { interrupts->disable_interrupts(); }
 // TODO EI
-void CPU::opcode_FB() { ime_delay = true; }
+void CPU::opcode_FB() { interrupts->enable_interrupts(); }
 
 // Loads
 void CPU::opcode_02() { load_reg(BC, A); }
@@ -254,7 +254,7 @@ void CPU::opcode_C8() { ret(F.get_zero()); }
 void CPU::opcode_D8() { ret(F.get_carry()); }
 void CPU::opcode_C9() { ret(); }
 // TODO implement
-void CPU::opcode_D9() { ime_delay = true; ret(); }
+void CPU::opcode_D9() { interrupts->enable_interrupts(); ret(); }
 
 void CPU::opcode_C2() { jp(!F.get_zero()); }
 void CPU::opcode_D2() { jp(!F.get_carry()); }
