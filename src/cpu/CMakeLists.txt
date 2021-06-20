@@ -3,6 +3,7 @@ add_library(cpu STATIC)
 target_sources(cpu PRIVATE
     cpu.h
     cpu.cpp
+    debug.cpp
     opcodes.cpp
     opcode_helpers.cpp
     opcode_mappings.cpp

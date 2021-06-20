@@ -9,6 +9,4 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(src)
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE cpu
-    PRIVATE memory)
+target_link_libraries(${PROJECT_NAME} PRIVATE gameboy)

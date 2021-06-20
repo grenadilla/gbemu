@@ -10,7 +10,15 @@
 class CPU {
     public:
         CPU(Interrupts* interrupts, Timer* timer, Memory* mem);
-        void main_loop(bool debug);
+        void tick();
+
+        // Debug functions
+        void print_debug(uint8_t opcode);
+        void print_line_debug(uint8_t opcode);
+        void print_imm_debug();
+        void print_mem_debug();
+        uint8_t get_opcode_debug();
+        uint16_t get_PC_debug();
     private:
         Register8 A;
         Register8 B;
@@ -62,8 +70,6 @@ class CPU {
         // Calling a function in the table
         //(this->*(opcode_table[0]))();
        
-        void main_loop_debug();
-        void tick();
         unsigned run_opcode();
 
         // --opcode Helper Functions--
