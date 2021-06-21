@@ -20,7 +20,7 @@ void Gameboy::run(bool debug) {
         return;
     }
 
-    CPU cpu = CPU(&interrupts, &timer, mem);
+    CPU cpu = CPU(&interrupts, mem);
     while (!quit) {
         if (!debug) {
             tick(cpu);
@@ -122,7 +122,8 @@ void Gameboy::run(bool debug) {
 
 void Gameboy::tick(CPU& cpu) {
     // TODO graphics
-    cpu.tick();
+    unsigned cycles = cpu.tick();
+    timer.update_timers(cycles);
 }
 
 void Gameboy::print_help() {

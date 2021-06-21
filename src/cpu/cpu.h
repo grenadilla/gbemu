@@ -9,8 +9,9 @@
 
 class CPU {
     public:
-        CPU(Interrupts* interrupts, Timer* timer, Memory* mem);
-        void tick();
+        CPU(Interrupts* interrupts, Memory* mem);
+        // Returns cycles ran
+        unsigned tick();
 
         // Debug functions
         void print_debug(uint8_t opcode);
@@ -19,6 +20,7 @@ class CPU {
         void print_mem_debug();
         uint8_t get_opcode_debug();
         uint16_t get_PC_debug();
+
     private:
         Register8 A;
         Register8 B;
@@ -45,7 +47,6 @@ class CPU {
         // TODO make shared pointer?
         Interrupts* interrupts;
         Memory* mem;
-        Timer* timer;
 
         typedef void (CPU::*MemFuncPtr)();
         struct Opcode {
