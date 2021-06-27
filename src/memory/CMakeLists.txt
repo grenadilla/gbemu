@@ -7,4 +7,4 @@ target_sources(memory PRIVATE
 )
 target_include_directories(memory PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(memory PRIVATE utils interrupts)
-target_link_libraries(memory PUBLIC timer) 
+target_link_libraries(memory PUBLIC timer ppu)

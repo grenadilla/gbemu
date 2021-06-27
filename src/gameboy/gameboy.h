@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #include "interrupts.h"
@@ -17,6 +19,7 @@ class Gameboy {
 
         Interrupts interrupts;
         Timer timer;
+        PPU ppu;
         Memory* mem;
         bool quit;
 };

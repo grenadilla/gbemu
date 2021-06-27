@@ -25,7 +25,7 @@ void CPU::print_line_debug(uint8_t opcode) {
 }
 
 uint8_t CPU::get_opcode_debug() {
-    return mem->read(PC);
+    return mem->read(PC, true);
 }
 
 uint16_t CPU::get_PC_debug() {
@@ -40,6 +40,6 @@ void CPU::print_imm_debug() {
 }
 
 void CPU::print_mem_debug() {
-    uint16_t data = mem->read(HL.get());
+    uint16_t data = mem->read(HL.get(), true);
     std::cout << utils::hexify8 << +data << " - " << std::dec << +data << '\n' << std::endl;
 }

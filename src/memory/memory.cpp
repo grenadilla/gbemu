@@ -1,12 +1,11 @@
 #include "memory.h"
 
-#include "utils.h"
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
-Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* timer) : interrupts(interrupts), timer(timer) {
+Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu) 
+    : interrupts(interrupts), timer(timer), ppu(ppu) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
         rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
@@ -18,7 +17,7 @@ bool Memory::is_loaded() const {
     return !rom_data.empty();
 }
 
-uint8_t Memory::read(uint16_t address) const {
+uint8_t Memory::read(uint16_t address, bool debug) const {
     /* --Memory Map--
     0000 	3FFF 	16KB ROM bank 00 	From cartridge, usually a fixed bank
     4000 	7FFF 	16KB ROM Bank 01~NN 	From cartridge, switchable bank via MBC (if any)
@@ -40,7 +39,14 @@ uint8_t Memory::read(uint16_t address) const {
         return rom_read(address);
     } else if (address <= 0x9FFF) {
         // VRAM
-        return vram[address - 0x8000];
+        if (address <= 0x97FF) {
+            // Tile Data
+            return ppu->read_tile_data(address - 0x8000, debug);
+        } else if (address <= 0x9BFF) {
+            return ppu->read_tile_map1(address - 0x9800, debug);
+        } else {
+            return ppu->read_tile_map2(address - 0x9C00, debug);
+        }
     } else if (address <= 0xBFFF) {
         // External RAM
         return ext_ram[address - 0xA000];
@@ -85,7 +91,14 @@ void Memory::write(uint16_t address, uint8_t value) {
         rom_write(address, value);
     } else if (address <= 0x9FFF) {
         // VRAM
-        vram[address - 0x8000] = value;
+        if (address <= 0x97FF) {
+            // Tile Data
+            ppu->write_tile_data(address - 0x8000, value);
+        } else if (address <= 0x9BFF) {
+            ppu->write_tile_map1(address - 0x9800, value);
+        } else {
+            ppu->write_tile_map2(address - 0x9C00, value);
+        }
     } else if (address <= 0xBFFF) {
         // External RAM
         ext_ram[address - 0xA000] = value;
@@ -119,7 +132,8 @@ void Memory::write(uint16_t address, uint8_t value) {
     }
 }
 
-MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* timer) : Memory(rom_path, interrupts, timer) {}
+MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu) 
+    : Memory(rom_path, interrupts, timer, ppu) {}
 
 uint8_t MBC0::rom_read(uint16_t address) const {
     return rom_data[address];

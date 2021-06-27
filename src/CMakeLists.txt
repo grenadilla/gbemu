@@ -1,5 +1,6 @@
 add_subdirectory(utils)
 add_subdirectory(interrupts)
+add_subdirectory(ppu)
 add_subdirectory(timer)
 add_subdirectory(memory)
 add_subdirectory(cpu)

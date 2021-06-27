@@ -7,7 +7,7 @@
 #include "utils.h"
 
 Gameboy::Gameboy(std::string rom_path) : timer(&interrupts) {
-    mem = new MBC0(rom_path, &interrupts, &timer);
+    mem = new MBC0(rom_path, &interrupts, &timer, &ppu);
 }
 
 Gameboy::~Gameboy() {
@@ -87,7 +87,7 @@ void Gameboy::run(bool debug) {
                 case 'm': {
                     uint16_t address;
                     iss >> std::hex >> address;
-                    uint16_t data = mem->read(address);
+                    uint16_t data = mem->read(address, true);
                     std::cout << utils::hexify8 << +data << " - " << std::dec << +data << '\n' << std::endl;
                     break;
                 }
