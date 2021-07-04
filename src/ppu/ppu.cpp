@@ -1,150 +1,112 @@
 #include "ppu.h"
 
-#include <iostream>
-#include <string>
+#include "utils.h"
 
-bool PPU::validate_vram_access(std::string source) {
-    if (!lcd_enable) {
-        return true;
+PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
+    int bg_pixel_x = (pixel_x + scroll_x) % utils::SCREEN_X;
+    int bg_pixel_y = (pixel_y + scroll_y) % utils::SCREEN_Y;
+    
+    int tile_x = bg_pixel_x / TILE_SIZE;
+    int tile_y = bg_pixel_y / TILE_SIZE;
+
+    int tile_offset_x = bg_pixel_x - tile_x;
+    int tile_offset_y = bg_pixel_y - tile_y;
+
+    int tile_map_pointer = tile_offset_y * NUM_TILES_X + tile_x;
+    uint8_t tile_data_pointer = bg_map ? tile_map2[tile_map_pointer] : tile_map1[tile_map_pointer];
+    uint8_t* tile;
+
+    if (tile_data_area) {
+        tile = tile_data + tile_data_pointer;
+    } else {
+        if (tile_data_pointer <= 127) {
+            tile = tile_data + 0x1000 + tile_data_pointer;
+        } else {
+            tile = tile_data + 0x0800 + tile_data_pointer - 128;
+        }
     }
+
+    // Each line in the tile is 2 bytes
+    uint8_t line_lsb = tile[tile_offset_y * 2];
+    uint8_t line_msb = tile[tile_offset_y * 2 + 1];
+    // Leftmost bit is leftmost pixel
+    unsigned shift = TILE_SIZE - 1 - tile_offset_x;
+    uint8_t mask = 1 << shift;
+    uint8_t lsb = (line_lsb & mask) >> shift;
+    uint8_t msb = (line_msb & mask) >> shift;
+    uint8_t palette_index = (msb << 1) | lsb;
+
+    return bg_palette[palette_index];
+}
+
+void PPU::draw_pixel(int pixel_x, int pixel_y) {
+    // TODO check for window and sprites
+    Color pixel_color = get_bg_pixel(pixel_x, pixel_y);
+}
+
+void PPU::draw_line(int pixel_y) {
+    for (int pixel_x = 0; pixel_x < utils::SCREEN_X; pixel_x++) {
+        draw_pixel(pixel_x, pixel_y);
+    }
+}
+
+void PPU::tick() {
+    internal_timer--;
     switch (status) {
-        case SEARCH:
-        case HBLANK:
-        case VBLANK:
-            return true;
-        case READ:
-            std::cerr << "Invalid " << source << "; current mode is" 
-                << status << std::endl;
-            return false;
+        case OAM_SEARCH: {
+            if (internal_timer == 0) {
+                status = READ;
+                internal_timer = READ_LEN;
+            }
+            break;
+        }
+
+        case READ: {
+            // For simplicity we draw the whole line in the middle of the read
+            if (internal_timer == READ_LEN / 2) {
+                draw_line(ly);
+            } else if (internal_timer == 0) {
+                status = HBLANK;
+                internal_timer = HBLANK_LEN;
+                // TODO check HBLANK interrupt
+            }
+            break;
+        }
+
+        case HBLANK: {
+            if (internal_timer == 0) {
+                ly++;
+                if (ly == 144) {
+                    status = OAM_SEARCH;
+                    internal_timer = OAM_SEARCH_LEN;
+                    // TODO Check LY == LYC interrupt
+                    // TODO check OAM interrupt
+                } else {
+                    status = VBLANK;
+                    internal_timer = VBLANK_LEN;
+                    // TODO check vblank interrupt and vblank stat interrupt
+                }
+            }
+            break;
+        }
+
+        case VBLANK: {
+            if (internal_timer == 0) {
+                status = OAM_SEARCH;
+                internal_timer = OAM_SEARCH_LEN;
+                ly = 0;
+                // TODO check OAM interrupt
+            } else if (internal_timer % LINE_LEN == 0){
+                // Increment LY for each of the 10 VBLANK lines
+                ly++;
+            }
+            break;
+        }
     }
 }
 
-void PPU::write_tile_data(uint16_t address, uint8_t value) {
-    if (validate_vram_access("tile data write")) {
-        tile_data[address] = value;
+void PPU::run(unsigned cycles) {
+    for (unsigned i = 0; i < cycles; i++) {
+        tick();
     }
-}
-
-void PPU::write_tile_map1(uint16_t address, uint8_t value) {
-    if (validate_vram_access("tile map 1 write")) {
-        tile_map1[address] = value;
-    }
-}
-
-void PPU::write_tile_map2(uint16_t address, uint8_t value) {
-    if (validate_vram_access("tile map 2 write")) {
-        tile_map2[address] = value;
-    }
-}
-
-uint8_t PPU::read_tile_data(uint16_t address, bool debug) {
-    if (debug || validate_vram_access("tile data read")) {
-        return tile_data[address];
-    }
-    return 0xFF;
-}
-
-uint8_t PPU::read_tile_map1(uint16_t address, bool debug) {
-    if (debug || validate_vram_access("tile map 1 read")) {
-        return tile_map1[address];
-    }
-    return 0xFF;
-}
-
-uint8_t PPU::read_tile_map2(uint16_t address, bool debug) {
-    if (debug || validate_vram_access("tile map 2 read")) {
-        return tile_data[address];
-    }
-    return 0xFF;
-}
-
-void PPU::write_lcd_control(uint8_t value) {
-    lcd_enable = value & 0x80;
-    window_map = value & 0x40;
-    window_enable = value & 0x20;
-    tile_data_area = value & 0x10;
-    bg_map = value & 0x08;
-    obj_size = value & 0x04;
-    obj_enable = value & 0x02;
-    bg_window_enable = value & 0x01;
-}
-
-uint8_t PPU::read_lcd_control() {
-    return (lcd_enable << 7)
-            | (window_map << 6)
-            | (window_enable << 5)
-            | (tile_data_area << 4)
-            | (bg_map << 3)
-            | (obj_size << 2)
-            | (obj_enable << 1)
-            | bg_window_enable;
-}
-
-void PPU::set_scroll_y(uint8_t value) {
-    scroll_y = value;
-}
-
-void PPU::set_scroll_x(uint8_t value) {
-    scroll_x = value;
-}
-
-void PPU::set_lyc(uint8_t value) {
-    lyc = value;
-}
-
-void PPU::set_window_y(uint8_t value) {
-    window_y = value;
-}
-
-void PPU::set_window_x(uint8_t value) {
-    window_x = value;
-}
-
-uint8_t PPU::get_scroll_y() {
-    return scroll_y;
-}
-
-uint8_t PPU::get_scroll_x() {
-    return scroll_x;
-}
-
-uint8_t PPU::get_ly() {
-    return ly;
-}
-
-uint8_t PPU::get_lyc() {
-    return lyc;
-}
-
-uint8_t PPU::get_window_y() {
-    return window_y;
-}
-
-uint8_t PPU::get_window_x() {
-    return window_x;
-}
-
-void PPU::write_stat(uint8_t value) {
-    stat_interrupt = static_cast<Interrupt_Source>(value & 0x78);
-    status = static_cast<Mode>(value & 0x03);
-}
-
-uint8_t PPU::read_stat() {
-    return static_cast<uint8_t>(stat_interrupt)
-        | ((lyc == ly) << 2)
-        | static_cast<uint8_t>(status);
-}
-
-void PPU::write_palette(uint8_t value) {
-    bg_palette[3] = static_cast<Color>(value & 0xC0);
-    bg_palette[2] = static_cast<Color>(value & 0x30);
-    bg_palette[1] = static_cast<Color>(value & 0x0C);
-    bg_palette[0] = static_cast<Color>(value & 0x03);
-}
-
-uint8_t PPU::read_palette() {
-    return (static_cast<uint8_t>(bg_palette[3]) << 6)
-        | (static_cast<uint8_t>(bg_palette[2]) << 4)
-        | (static_cast<uint8_t>(bg_palette[1]) << 2)
-        | static_cast<uint8_t>(bg_palette[0]);
 }

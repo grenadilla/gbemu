@@ -40,9 +40,11 @@ class PPU {
         void write_palette(uint8_t value);
         uint8_t read_palette();
 
+        void run(unsigned cycles);
+
     private:
         enum Mode {
-            SEARCH = 2,
+            OAM_SEARCH = 2,
             READ = 3,
             HBLANK = 0,
             VBLANK = 1,
@@ -61,6 +63,15 @@ class PPU {
             DARK_GREY = 2,
             BLACK = 3
         };
+
+        constexpr static unsigned TILE_SIZE = 8;
+        constexpr static unsigned NUM_TILES_X = 32;
+        constexpr static unsigned NUM_TILES_Y = 32;
+        constexpr static unsigned OAM_SEARCH_LEN = 80;
+        constexpr static unsigned READ_LEN = 172;
+        constexpr static unsigned HBLANK_LEN = 204;
+        constexpr static unsigned LINE_LEN = OAM_SEARCH_LEN + READ_LEN + HBLANK_LEN;
+        constexpr static unsigned VBLANK_LEN = 10 * LINE_LEN;
 
         // TODO set color data to map to rgb
         // constexpr COLORS[4] = {...}
@@ -87,8 +98,19 @@ class PPU {
         uint8_t window_x;
 
         Interrupt_Source stat_interrupt = LYC_STAT;
-        Mode status = SEARCH;
+        Mode status = OAM_SEARCH;
         Color bg_palette[4];
 
+        unsigned internal_timer = OAM_SEARCH_LEN;
+
         bool validate_vram_access(std::string source = "[UNKNOWN SOURCE]");
+
+        /* TODO switch over to emulating pixel FIFO
+         * For now we go pixel by pixel instead of tile by tile
+         * Use timings 80 - 172 - 204
+         */
+        Color get_bg_pixel(int pixel_x, int pixel_y);
+        void draw_pixel(int pixel_x, int pixel_y);
+        void draw_line(int pixel_y);
+        void tick();
 };
