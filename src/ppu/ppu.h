@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.h"
+#include "interrupts.h"
 
 #include <cstdint>
 
@@ -8,6 +9,8 @@ constexpr int KILOBYTE = 1024;
 
 class PPU {
     public:
+        PPU(Interrupts* interrupts);
+
         void write_tile_data(uint16_t address, uint8_t value);
         void write_tile_map1(uint16_t address, uint8_t value);
         void write_tile_map2(uint16_t address, uint8_t value);
@@ -102,6 +105,8 @@ class PPU {
         Color bg_palette[4];
 
         unsigned internal_timer = OAM_SEARCH_LEN;
+
+        Interrupts* interrupts;
 
         bool validate_vram_access(std::string source = "[UNKNOWN SOURCE]");
 

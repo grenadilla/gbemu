@@ -6,7 +6,7 @@
 
 #include "utils.h"
 
-Gameboy::Gameboy(std::string rom_path) : timer(&interrupts) {
+Gameboy::Gameboy(std::string rom_path) : timer(&interrupts), ppu(&interrupts) {
     mem = new MBC0(rom_path, &interrupts, &timer, &ppu);
 }
 

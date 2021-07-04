@@ -5,7 +5,11 @@
 class Interrupts {
     public:
         // Interrupt flags
+        static constexpr uint8_t VBLANK = 0x01;
+        static constexpr uint8_t LCD_STAT = 0x02;
         static constexpr uint8_t TIMER = 0x04;
+        static constexpr uint8_t SERIAL = 0x08;
+        static constexpr uint8_t JOYPAD = 0x10;
 
         uint8_t get_IF() const;
         void set_IF(uint8_t value);

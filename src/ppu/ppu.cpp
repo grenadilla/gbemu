@@ -2,6 +2,8 @@
 
 #include "utils.h"
 
+PPU::PPU(Interrupts* interrupts) : interrupts(interrupts) { }
+
 PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
     int bg_pixel_x = (pixel_x + scroll_x) % utils::SCREEN_X;
     int bg_pixel_y = (pixel_y + scroll_y) % utils::SCREEN_Y;
@@ -68,7 +70,10 @@ void PPU::tick() {
             } else if (internal_timer == 0) {
                 status = HBLANK;
                 internal_timer = HBLANK_LEN;
-                // TODO check HBLANK interrupt
+
+                if (stat_interrupt == HBLANK_STAT) {
+                    interrupts->set_interrupt(Interrupts::LCD_STAT);
+                }
             }
             break;
         }
@@ -79,12 +84,18 @@ void PPU::tick() {
                 if (ly == 144) {
                     status = OAM_SEARCH;
                     internal_timer = OAM_SEARCH_LEN;
-                    // TODO Check LY == LYC interrupt
-                    // TODO check OAM interrupt
+
+                    if (stat_interrupt == LYC_STAT || stat_interrupt == OAM_STAT) {
+                        interrupts->set_interrupt(Interrupts::LCD_STAT);
+                    }
                 } else {
                     status = VBLANK;
                     internal_timer = VBLANK_LEN;
-                    // TODO check vblank interrupt and vblank stat interrupt
+
+                    interrupts->set_interrupt(Interrupts::VBLANK);
+                    if (stat_interrupt == VBLANK_STAT) {
+                        interrupts->set_interrupt(Interrupts::LCD_STAT);
+                    }
                 }
             }
             break;
@@ -95,7 +106,10 @@ void PPU::tick() {
                 status = OAM_SEARCH;
                 internal_timer = OAM_SEARCH_LEN;
                 ly = 0;
-                // TODO check OAM interrupt
+
+                if (stat_interrupt == OAM_STAT) {
+                    interrupts->set_interrupt(Interrupts::LCD_STAT);
+                }
             } else if (internal_timer % LINE_LEN == 0){
                 // Increment LY for each of the 10 VBLANK lines
                 ly++;
