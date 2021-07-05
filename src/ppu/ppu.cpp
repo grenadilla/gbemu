@@ -4,6 +4,10 @@
 
 PPU::PPU(Interrupts* interrupts) : interrupts(interrupts) { }
 
+void PPU::set_renderer(SDL_Renderer* renderer) {
+    this->renderer = renderer;
+}
+
 PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
     int bg_pixel_x = (pixel_x + scroll_x) % utils::SCREEN_X;
     int bg_pixel_y = (pixel_y + scroll_y) % utils::SCREEN_Y;
@@ -44,12 +48,35 @@ PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
 void PPU::draw_pixel(int pixel_x, int pixel_y) {
     // TODO check for window and sprites
     Color pixel_color = get_bg_pixel(pixel_x, pixel_y);
+    switch (pixel_color) {
+        case WHITE:
+            SDL_SetRenderDrawColor(renderer, 155, 188, 15, SDL_ALPHA_OPAQUE);
+            break;
+        case LIGHT_GREY:
+            SDL_SetRenderDrawColor(renderer, 139, 172, 15, SDL_ALPHA_OPAQUE);
+            break;
+        case DARK_GREY:
+            SDL_SetRenderDrawColor(renderer, 48, 98, 48, SDL_ALPHA_OPAQUE);
+            break;
+        case BLACK:
+            SDL_SetRenderDrawColor(renderer, 15, 56, 15, SDL_ALPHA_OPAQUE);
+            break;
+    }
+
+    SDL_Rect rect;
+    rect.x = pixel_x * utils::SCREEN_MAGNIFY;
+    rect.y = pixel_y * utils::SCREEN_MAGNIFY;
+    rect.w = utils::SCREEN_MAGNIFY;
+    rect.h = utils::SCREEN_MAGNIFY;
+
+    SDL_RenderFillRect(renderer, &rect);
 }
 
 void PPU::draw_line(int pixel_y) {
     for (int pixel_x = 0; pixel_x < utils::SCREEN_X; pixel_x++) {
         draw_pixel(pixel_x, pixel_y);
     }
+    SDL_RenderPresent(renderer);
 }
 
 void PPU::tick() {
@@ -81,7 +108,7 @@ void PPU::tick() {
         case HBLANK: {
             if (internal_timer == 0) {
                 ly++;
-                if (ly == 144) {
+                if (ly < 144) {
                     status = OAM_SEARCH;
                     internal_timer = OAM_SEARCH_LEN;
 

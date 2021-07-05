@@ -43,6 +43,8 @@ void Gameboy::init_graphics() {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
+
+    ppu.set_renderer(renderer);
 }
 
 void Gameboy::debug_run(CPU& cpu) {

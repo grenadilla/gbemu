@@ -4,12 +4,14 @@
 #include "interrupts.h"
 
 #include <cstdint>
+#include <SDL2/SDL.h>
 
 constexpr int KILOBYTE = 1024;
 
 class PPU {
     public:
         PPU(Interrupts* interrupts);
+        void set_renderer(SDL_Renderer* renderer);
 
         void write_tile_data(uint16_t address, uint8_t value);
         void write_tile_map1(uint16_t address, uint8_t value);
@@ -107,6 +109,7 @@ class PPU {
         unsigned internal_timer = OAM_SEARCH_LEN;
 
         Interrupts* interrupts;
+        SDL_Renderer* renderer;
 
         bool validate_vram_access(std::string source = "[UNKNOWN SOURCE]");
 

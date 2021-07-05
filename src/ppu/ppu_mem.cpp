@@ -13,7 +13,7 @@ bool PPU::validate_vram_access(std::string source) {
         case VBLANK:
             return true;
         case READ:
-            std::cerr << "Invalid " << source << "; current mode is" 
+            std::cerr << "Invalid " << source << "; current mode is " 
                 << status << std::endl;
             return false;
     }
