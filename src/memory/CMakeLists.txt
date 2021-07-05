@@ -1,10 +1,8 @@
-add_library(memory STATIC)
-
-target_sources(memory PRIVATE
-    memory.h
-    memory.cpp
-    hardware_registers.cpp
+target_sources(gameboy 
+    PUBLIC
+        memory.h
+        memory.cpp
+        hardware_registers.cpp
 )
-target_include_directories(memory PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(memory PRIVATE utils interrupts)
-target_link_libraries(memory PUBLIC timer ppu)
+
+target_include_directories(gameboy PUBLIC ${CMAKE_CURRENT_LIST_DIR})

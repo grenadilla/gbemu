@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <SDL2/SDL.h>
 
 #include "interrupts.h"
 #include "timer.h"
@@ -22,4 +23,7 @@ class Gameboy {
         PPU ppu;
         Memory* mem;
         bool quit;
+
+        SDL_Window* window = nullptr;
+        SDL_Renderer* renderer = nullptr;
 };
