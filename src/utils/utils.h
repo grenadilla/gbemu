@@ -10,4 +10,7 @@ namespace utils {
     constexpr unsigned KILOBYTE = 1024;
     constexpr unsigned SCREEN_X = 160;
     constexpr unsigned SCREEN_Y = 144;
+    constexpr unsigned SCREEN_MAGNIFY = 4;
+
+    constexpr unsigned CLOCK_SPEED = 4194304;
 }

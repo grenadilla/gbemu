@@ -17,12 +17,14 @@ class Gameboy {
     private:
         void tick(CPU& cpu);
         void print_help();
+        void init_graphics();
+        void debug_run(CPU& cpu);
 
         Interrupts interrupts;
         Timer timer;
         PPU ppu;
         Memory* mem;
-        bool quit;
+        bool quit = false;
 
         SDL_Window* window = nullptr;
         SDL_Renderer* renderer = nullptr;
