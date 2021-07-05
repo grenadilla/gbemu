@@ -4,9 +4,9 @@
 
 PPU::PPU(Interrupts* interrupts) : interrupts(interrupts) { }
 
-void PPU::set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_map_renderer) {
+void PPU::set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_data_renderer) {
     this->gb_renderer = gb_renderer;
-    this->tile_map_renderer = tile_map_renderer;
+    this->tile_data_renderer = tile_data_renderer;
 }
 
 PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y) {
@@ -50,10 +50,8 @@ PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
     return fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
 }
 
-void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
-    // TODO check for window and sprites
-    Color pixel_color = get_bg_pixel(pixel_x, pixel_y);
-    switch (pixel_color) {
+void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
+    switch (color) {
         case WHITE:
             SDL_SetRenderDrawColor(renderer, 155, 188, 15, SDL_ALPHA_OPAQUE);
             break;
@@ -67,6 +65,12 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
             SDL_SetRenderDrawColor(renderer, 15, 56, 15, SDL_ALPHA_OPAQUE);
             break;
     }
+}
+
+void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
+    // TODO check for window and sprites
+    Color pixel_color = get_bg_pixel(pixel_x, pixel_y);
+    set_draw_color(renderer, pixel_color);
 
     SDL_Rect rect;
     rect.x = pixel_x * utils::SCREEN_MAGNIFY;
@@ -155,4 +159,34 @@ void PPU::run(unsigned cycles) {
     for (unsigned i = 0; i < cycles; i++) {
         tick();
     }
+}
+
+void PPU::draw_tile_display(uint16_t address, bool present) {
+    // Each tile is 16 bytes
+    int tile_display_x = (address / 16) % utils::TILE_DATA_WIDTH;
+    int tile_display_y = (address / 16) / utils::TILE_DATA_WIDTH;
+    int tile_offset_y = (address % 16) / 2;
+
+    for (int tile_offset_x = 0; tile_offset_x < utils::TILE_SIZE; tile_offset_x++) {
+        Color pixel_color = fetch_tile_pixel(tile_data + address, tile_offset_x, tile_offset_y);
+        set_draw_color(tile_data_renderer, pixel_color);
+        SDL_Rect rect;
+        rect.x = (tile_display_x * utils::TILE_SIZE + tile_offset_x) * utils::SCREEN_MAGNIFY + 1 + tile_display_x;
+        rect.y = (tile_display_y * utils::TILE_SIZE + tile_offset_y) * utils::SCREEN_MAGNIFY + 1 + tile_display_y;
+        rect.w = utils::SCREEN_MAGNIFY;
+        rect.h = utils::SCREEN_MAGNIFY;
+
+        SDL_RenderFillRect(tile_data_renderer, &rect);
+    }
+
+    if (present) {
+        SDL_RenderPresent(tile_data_renderer);
+    }
+}
+
+void PPU::update_all_tile_display() {
+    for (uint16_t address = 0; address < 6 * utils::KILOBYTE; address += 2) {
+        draw_tile_display(address, false);
+    }
+    SDL_RenderPresent(tile_data_renderer);
 }

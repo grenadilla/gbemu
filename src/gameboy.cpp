@@ -51,8 +51,8 @@ void Gameboy::init_graphics() {
         "Gameboy Emulator Tile Data", 
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        utils::TILE_SIZE * utils::SCREEN_MAGNIFY * utils::TILE_DATA_WIDTH,
-        utils::TILE_SIZE * utils::SCREEN_MAGNIFY * utils::TILE_DATA_HEIGHT,
+        utils::TILE_DATA_WINDOW_WIDTH,
+        utils::TILE_DATA_WINDOW_HEIGHT,
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP
     );
 
@@ -67,6 +67,26 @@ void Gameboy::init_graphics() {
 
     SDL_SetRenderDrawColor(tile_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(tile_renderer);
+
+    // Draw grid
+    SDL_SetRenderDrawColor(tile_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    for (int x = 0; x <= utils::TILE_DATA_WIDTH; x++) {
+        SDL_RenderDrawLine(tile_renderer, 
+            x + x * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
+            0, 
+            x + x * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
+            utils::TILE_DATA_WINDOW_HEIGHT - 1
+        );
+    }
+    for (int y = 0; y <= utils::TILE_DATA_HEIGHT; y++) {
+        SDL_RenderDrawLine(tile_renderer,
+            0,
+            y + y * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
+            utils::TILE_DATA_WINDOW_WIDTH - 1,
+            y + y * utils::TILE_SIZE * utils::SCREEN_MAGNIFY
+        );
+    }
+
     SDL_RenderPresent(tile_renderer);
 
     ppu.set_renderer(renderer, tile_renderer);

@@ -28,6 +28,9 @@ void PPU::write_tile_data(uint16_t address, uint8_t value) {
 void PPU::write_tile_map1(uint16_t address, uint8_t value) {
     if (validate_vram_access("tile map 1 write")) {
         tile_map1[address] = value;
+
+        // Update debug tile map display
+        draw_tile_display(address);
     }
 }
 
@@ -136,10 +139,13 @@ uint8_t PPU::read_stat() {
 }
 
 void PPU::write_palette(uint8_t value) {
-    bg_palette[3] = static_cast<Color>(value & 0xC0);
-    bg_palette[2] = static_cast<Color>(value & 0x30);
-    bg_palette[1] = static_cast<Color>(value & 0x0C);
+    bg_palette[3] = static_cast<Color>((value & 0xC0) >> 6);
+    bg_palette[2] = static_cast<Color>((value & 0x30) >> 4);
+    bg_palette[1] = static_cast<Color>((value & 0x0C) >> 2);
     bg_palette[0] = static_cast<Color>(value & 0x03);
+
+    // For debug
+    update_all_tile_display();
 }
 
 uint8_t PPU::read_palette() {

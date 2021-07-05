@@ -11,7 +11,7 @@ constexpr int KILOBYTE = 1024;
 class PPU {
     public:
         PPU(Interrupts* interrupts);
-        void set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_map_renderer);
+        void set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_data_renderer);
 
         void write_tile_data(uint16_t address, uint8_t value);
         void write_tile_map1(uint16_t address, uint8_t value);
@@ -103,13 +103,13 @@ class PPU {
 
         Interrupt_Source stat_interrupt = LYC_STAT;
         Mode status = OAM_SEARCH;
-        Color bg_palette[4];
+        Color bg_palette[4] = {WHITE, BLACK, BLACK, BLACK};
 
         unsigned internal_timer = OAM_SEARCH_LEN;
 
         Interrupts* interrupts;
         SDL_Renderer* gb_renderer = nullptr;
-        SDL_Renderer* tile_map_renderer = nullptr;
+        SDL_Renderer* tile_data_renderer = nullptr;
 
         bool validate_vram_access(std::string source = "[UNKNOWN SOURCE]");
 
@@ -121,5 +121,8 @@ class PPU {
         Color get_bg_pixel(int pixel_x, int pixel_y);
         void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y);
         void draw_line(int pixel_y);
+        void draw_tile_display(uint16_t address, bool present = true);
+        void update_all_tile_display();
+        void set_draw_color(SDL_Renderer* renderer, Color color);
         void tick();
 };
