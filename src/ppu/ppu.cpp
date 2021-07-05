@@ -4,16 +4,31 @@
 
 PPU::PPU(Interrupts* interrupts) : interrupts(interrupts) { }
 
-void PPU::set_renderer(SDL_Renderer* renderer) {
-    this->renderer = renderer;
+void PPU::set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_map_renderer) {
+    this->gb_renderer = gb_renderer;
+    this->tile_map_renderer = tile_map_renderer;
+}
+
+PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y) {
+    // Each line in the tile is 2 bytes
+    uint8_t line_lsb = tile[tile_offset_y * 2];
+    uint8_t line_msb = tile[tile_offset_y * 2 + 1];
+    // Leftmost bit is leftmost pixel
+    unsigned shift = utils::TILE_SIZE - 1 - tile_offset_x;
+    uint8_t mask = 1 << shift;
+    uint8_t lsb = (line_lsb & mask) >> shift;
+    uint8_t msb = (line_msb & mask) >> shift;
+    uint8_t palette_index = (msb << 1) | lsb;
+
+    return bg_palette[palette_index];
 }
 
 PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
     int bg_pixel_x = (pixel_x + scroll_x) % utils::SCREEN_X;
     int bg_pixel_y = (pixel_y + scroll_y) % utils::SCREEN_Y;
     
-    int tile_x = bg_pixel_x / TILE_SIZE;
-    int tile_y = bg_pixel_y / TILE_SIZE;
+    int tile_x = bg_pixel_x / utils::TILE_SIZE;
+    int tile_y = bg_pixel_y / utils::TILE_SIZE;
 
     int tile_offset_x = bg_pixel_x - tile_x;
     int tile_offset_y = bg_pixel_y - tile_y;
@@ -32,20 +47,10 @@ PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
         }
     }
 
-    // Each line in the tile is 2 bytes
-    uint8_t line_lsb = tile[tile_offset_y * 2];
-    uint8_t line_msb = tile[tile_offset_y * 2 + 1];
-    // Leftmost bit is leftmost pixel
-    unsigned shift = TILE_SIZE - 1 - tile_offset_x;
-    uint8_t mask = 1 << shift;
-    uint8_t lsb = (line_lsb & mask) >> shift;
-    uint8_t msb = (line_msb & mask) >> shift;
-    uint8_t palette_index = (msb << 1) | lsb;
-
-    return bg_palette[palette_index];
+    return fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
 }
 
-void PPU::draw_pixel(int pixel_x, int pixel_y) {
+void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
     // TODO check for window and sprites
     Color pixel_color = get_bg_pixel(pixel_x, pixel_y);
     switch (pixel_color) {
@@ -74,9 +79,9 @@ void PPU::draw_pixel(int pixel_x, int pixel_y) {
 
 void PPU::draw_line(int pixel_y) {
     for (int pixel_x = 0; pixel_x < utils::SCREEN_X; pixel_x++) {
-        draw_pixel(pixel_x, pixel_y);
+        draw_pixel(gb_renderer, pixel_x, pixel_y);
     }
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(gb_renderer);
 }
 
 void PPU::tick() {

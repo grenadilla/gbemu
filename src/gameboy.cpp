@@ -21,6 +21,7 @@ void Gameboy::init_graphics() {
         return;
     }
 
+    // Set up main gameboy screen
     window = SDL_CreateWindow
     (
         "Gameboy Emulator", 
@@ -44,7 +45,31 @@ void Gameboy::init_graphics() {
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
-    ppu.set_renderer(renderer);
+    // Set up debug tile data screen
+    tile_window = SDL_CreateWindow
+    (
+        "Gameboy Emulator Tile Data", 
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        utils::TILE_SIZE * utils::SCREEN_MAGNIFY * utils::TILE_DATA_WIDTH,
+        utils::TILE_SIZE * utils::SCREEN_MAGNIFY * utils::TILE_DATA_HEIGHT,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP
+    );
+
+    if (tile_window == nullptr) {
+        std::cerr << "SDL window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+    }
+
+    tile_renderer = SDL_CreateRenderer(tile_window, -1, SDL_RENDERER_ACCELERATED);
+    if (tile_renderer == nullptr) {
+        std::cerr << "SDL renderer could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
+    }
+
+    SDL_SetRenderDrawColor(tile_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(tile_renderer);
+    SDL_RenderPresent(tile_renderer);
+
+    ppu.set_renderer(renderer, tile_renderer);
 }
 
 void Gameboy::debug_run(CPU& cpu) {
@@ -159,6 +184,7 @@ void Gameboy::run(bool debug) {
     }
 
     SDL_DestroyWindow(window);
+    SDL_DestroyWindow(tile_window);
     SDL_Quit();
 }
 
@@ -167,6 +193,8 @@ void Gameboy::tick(CPU& cpu) {
     while(SDL_PollEvent(&event) != 0) {
         if (event.type == SDL_QUIT) {
             quit = true;
+        } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+            quit = true;
         }
     }
 
@@ -174,10 +202,13 @@ void Gameboy::tick(CPU& cpu) {
     ppu.run(cycles);
     timer.update_timers(cycles);
 
-    unsigned delta = (timer.get_fps_timer() - SDL_GetTicks() * utils::CLOCK_SPEED * 1000) / (utils::CLOCK_SPEED * 1000);
+    // Cap FPS
+    unsigned curr_time = SDL_GetTicks();
+    unsigned delta = (cycles - (curr_time - last_time) * utils::CLOCK_SPEED_MILLI) / utils::CLOCK_SPEED_MILLI;
     if (delta > 0) {
         SDL_Delay(delta);
     }
+    last_time = curr_time;
 }
 
 void Gameboy::print_help() {

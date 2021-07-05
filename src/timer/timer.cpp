@@ -31,7 +31,6 @@ void Timer::set_counter(uint8_t val) {
 }
 
 void Timer::update_timers(unsigned cycles) {
-    fps_timer += cycles;
     // See detailed schematics: https://gbdev.io/pandocs/Timer_Obscure_Behaviour.html
 
     // Falling edge detection
@@ -116,8 +115,4 @@ void Timer::timer_debug(std::ostream& out) {
         << "0xFF07 (Control) : " << utils::hexify8 << +get_control() << '\n'
         << "Speed: " << std::dec << clocks << ", Running: " << running 
         << '\n' << std::endl;
-}
-
-unsigned Timer::get_fps_timer() const {
-    return fps_timer;
 }

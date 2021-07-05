@@ -24,8 +24,6 @@ class Timer {
         uint8_t get_counter() const;
         void set_counter(uint8_t val);
 
-        unsigned get_fps_timer() const;
-
     private:
         // Note: DIV is implemented internally as uint16_t,
         // DIV register is upper 8 bits
@@ -36,9 +34,6 @@ class Timer {
         // 00: 4096Hz, 01: 262144Hz, 10: 65536Hz, 11: 16384Hz
         uint8_t speed = 0;
         bool running = false;
-
-        // To be used for fps capping
-        unsigned fps_timer;
 
         Interrupts* interrupts;
 };

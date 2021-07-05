@@ -11,7 +11,7 @@ constexpr int KILOBYTE = 1024;
 class PPU {
     public:
         PPU(Interrupts* interrupts);
-        void set_renderer(SDL_Renderer* renderer);
+        void set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_map_renderer);
 
         void write_tile_data(uint16_t address, uint8_t value);
         void write_tile_map1(uint16_t address, uint8_t value);
@@ -69,7 +69,6 @@ class PPU {
             BLACK = 3
         };
 
-        constexpr static unsigned TILE_SIZE = 8;
         constexpr static unsigned NUM_TILES_X = 32;
         constexpr static unsigned NUM_TILES_Y = 32;
         constexpr static unsigned OAM_SEARCH_LEN = 80;
@@ -86,21 +85,21 @@ class PPU {
         uint8_t tile_map2[utils::KILOBYTE];
 
         // LCD control
-        bool lcd_enable;
-        bool window_map; // false - 0x9800-0x9BFF, true - 0x9C00 - 0x9FFF
-        bool window_enable;
-        bool tile_data_area; // false - 0x8800-0x9700, true 0x8000-0x8FFF
-        bool bg_map; // false - 0x9800-0x9BFF, true - 0x9C00 - 0x9FFF
-        bool obj_size; // false - 8x8, true - 8x16
-        bool obj_enable;
-        bool bg_window_enable;
+        bool lcd_enable = true;
+        bool window_map = false; // false - 0x9800-0x9BFF, true - 0x9C00 - 0x9FFF
+        bool window_enable = false;
+        bool tile_data_area = false; // false - 0x8800-0x9700, true 0x8000-0x8FFF
+        bool bg_map = false; // false - 0x9800-0x9BFF, true - 0x9C00 - 0x9FFF
+        bool obj_size = false; // false - 8x8, true - 8x16
+        bool obj_enable = false;
+        bool bg_window_enable = true;
 
-        uint8_t scroll_y;
-        uint8_t scroll_x;
-        uint8_t ly;
-        uint8_t lyc;
-        uint8_t window_y;
-        uint8_t window_x;
+        uint8_t scroll_y = 0;
+        uint8_t scroll_x = 0;
+        uint8_t ly = 0;
+        uint8_t lyc = 0;
+        uint8_t window_y = 0;
+        uint8_t window_x = 0;
 
         Interrupt_Source stat_interrupt = LYC_STAT;
         Mode status = OAM_SEARCH;
@@ -109,7 +108,8 @@ class PPU {
         unsigned internal_timer = OAM_SEARCH_LEN;
 
         Interrupts* interrupts;
-        SDL_Renderer* renderer;
+        SDL_Renderer* gb_renderer = nullptr;
+        SDL_Renderer* tile_map_renderer = nullptr;
 
         bool validate_vram_access(std::string source = "[UNKNOWN SOURCE]");
 
@@ -117,8 +117,9 @@ class PPU {
          * For now we go pixel by pixel instead of tile by tile
          * Use timings 80 - 172 - 204
          */
+        Color fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y);
         Color get_bg_pixel(int pixel_x, int pixel_y);
-        void draw_pixel(int pixel_x, int pixel_y);
+        void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y);
         void draw_line(int pixel_y);
         void tick();
 };

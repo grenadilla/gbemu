@@ -26,6 +26,11 @@ class Gameboy {
         Memory* mem;
         bool quit = false;
 
+        unsigned last_time;
+
         SDL_Window* window = nullptr;
         SDL_Renderer* renderer = nullptr;
+
+        SDL_Window* tile_window = nullptr;
+        SDL_Renderer* tile_renderer = nullptr;
 };
