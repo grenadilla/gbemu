@@ -22,15 +22,15 @@ bool PPU::validate_vram_access(std::string source) {
 void PPU::write_tile_data(uint16_t address, uint8_t value) {
     if (validate_vram_access("tile data write")) {
         tile_data[address] = value;
+
+        // Update debug tile map display
+        draw_tile_display(address);
     }
 }
 
 void PPU::write_tile_map1(uint16_t address, uint8_t value) {
     if (validate_vram_access("tile map 1 write")) {
         tile_map1[address] = value;
-
-        // Update debug tile map display
-        draw_tile_display(address);
     }
 }
 

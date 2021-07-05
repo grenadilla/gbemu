@@ -168,7 +168,8 @@ void PPU::draw_tile_display(uint16_t address, bool present) {
     int tile_offset_y = (address % 16) / 2;
 
     for (int tile_offset_x = 0; tile_offset_x < utils::TILE_SIZE; tile_offset_x++) {
-        Color pixel_color = fetch_tile_pixel(tile_data + address, tile_offset_x, tile_offset_y);
+        uint8_t* tile = tile_data + (address - (address % 16));
+        Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
         set_draw_color(tile_data_renderer, pixel_color);
         SDL_Rect rect;
         rect.x = (tile_display_x * utils::TILE_SIZE + tile_offset_x) * utils::SCREEN_MAGNIFY + 1 + tile_display_x;
