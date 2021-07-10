@@ -24,21 +24,22 @@ PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offs
 }
 
 PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
-    int bg_pixel_x = (pixel_x + scroll_x) % utils::SCREEN_X;
-    int bg_pixel_y = (pixel_y + scroll_y) % utils::SCREEN_Y;
+    int bg_pixel_x = (pixel_x - scroll_x) % utils::SCREEN_X;
+    int bg_pixel_y = (pixel_y - scroll_y) % utils::SCREEN_Y;
     
     int tile_x = bg_pixel_x / utils::TILE_SIZE;
     int tile_y = bg_pixel_y / utils::TILE_SIZE;
 
-    int tile_offset_x = bg_pixel_x - tile_x;
-    int tile_offset_y = bg_pixel_y - tile_y;
+    int tile_offset_x = bg_pixel_x % utils::TILE_SIZE;
+    int tile_offset_y = bg_pixel_y % utils::TILE_SIZE;
 
-    int tile_map_pointer = tile_offset_y * NUM_TILES_X + tile_x;
+    int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
     uint8_t tile_data_pointer = bg_map ? tile_map2[tile_map_pointer] : tile_map1[tile_map_pointer];
     uint8_t* tile;
 
     if (tile_data_area) {
-        tile = tile_data + tile_data_pointer;
+        // Each tile is 16 bytes
+        tile = tile_data + 16 * tile_data_pointer;
     } else {
         if (tile_data_pointer <= 127) {
             tile = tile_data + 0x1000 + tile_data_pointer;
@@ -139,6 +140,7 @@ void PPU::tick() {
 
         case VBLANK: {
             if (internal_timer == 0) {
+                //SDL_RenderPresent(gb_renderer);
                 status = OAM_SEARCH;
                 internal_timer = OAM_SEARCH_LEN;
                 ly = 0;

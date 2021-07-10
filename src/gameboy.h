@@ -26,7 +26,9 @@ class Gameboy {
         Memory* mem;
         bool quit = false;
 
-        unsigned last_time;
+        unsigned last_time = 0;
+        unsigned tick_countdown = 0;
+        unsigned cycle_acc = 0;
 
         SDL_Window* window = nullptr;
         SDL_Renderer* renderer = nullptr;

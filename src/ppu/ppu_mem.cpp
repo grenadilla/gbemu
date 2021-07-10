@@ -24,7 +24,7 @@ void PPU::write_tile_data(uint16_t address, uint8_t value) {
         tile_data[address] = value;
 
         // Update debug tile map display
-        draw_tile_display(address);
+        //draw_tile_display(address);
     }
 }
 
