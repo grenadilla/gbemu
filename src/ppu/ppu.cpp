@@ -42,9 +42,9 @@ PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
         tile = tile_data + 16 * tile_data_pointer;
     } else {
         if (tile_data_pointer <= 127) {
-            tile = tile_data + 0x1000 + tile_data_pointer;
+            tile = tile_data + 0x1000 + 16 * tile_data_pointer;
         } else {
-            tile = tile_data + 0x0800 + tile_data_pointer - 128;
+            tile = tile_data + 0x0800 + 16 * (tile_data_pointer - 128);
         }
     }
 
