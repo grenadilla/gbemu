@@ -86,7 +86,6 @@ void PPU::draw_line(int pixel_y) {
     for (int pixel_x = 0; pixel_x < utils::SCREEN_X; pixel_x++) {
         draw_pixel(gb_renderer, pixel_x, pixel_y);
     }
-    SDL_RenderPresent(gb_renderer);
 }
 
 void PPU::tick() {
@@ -126,6 +125,8 @@ void PPU::tick() {
                         interrupts->set_interrupt(Interrupts::LCD_STAT);
                     }
                 } else {
+                    // Render each frame at start of VBLANK for speed
+                    SDL_RenderPresent(gb_renderer);
                     status = VBLANK;
                     internal_timer = VBLANK_LEN;
 
