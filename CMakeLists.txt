@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 
+find_package(gflags REQUIRED)
+
 add_subdirectory(src)
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE gameboy)
+target_link_libraries(${PROJECT_NAME} PRIVATE gameboy ${GFLAGS_LIBRARIES})

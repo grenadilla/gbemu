@@ -12,12 +12,12 @@ class Gameboy {
     public:
         Gameboy(std::string rom_path);
         ~Gameboy();
-        void run(bool debug = false);
+        void run(bool debug = false, bool tilemap = false);
 
     private:
         void tick(CPU& cpu);
         void print_help();
-        void init_graphics();
+        void init_graphics(bool tilemap);
         void debug_run(CPU& cpu);
 
         Interrupts interrupts;

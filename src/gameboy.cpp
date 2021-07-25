@@ -15,7 +15,7 @@ Gameboy::~Gameboy() {
     delete mem;
 }
 
-void Gameboy::init_graphics() {
+void Gameboy::init_graphics(bool tilemap) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "Could not initialize SDL! SDL Error: " << SDL_GetError() << std::endl;
         quit = true;
@@ -48,48 +48,50 @@ void Gameboy::init_graphics() {
     SDL_RenderPresent(renderer);
 
     // Set up debug tile data screen
-    tile_window = SDL_CreateWindow
-    (
-        "Gameboy Emulator Tile Data", 
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        utils::TILE_DATA_WINDOW_WIDTH,
-        utils::TILE_DATA_WINDOW_HEIGHT,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP
-    );
-
-    if (tile_window == nullptr) {
-        std::cerr << "SDL window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-    }
-
-    tile_renderer = SDL_CreateRenderer(tile_window, -1, SDL_RENDERER_SOFTWARE);
-    if (tile_renderer == nullptr) {
-        std::cerr << "SDL renderer could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
-    }
-
-    SDL_SetRenderDrawColor(tile_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(tile_renderer);
-
-    // Draw grid
-    SDL_SetRenderDrawColor(tile_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-    for (int x = 0; x <= utils::TILE_DATA_WIDTH; x++) {
-        SDL_RenderDrawLine(tile_renderer, 
-            x + x * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
-            0, 
-            x + x * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
-            utils::TILE_DATA_WINDOW_HEIGHT - 1
+    if (tilemap) {
+        tile_window = SDL_CreateWindow
+        (
+            "Gameboy Emulator Tile Data", 
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            utils::TILE_DATA_WINDOW_WIDTH,
+            utils::TILE_DATA_WINDOW_HEIGHT,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP
         );
-    }
-    for (int y = 0; y <= utils::TILE_DATA_HEIGHT; y++) {
-        SDL_RenderDrawLine(tile_renderer,
-            0,
-            y + y * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
-            utils::TILE_DATA_WINDOW_WIDTH - 1,
-            y + y * utils::TILE_SIZE * utils::SCREEN_MAGNIFY
-        );
-    }
 
-    SDL_RenderPresent(tile_renderer);
+        if (tile_window == nullptr) {
+            std::cerr << "SDL window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+        }
+
+        tile_renderer = SDL_CreateRenderer(tile_window, -1, SDL_RENDERER_SOFTWARE);
+        if (tile_renderer == nullptr) {
+            std::cerr << "SDL renderer could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
+        }
+
+        SDL_SetRenderDrawColor(tile_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(tile_renderer);
+
+        // Draw grid
+        SDL_SetRenderDrawColor(tile_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+        for (int x = 0; x <= utils::TILE_DATA_WIDTH; x++) {
+            SDL_RenderDrawLine(tile_renderer, 
+                x + x * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
+                0, 
+                x + x * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
+                utils::TILE_DATA_WINDOW_HEIGHT - 1
+            );
+        }
+        for (int y = 0; y <= utils::TILE_DATA_HEIGHT; y++) {
+            SDL_RenderDrawLine(tile_renderer,
+                0,
+                y + y * utils::TILE_SIZE * utils::SCREEN_MAGNIFY,
+                utils::TILE_DATA_WINDOW_WIDTH - 1,
+                y + y * utils::TILE_SIZE * utils::SCREEN_MAGNIFY
+            );
+        }
+
+        SDL_RenderPresent(tile_renderer);
+    }
 
     ppu.set_renderer(renderer, tile_renderer);
 }
@@ -188,13 +190,13 @@ void Gameboy::debug_run(CPU& cpu) {
     }
 }
 
-void Gameboy::run(bool debug) {
+void Gameboy::run(bool debug, bool tilemap) {
     if (!mem->is_loaded()) {
         std::cout << "Bad file name or error while reading file" << std::endl;
         return;
     }
 
-    init_graphics();
+    init_graphics(tilemap);
 
     CPU cpu = CPU(&interrupts, mem);
     while (!quit) {

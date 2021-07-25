@@ -165,32 +165,36 @@ void PPU::run(unsigned cycles) {
 }
 
 void PPU::draw_tile_display(uint16_t address, bool present) {
-    // Each tile is 16 bytes
-    int tile_display_x = (address / 16) % utils::TILE_DATA_WIDTH;
-    int tile_display_y = (address / 16) / utils::TILE_DATA_WIDTH;
-    int tile_offset_y = (address % 16) / 2;
+    if (tile_data_renderer) {
+        // Each tile is 16 bytes
+        int tile_display_x = (address / 16) % utils::TILE_DATA_WIDTH;
+        int tile_display_y = (address / 16) / utils::TILE_DATA_WIDTH;
+        int tile_offset_y = (address % 16) / 2;
 
-    for (int tile_offset_x = 0; tile_offset_x < utils::TILE_SIZE; tile_offset_x++) {
-        uint8_t* tile = tile_data + (address - (address % 16));
-        Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
-        set_draw_color(tile_data_renderer, pixel_color);
-        SDL_Rect rect;
-        rect.x = (tile_display_x * utils::TILE_SIZE + tile_offset_x) * utils::SCREEN_MAGNIFY + 1 + tile_display_x;
-        rect.y = (tile_display_y * utils::TILE_SIZE + tile_offset_y) * utils::SCREEN_MAGNIFY + 1 + tile_display_y;
-        rect.w = utils::SCREEN_MAGNIFY;
-        rect.h = utils::SCREEN_MAGNIFY;
+        for (int tile_offset_x = 0; tile_offset_x < utils::TILE_SIZE; tile_offset_x++) {
+            uint8_t* tile = tile_data + (address - (address % 16));
+            Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
+            set_draw_color(tile_data_renderer, pixel_color);
+            SDL_Rect rect;
+            rect.x = (tile_display_x * utils::TILE_SIZE + tile_offset_x) * utils::SCREEN_MAGNIFY + 1 + tile_display_x;
+            rect.y = (tile_display_y * utils::TILE_SIZE + tile_offset_y) * utils::SCREEN_MAGNIFY + 1 + tile_display_y;
+            rect.w = utils::SCREEN_MAGNIFY;
+            rect.h = utils::SCREEN_MAGNIFY;
 
-        SDL_RenderFillRect(tile_data_renderer, &rect);
-    }
+            SDL_RenderFillRect(tile_data_renderer, &rect);
+        }
 
-    if (present) {
-        SDL_RenderPresent(tile_data_renderer);
+        if (present) {
+            SDL_RenderPresent(tile_data_renderer);
+        }
     }
 }
 
 void PPU::update_all_tile_display() {
-    for (uint16_t address = 0; address < 6 * utils::KILOBYTE; address += 2) {
-        draw_tile_display(address, false);
+    if (tile_data_renderer) {
+        for (uint16_t address = 0; address < 6 * utils::KILOBYTE; address += 2) {
+            draw_tile_display(address, false);
+        }
+        SDL_RenderPresent(tile_data_renderer);
     }
-    SDL_RenderPresent(tile_data_renderer);
 }
