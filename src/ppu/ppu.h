@@ -17,8 +17,6 @@ class PPU {
         void write_tile_map1(uint16_t address, uint8_t value);
         void write_tile_map2(uint16_t address, uint8_t value);
 
-        // TODO add debug flag to allow debugger
-        // to read data during any mode
         uint8_t read_tile_data(uint16_t address, bool debug = false);
         uint8_t read_tile_map1(uint16_t address, bool debug = false);
         uint8_t read_tile_map2(uint16_t address, bool debug = false);
@@ -118,7 +116,8 @@ class PPU {
          * Use timings 80 - 172 - 204
          */
         Color fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y);
-        Color get_bg_pixel(int pixel_x, int pixel_y);
+        uint8_t* get_bg_tile(int tile_map_pointer);
+
         void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y);
         void draw_line(int pixel_y);
         void draw_tile_display(uint16_t address, bool present = true);

@@ -23,17 +23,7 @@ PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offs
     return bg_palette[palette_index];
 }
 
-PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
-    int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
-    int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
-    
-    int tile_x = bg_pixel_x / utils::TILE_SIZE;
-    int tile_y = bg_pixel_y / utils::TILE_SIZE;
-
-    int tile_offset_x = bg_pixel_x % utils::TILE_SIZE;
-    int tile_offset_y = bg_pixel_y % utils::TILE_SIZE;
-
-    int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
+uint8_t* PPU::get_bg_tile(int tile_map_pointer) {
     uint8_t tile_data_pointer = bg_map ? tile_map2[tile_map_pointer] : tile_map1[tile_map_pointer];
     uint8_t* tile;
 
@@ -49,7 +39,7 @@ PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
         }
     }
 
-    return fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
+    return tile;
 }
 
 void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
@@ -71,7 +61,20 @@ void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
 
 void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
     // TODO check for window and sprites
-    Color pixel_color = get_bg_pixel(pixel_x, pixel_y);
+    int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
+    int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
+    
+    int tile_x = bg_pixel_x / utils::TILE_SIZE;
+    int tile_y = bg_pixel_y / utils::TILE_SIZE;
+
+    int tile_offset_x = bg_pixel_x % utils::TILE_SIZE;
+    int tile_offset_y = bg_pixel_y % utils::TILE_SIZE;
+
+    int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
+
+    uint8_t* tile = get_bg_tile(tile_map_pointer);
+
+    Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
     set_draw_color(renderer, pixel_color);
 
     SDL_Rect rect;
