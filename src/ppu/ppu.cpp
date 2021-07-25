@@ -24,8 +24,8 @@ PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offs
 }
 
 PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
-    int bg_pixel_x = (pixel_x - scroll_x) % utils::SCREEN_X;
-    int bg_pixel_y = (pixel_y - scroll_y) % utils::SCREEN_Y;
+    int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
+    int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
     
     int tile_x = bg_pixel_x / utils::TILE_SIZE;
     int tile_y = bg_pixel_y / utils::TILE_SIZE;
