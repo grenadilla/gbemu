@@ -37,14 +37,15 @@ PPU::Color PPU::get_bg_pixel(int pixel_x, int pixel_y) {
     uint8_t tile_data_pointer = bg_map ? tile_map2[tile_map_pointer] : tile_map1[tile_map_pointer];
     uint8_t* tile;
 
+    // Multiply by 16 when addressing as each tile is 16 bytes
     if (tile_data_area) {
-        // Each tile is 16 bytes
         tile = tile_data + 16 * tile_data_pointer;
     } else {
         if (tile_data_pointer <= 127) {
-            tile = tile_data + 0x1000 + tile_data_pointer;
+            tile = tile_data + 0x1000 + 16 * tile_data_pointer;
         } else {
-            tile = tile_data + 0x0800 + tile_data_pointer - 128;
+            // Subtract 128 to simulate converting unsigned tile data pointer to become signed
+            tile = tile_data + 0x0800 + 16 * (tile_data_pointer - 128);
         }
     }
 
