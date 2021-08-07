@@ -17,7 +17,7 @@ bool Memory::is_loaded() const {
     return !rom_data.empty();
 }
 
-uint8_t Memory::read(uint16_t address, bool debug) const {
+uint8_t Memory::read(uint16_t address, bool transfer, bool debug) const {
     /* --Memory Map--
     0000 	3FFF 	16KB ROM bank 00 	From cartridge, usually a fixed bank
     4000 	7FFF 	16KB ROM Bank 01~NN 	From cartridge, switchable bank via MBC (if any)
@@ -32,6 +32,12 @@ uint8_t Memory::read(uint16_t address, bool debug) const {
     FF80 	FFFE 	High RAM (HRAM) 	
     FFFF 	FFFF 	Interrupts Enable Register (IE) 	
     */
+    if (!transfer && OAM_countdown && !(address >= 0xFF80 && address < 0xFFFF)) {
+        // In DMA OAM transfer, can only access HRMA
+        std::cerr << "Attempted invalid non-HRAM read during DMA OAM transfer" << std::endl;
+        return 0xFF;
+    }
+
     if (address <= 0x3FFF) {
         // Cartridge fixed bank
         return rom_data[address];
@@ -65,7 +71,7 @@ uint8_t Memory::read(uint16_t address, bool debug) const {
         }
     } else if (address <= 0xFE9F) {
         // Sprite attribute table (OAM)
-        return sprite_attr_table[address - 0xFE00];
+        return ppu->read_OAM(address - 0xFE00);
     } else if (address <= 0xFEFF) {
         // Not usable
         std::cerr << "Attempted access to unusable memory at " << utils::hexify16 << address << std::endl;
@@ -83,6 +89,12 @@ uint8_t Memory::read(uint16_t address, bool debug) const {
 }
 
 void Memory::write(uint16_t address, uint8_t value) {
+    if (OAM_countdown && !(address >= 0xFF80 && address < 0xFFFF)) {
+        // In DMA OAM transfer, can only access HRMA
+        std::cerr << "Attempted invalid non-HRAM write during DMA OAM transfer" << std::endl;
+        return;
+    }
+
     if (address <= 0x3FFF) {
         // Cartridge fixed bank
         std::cerr << "Invalid write into fixed bank ROM of " << utils::hexify8 << +value
@@ -117,7 +129,7 @@ void Memory::write(uint16_t address, uint8_t value) {
         }
     } else if (address <= 0xFE9F) {
         // Sprite attribute table (OAM)
-        sprite_attr_table[address - 0xFE00] = value;
+        ppu->write_OAM(address - 0xFE00, value);
     } else if (address <= 0xFEFF) {
         // Not usable
         std::cerr << "Attempted write to unusable memory of " << utils::hexify8 << +value
@@ -142,4 +154,20 @@ uint8_t MBC0::rom_read(uint16_t address) const {
 void MBC0::rom_write(uint16_t address, uint8_t value) {
     std::cerr << "Attempted write into ROM of " << utils::hexify8 << +value 
         << " at address " << utils::hexify16 << address << std::endl;
+}
+
+void Memory::tick(unsigned cycles) {
+    if (OAM_countdown > utils::OAM_SIZE) {
+        // Delay
+        OAM_countdown--;
+    } else if (OAM_countdown) {
+        unsigned m_cycles = cycles / 4;
+        unsigned start = utils::OAM_SIZE - OAM_countdown;
+        unsigned end = start + m_cycles < utils::OAM_SIZE ? start + m_cycles : utils::OAM_SIZE;
+        for (unsigned index = start; index < end; index++) {
+            uint8_t value = read(OAM_base + index, true, false);
+            ppu->write_OAM(index, value);
+            OAM_countdown--;
+        }
+    }
 }

@@ -154,3 +154,11 @@ uint8_t PPU::read_palette() {
         | (static_cast<uint8_t>(bg_palette[1]) << 2)
         | static_cast<uint8_t>(bg_palette[0]);
 }
+
+void PPU::write_OAM(uint16_t address, uint8_t value) {
+    OAM[address] = value;
+}
+
+uint8_t PPU::read_OAM(uint16_t address) {
+    return OAM[address];
+}

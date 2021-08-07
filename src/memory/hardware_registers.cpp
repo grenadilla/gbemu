@@ -80,6 +80,12 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
         case 0xFF45:
             ppu->set_lyc(value);
             break;
+        case 0xFF46:
+            // DMA transfer to OAM
+            OAM_base = static_cast<uint16_t>(value << 8);
+            // Start transfer in next cycle
+            OAM_countdown = utils::OAM_SIZE + 1;
+            break;
         case 0xFF47:
             ppu->write_palette(value);
             break;

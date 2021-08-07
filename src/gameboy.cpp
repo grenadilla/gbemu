@@ -159,7 +159,7 @@ void Gameboy::debug_run(CPU& cpu) {
         case 'm': {
             uint16_t address;
             iss >> std::hex >> address;
-            uint16_t data = mem->read(address, true);
+            uint16_t data = mem->read(address, true, true);
             std::cout << utils::hexify8 << +data << " - " << std::dec << +data << '\n' << std::endl;
             break;
         }
@@ -214,6 +214,8 @@ void Gameboy::run(bool debug, bool tilemap) {
 
 void Gameboy::tick(CPU& cpu) {
     unsigned cycles = cpu.tick();
+    // Tick memory in case of DMA transfor to OAM
+    mem->tick(cycles);
     ppu.run(cycles);
     timer.update_timers(cycles);
 

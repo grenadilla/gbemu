@@ -43,6 +43,9 @@ class PPU {
         void write_palette(uint8_t value);
         uint8_t read_palette();
 
+        void write_OAM(uint16_t address, uint8_t value);
+        uint8_t read_OAM(uint16_t address);
+
         void run(unsigned cycles);
 
     private:
@@ -81,6 +84,7 @@ class PPU {
         uint8_t tile_data[6 * utils::KILOBYTE];
         uint8_t tile_map1[utils::KILOBYTE];
         uint8_t tile_map2[utils::KILOBYTE];
+        uint8_t OAM[utils::OAM_SIZE];
 
         // LCD control
         bool lcd_enable = true;

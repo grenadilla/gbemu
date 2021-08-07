@@ -21,4 +21,6 @@ namespace utils {
     constexpr unsigned BACKGROUND_SIZE = 256;
 
     constexpr unsigned CLOCK_SPEED = 4194304;
+
+    constexpr unsigned OAM_SIZE = 160;
 }

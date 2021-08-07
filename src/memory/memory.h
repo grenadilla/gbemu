@@ -13,9 +13,12 @@ class Memory {
     public:
         Memory(const std::string rom_path, Interrupts* interrupts, Timer* new_timer, PPU* ppu);
         virtual ~Memory() {}
-        uint8_t read(uint16_t address, bool debug = false) const;
+        uint8_t read(uint16_t address, bool transfer = false, bool debug = false) const;
         void write(uint16_t address, uint8_t value);
         bool is_loaded() const;
+
+        // Used for DMA transfer to OAM cycle counting
+        void tick(unsigned cycles);
 
     protected:
         // The address used for rom_read and rom_write
@@ -31,8 +34,12 @@ class Memory {
         uint8_t ext_ram[8 * utils::KILOBYTE];
         uint8_t wram0[4 * utils::KILOBYTE];
         uint8_t wram1[4 * utils::KILOBYTE];
-        uint8_t sprite_attr_table[160];
         uint8_t hram[126];
+
+        // If 0, not in OAM transfer
+        // otherwise is number of cycles left in transfer
+        unsigned OAM_countdown = 0;
+        uint16_t OAM_base = 0x00;
 
     private:
         Interrupts* interrupts;
