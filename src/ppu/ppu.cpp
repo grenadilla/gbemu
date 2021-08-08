@@ -81,10 +81,6 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
             uint8_t tile_index = sprite_attr[2];
             uint8_t sprite_flags = sprite_attr[3];
 
-            /*if (tile_index == 144 || tile_index == 145 || tile_index == 146) {
-                continue;
-            }*/
-
             // Priority is determined by which sprite has the lower x value
             // and which sprite is first in OAM for tiebreakers
             if (sprite_x >= lowest_x) {
@@ -111,8 +107,6 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
                 continue;
             }
 
-            lowest_x = sprite_x;
-
             bool y_flip = sprite_flags & 0x40;
             bool x_flip = sprite_flags & 0x20;
             bool palette_number = sprite_flags & 0x10;
@@ -128,6 +122,7 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
             if (sprite_color != TRANSPARENT) {
                 pixel_color = sprite_color;
                 bg_window_over = sprite_flags & 0x80;
+                lowest_x = sprite_x;
             }
         }
     }
