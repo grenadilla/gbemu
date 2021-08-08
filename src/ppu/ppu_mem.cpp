@@ -155,6 +155,32 @@ uint8_t PPU::read_palette() {
         | static_cast<uint8_t>(bg_palette[0]);
 }
 
+void PPU::write_obj_palette0(uint8_t value) {
+    obj_palette0[3] = static_cast<Color>((value & 0xC0) >> 6);
+    obj_palette0[2] = static_cast<Color>((value & 0x30) >> 4);
+    obj_palette0[1] = static_cast<Color>((value & 0x0C) >> 2);
+    obj_palette0[0] = TRANSPARENT;
+}
+
+uint8_t PPU::read_obj_palette0() {
+    return (static_cast<uint8_t>(obj_palette0[3]) << 6)
+        | (static_cast<uint8_t>(obj_palette0[2]) << 4)
+        | (static_cast<uint8_t>(obj_palette0[1]) << 2);
+}
+
+void PPU::write_obj_palette1(uint8_t value) {
+    obj_palette1[3] = static_cast<Color>((value & 0xC0) >> 6);
+    obj_palette1[2] = static_cast<Color>((value & 0x30) >> 4);
+    obj_palette1[1] = static_cast<Color>((value & 0x0C) >> 2);
+    obj_palette1[0] = TRANSPARENT;
+}
+
+uint8_t PPU::read_obj_palette1() {
+    return (static_cast<uint8_t>(obj_palette1[3]) << 6)
+        | (static_cast<uint8_t>(obj_palette1[2]) << 4)
+        | (static_cast<uint8_t>(obj_palette1[1]) << 2);
+}
+
 void PPU::write_OAM(uint16_t address, uint8_t value) {
     OAM[address] = value;
 }

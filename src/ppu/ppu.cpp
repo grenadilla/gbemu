@@ -9,7 +9,7 @@ void PPU::set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_data_render
     this->tile_data_renderer = tile_data_renderer;
 }
 
-PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y) {
+PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y, Color* palette, bool hide_obj) {
     // Each line in the tile is 2 bytes
     uint8_t line_lsb = tile[tile_offset_y * 2];
     uint8_t line_msb = tile[tile_offset_y * 2 + 1];
@@ -20,7 +20,12 @@ PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offs
     uint8_t msb = (line_msb & mask) >> shift;
     uint8_t palette_index = (msb << 1) | lsb;
 
-    return bg_palette[palette_index];
+    // Used for bg and window over obj flag for sprites
+    if (hide_obj && palette_index == 0) {
+        return TRANSPARENT;
+    }
+
+    return palette[palette_index];
 }
 
 uint8_t* PPU::get_bg_tile(int tile_map_pointer) {
@@ -56,25 +61,90 @@ void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
         case BLACK:
             SDL_SetRenderDrawColor(renderer, 15, 56, 15, SDL_ALPHA_OPAQUE);
             break;
+        default:
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     }
 }
 
 void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
-    // TODO check for window and sprites
-    int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
-    int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
-    
-    int tile_x = bg_pixel_x / utils::TILE_SIZE;
-    int tile_y = bg_pixel_y / utils::TILE_SIZE;
+    Color pixel_color = TRANSPARENT;
 
-    int tile_offset_x = bg_pixel_x % utils::TILE_SIZE;
-    int tile_offset_y = bg_pixel_y % utils::TILE_SIZE;
+    if (obj_enable) {
+        // Check sprites
+        uint8_t lowest_x = 0xFF;
+        for (uint8_t* sprite_attr = OAM; sprite_attr < OAM + utils::OAM_SIZE; sprite_attr += 4) {
+            // Each sprite attribute is 4 bytes
+            // Sprite y is by bottom of sprite
+            uint8_t sprite_y = sprite_attr[0];
+            uint8_t sprite_x = sprite_attr[1];
+            uint8_t tile_index = sprite_attr[2];
+            uint8_t sprite_flags = sprite_attr[3];
 
-    int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
+            // Priority is determined by which sprite has the lower x value
+            // and which sprite is first in OAM for tiebreakers
+            if (sprite_x >= lowest_x) {
+                continue;
+            }
 
-    uint8_t* tile = get_bg_tile(tile_map_pointer);
+            uint8_t* tile = nullptr;
+            int tile_offset_x;
+            int tile_offset_y;
 
-    Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
+            // Remember tiles are 16 bytes
+            // When 8 x 16 tiles, ignore LSB of tile index, enforced by hardware
+            if (obj_size && pixel_y < sprite_y && (pixel_y + 8) >= sprite_y && (pixel_x + 8) >= sprite_x && pixel_x < sprite_x) {
+                // Bottom tile of 8 x 16 sprite
+                tile = tile_data + (tile_index | 0x01) * 16;
+                tile_offset_x = pixel_x - sprite_x + 8;
+                tile_offset_y = pixel_y - sprite_y + 8;
+            } else if ((pixel_y + 8) < sprite_y && (pixel_y + 16) >= sprite_y && (pixel_x + 8) >= sprite_x && pixel_x < sprite_x) {
+                // Top tile of 8 x 16 sprite or in 8 x 8 sprite
+                tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * 16;
+                tile_offset_x = pixel_x - sprite_x + 8;
+                tile_offset_y = pixel_y - sprite_y + 16;
+            } else {
+                continue;
+            }
+
+            lowest_x = sprite_x;
+
+            // TODO implement bg_window_over
+            bool bg_window_over = sprite_flags & 0x80;
+            bool y_flip = sprite_flags & 0x40;
+            bool x_flip = sprite_flags & 0x20;
+            bool palette_number = sprite_flags & 0x10;
+
+            if (y_flip) {
+                tile_offset_y = 7 - tile_offset_y;
+            }
+            if (x_flip) {
+                tile_offset_x = 7 - tile_offset_x;
+            }
+
+            pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, palette_number ? obj_palette1 : obj_palette0);
+        }
+    }
+
+    if (pixel_color == TRANSPARENT && bg_window_enable && window_enable) {
+        // Check window
+    }
+
+    if (pixel_color == TRANSPARENT && bg_window_enable) {
+        // Check background
+        int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
+        int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
+        
+        int tile_x = bg_pixel_x / utils::TILE_SIZE;
+        int tile_y = bg_pixel_y / utils::TILE_SIZE;
+
+        int tile_offset_x = bg_pixel_x % utils::TILE_SIZE;
+        int tile_offset_y = bg_pixel_y % utils::TILE_SIZE;
+
+        int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
+        uint8_t* tile = get_bg_tile(tile_map_pointer);
+        pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, bg_palette);
+    }
+
     set_draw_color(renderer, pixel_color);
 
     SDL_Rect rect;
@@ -177,7 +247,7 @@ void PPU::draw_tile_display(uint16_t address, bool present) {
 
         for (int tile_offset_x = 0; tile_offset_x < utils::TILE_SIZE; tile_offset_x++) {
             uint8_t* tile = tile_data + (address - (address % 16));
-            Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y);
+            Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, bg_palette);
             set_draw_color(tile_data_renderer, pixel_color);
             SDL_Rect rect;
             rect.x = (tile_display_x * utils::TILE_SIZE + tile_offset_x) * utils::SCREEN_MAGNIFY + 1 + tile_display_x;

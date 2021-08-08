@@ -31,6 +31,10 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return ppu->get_lyc();
         case 0xFF47:
             return ppu->read_palette();
+        case 0xFF48:
+            return ppu->read_obj_palette0();
+        case 0xFF49:
+            return ppu->read_obj_palette1();
         case 0xFF4A:
             return ppu->get_window_y();
         case 0xFF4B:
@@ -88,6 +92,12 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             break;
         case 0xFF47:
             ppu->write_palette(value);
+            break;
+        case 0xFF48:
+            ppu->write_obj_palette0(value);
+            break;
+        case 0xFF49:
+            ppu->write_obj_palette1(value);
             break;
         case 0xFF4A:
             ppu->set_window_y(value);

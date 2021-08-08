@@ -43,6 +43,12 @@ class PPU {
         void write_palette(uint8_t value);
         uint8_t read_palette();
 
+        void write_obj_palette0(uint8_t value);
+        uint8_t read_obj_palette0();
+
+        void write_obj_palette1(uint8_t value);
+        uint8_t read_obj_palette1();
+
         void write_OAM(uint16_t address, uint8_t value);
         uint8_t read_OAM(uint16_t address);
 
@@ -67,7 +73,10 @@ class PPU {
             WHITE = 0,
             LIGHT_GREY = 1,
             DARK_GREY = 2,
-            BLACK = 3
+            BLACK = 3,
+
+            // Only used internally for implementation, will never be actually rendered
+            TRANSPARENT = 4
         };
 
         constexpr static unsigned NUM_TILES_X = 32;
@@ -84,7 +93,7 @@ class PPU {
         uint8_t tile_data[6 * utils::KILOBYTE];
         uint8_t tile_map1[utils::KILOBYTE];
         uint8_t tile_map2[utils::KILOBYTE];
-        uint8_t OAM[utils::OAM_SIZE];
+        uint8_t OAM[utils::OAM_SIZE] = {0};
 
         // LCD control
         bool lcd_enable = true;
@@ -106,6 +115,8 @@ class PPU {
         Interrupt_Source stat_interrupt = LYC_STAT;
         Mode status = OAM_SEARCH;
         Color bg_palette[4] = {WHITE, BLACK, BLACK, BLACK};
+        Color obj_palette0[4] = {TRANSPARENT, BLACK, BLACK, BLACK};
+        Color obj_palette1[4] = {TRANSPARENT, BLACK, BLACK, BLACK};
 
         unsigned internal_timer = OAM_SEARCH_LEN;
 
@@ -119,7 +130,7 @@ class PPU {
          * For now we go pixel by pixel instead of tile by tile
          * Use timings 80 - 172 - 204
          */
-        Color fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y);
+        Color fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y, Color* palette, bool hide_obj = false);
         uint8_t* get_bg_tile(int tile_map_pointer);
 
         void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y);
