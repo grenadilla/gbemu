@@ -68,6 +68,7 @@ void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
 
 void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
     Color pixel_color = TRANSPARENT;
+    bool bg_window_over = false;
 
     if (obj_enable) {
         // Check sprites
@@ -79,6 +80,10 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
             uint8_t sprite_x = sprite_attr[1];
             uint8_t tile_index = sprite_attr[2];
             uint8_t sprite_flags = sprite_attr[3];
+
+            /*if (tile_index == 144 || tile_index == 145 || tile_index == 146) {
+                continue;
+            }*/
 
             // Priority is determined by which sprite has the lower x value
             // and which sprite is first in OAM for tiebreakers
@@ -108,8 +113,6 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
 
             lowest_x = sprite_x;
 
-            // TODO implement bg_window_over
-            bool bg_window_over = sprite_flags & 0x80;
             bool y_flip = sprite_flags & 0x40;
             bool x_flip = sprite_flags & 0x20;
             bool palette_number = sprite_flags & 0x10;
@@ -121,7 +124,11 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
                 tile_offset_x = 7 - tile_offset_x;
             }
 
-            pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, palette_number ? obj_palette1 : obj_palette0);
+            Color sprite_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, palette_number ? obj_palette1 : obj_palette0);
+            if (sprite_color != TRANSPARENT) {
+                pixel_color = sprite_color;
+                bg_window_over = sprite_flags & 0x80;
+            }
         }
     }
 
@@ -142,7 +149,13 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
 
         int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
         uint8_t* tile = get_bg_tile(tile_map_pointer);
-        pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, bg_palette);
+
+        // Note the only time bg_color will be TRANSPARENT will be when there is a non-transparent
+        // sprite underneath with bg_window_over set to true
+        Color bg_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, bg_palette, bg_window_over);
+        if (bg_color != TRANSPARENT) {
+            pixel_color = bg_color;
+        }
     }
 
     set_draw_color(renderer, pixel_color);
