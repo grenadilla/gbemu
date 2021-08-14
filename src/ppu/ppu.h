@@ -90,9 +90,9 @@ class PPU {
         // TODO set color data to map to rgb
         // constexpr COLORS[4] = {...}
 
-        uint8_t tile_data[6 * utils::KILOBYTE];
-        uint8_t tile_map1[utils::KILOBYTE];
-        uint8_t tile_map2[utils::KILOBYTE];
+        uint8_t tile_data[6 * utils::KILOBYTE] = {0};
+        uint8_t tile_map1[utils::KILOBYTE] = {0};
+        uint8_t tile_map2[utils::KILOBYTE] = {0};
         uint8_t OAM[utils::OAM_SIZE] = {0};
 
         // LCD control

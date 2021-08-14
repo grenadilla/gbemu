@@ -62,6 +62,7 @@ void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
             SDL_SetRenderDrawColor(renderer, 15, 56, 15, SDL_ALPHA_OPAQUE);
             break;
         default:
+            std::cerr << "Invalid color: " << (int) color << std::endl;
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     }
 }
@@ -131,7 +132,9 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
         // Check window
     }
 
-    if (pixel_color == TRANSPARENT && bg_window_enable) {
+    if (pixel_color == TRANSPARENT && !bg_window_enable) {
+        pixel_color = bg_palette[0];
+    } else if (pixel_color == TRANSPARENT && bg_window_enable) {
         // Check background
         int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
         int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
@@ -199,11 +202,14 @@ void PPU::tick() {
         case HBLANK: {
             if (internal_timer == 0) {
                 ly++;
+                if (stat_interrupt == LYC_STAT && ly == lyc) {
+                    interrupts->set_interrupt(Interrupts::LCD_STAT);
+                }
                 if (ly < 144) {
                     status = OAM_SEARCH;
                     internal_timer = OAM_SEARCH_LEN;
 
-                    if (stat_interrupt == LYC_STAT || stat_interrupt == OAM_STAT) {
+                    if (stat_interrupt == OAM_STAT) {
                         interrupts->set_interrupt(Interrupts::LCD_STAT);
                     }
                 } else {
