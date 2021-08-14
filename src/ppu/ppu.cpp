@@ -134,7 +134,7 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
 
     if (pixel_color == TRANSPARENT && !bg_window_enable) {
         pixel_color = bg_palette[0];
-    } else if (pixel_color == TRANSPARENT && bg_window_enable) {
+    } else if ((bg_window_over || pixel_color == TRANSPARENT) && bg_window_enable) {
         // Check background
         int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
         int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
