@@ -28,8 +28,8 @@ PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offs
     return palette[palette_index];
 }
 
-uint8_t* PPU::get_bg_tile(int tile_map_pointer) {
-    uint8_t tile_data_pointer = bg_map ? tile_map2[tile_map_pointer] : tile_map1[tile_map_pointer];
+uint8_t* PPU::get_bg_win_tile(int tile_map_pointer, bool tilemap) {
+    uint8_t tile_data_pointer = tilemap ? tile_map2[tile_map_pointer] : tile_map1[tile_map_pointer];
     uint8_t* tile;
 
     // Multiply by 16 when addressing as each tile is 16 bytes
@@ -128,13 +128,31 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
         }
     }
 
-    if (pixel_color == TRANSPARENT && bg_window_enable && window_enable) {
-        // Check window
+    if ((bg_window_over || pixel_color == TRANSPARENT) && bg_window_enable && window_enable) {
+        int win_pixel_x = (pixel_x - window_x + 7);
+        int win_pixel_y = (pixel_y - window_y);
+
+        // Check if window in bounds
+        if (win_pixel_x >= 0 && win_pixel_x < utils::SCREEN_X && win_pixel_y >= 0 && win_pixel_y < utils::SCREEN_Y) {
+            int tile_x = win_pixel_x / utils::TILE_SIZE;
+            int tile_y = win_pixel_y / utils::TILE_SIZE;
+
+            int tile_offset_x = win_pixel_x % utils::TILE_SIZE;
+            int tile_offset_y = win_pixel_y % utils::TILE_SIZE;
+
+            int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
+            uint8_t* tile = get_bg_win_tile(tile_map_pointer, window_map);
+
+            // Note the only time bg_color will be TRANSPARENT will be when there is a non-transparent
+            // sprite underneath with bg_window_over set to true
+            Color win_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, bg_palette, bg_window_over);
+            if (win_color != TRANSPARENT) {
+                pixel_color = win_color;
+            }
+        }
     }
 
-    if (pixel_color == TRANSPARENT && !bg_window_enable) {
-        pixel_color = bg_palette[0];
-    } else if ((bg_window_over || pixel_color == TRANSPARENT) && bg_window_enable) {
+    if ((bg_window_over || pixel_color == TRANSPARENT) && bg_window_enable) {
         // Check background
         int bg_pixel_x = (pixel_x + scroll_x) % utils::BACKGROUND_SIZE;
         int bg_pixel_y = (pixel_y + scroll_y) % utils::BACKGROUND_SIZE;
@@ -146,7 +164,7 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
         int tile_offset_y = bg_pixel_y % utils::TILE_SIZE;
 
         int tile_map_pointer = tile_y * NUM_TILES_X + tile_x;
-        uint8_t* tile = get_bg_tile(tile_map_pointer);
+        uint8_t* tile = get_bg_win_tile(tile_map_pointer, bg_map);
 
         // Note the only time bg_color will be TRANSPARENT will be when there is a non-transparent
         // sprite underneath with bg_window_over set to true
@@ -154,6 +172,10 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
         if (bg_color != TRANSPARENT) {
             pixel_color = bg_color;
         }
+    }
+
+    if (pixel_color == TRANSPARENT && !bg_window_enable) {
+        pixel_color = bg_palette[0];
     }
 
     set_draw_color(renderer, pixel_color);

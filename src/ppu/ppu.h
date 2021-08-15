@@ -131,7 +131,7 @@ class PPU {
          * Use timings 80 - 172 - 204
          */
         Color fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y, Color* palette, bool hide_obj = false);
-        uint8_t* get_bg_tile(int tile_map_pointer);
+        uint8_t* get_bg_win_tile(int tile_map_pointer, bool tilemap);
 
         void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y);
         void draw_line(int pixel_y);
