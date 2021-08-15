@@ -7,7 +7,7 @@ Timer::Timer(Interrupts* interrupts) : interrupts(interrupts) { }
 
 uint8_t Timer::get_divider() const {
     // Divider register is upper 8 bits
-    return (divider & 0xF0) >> 8;
+    return (divider & 0xFF00) >> 8;
 }
 
 void Timer::set_divider(uint8_t val) {
