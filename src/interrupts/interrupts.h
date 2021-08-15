@@ -27,7 +27,7 @@ class Interrupts {
 
     private:
         uint8_t interrupt_enable;
-        uint8_t interrupt_flags = 0xE0;
+        uint8_t interrupt_flags = 0xE1;
 
         // EI is delayed - see https://gbdev.gg8.se/wiki/articles/Interrupts
         bool ime_delay;

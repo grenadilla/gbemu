@@ -108,7 +108,7 @@ class PPU {
 
         uint8_t scroll_y = 0;
         uint8_t scroll_x = 0;
-        uint8_t ly = 0;
+        uint8_t ly = 0x91;
         uint8_t lyc = 0;
         uint8_t window_y = 0;
         uint8_t window_x = 0;
