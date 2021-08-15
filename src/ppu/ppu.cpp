@@ -67,14 +67,19 @@ void PPU::set_draw_color(SDL_Renderer* renderer, Color color) {
     }
 }
 
-void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
+void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<uint8_t*>& drawn_sprites) {
     Color pixel_color = TRANSPARENT;
     bool bg_window_over = false;
 
     if (obj_enable) {
         // Check sprites
         uint8_t lowest_x = 0xFF;
+        uint8_t* selected_sprite = nullptr;
         for (uint8_t* sprite_attr = OAM; sprite_attr < OAM + utils::OAM_SIZE; sprite_attr += 4) {
+            if (drawn_sprites.size() == utils::SPRITE_LIMIT && drawn_sprites.count(sprite_attr) == 0) {
+                continue;
+            }
+
             // Each sprite attribute is 4 bytes
             // Sprite y is by bottom of sprite
             uint8_t sprite_y = sprite_attr[0];
@@ -124,7 +129,12 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
                 pixel_color = sprite_color;
                 bg_window_over = sprite_flags & 0x80;
                 lowest_x = sprite_x;
+                selected_sprite = sprite_attr;
             }
+        }
+
+        if (selected_sprite != nullptr) {
+            drawn_sprites.insert(selected_sprite);
         }
     }
 
@@ -190,8 +200,9 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
 }
 
 void PPU::draw_line(int pixel_y) {
+    std::set<uint8_t*> drawn_sprites;
     for (int pixel_x = 0; pixel_x < utils::SCREEN_X; pixel_x++) {
-        draw_pixel(gb_renderer, pixel_x, pixel_y);
+        draw_pixel(gb_renderer, pixel_x, pixel_y, drawn_sprites);
     }
 }
 

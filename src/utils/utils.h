@@ -22,4 +22,6 @@ namespace utils {
 
     constexpr unsigned CLOCK_SPEED = 4194304;
     constexpr unsigned OAM_SIZE = 160;
+
+    constexpr unsigned SPRITE_LIMIT = 10;
 }

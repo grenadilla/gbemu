@@ -4,6 +4,7 @@
 #include "interrupts.h"
 
 #include <cstdint>
+#include <set>
 #include <SDL2/SDL.h>
 
 constexpr int KILOBYTE = 1024;
@@ -137,7 +138,7 @@ class PPU {
 
         void increment_line();
 
-        void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y);
+        void draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<uint8_t*>& drawn_sprites);
         void draw_line(int pixel_y);
         void draw_tile_display(uint16_t address, bool present = true);
         void update_all_tile_display();
