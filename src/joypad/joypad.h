@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interrupts.h"
+#include <cstdint>
 #include <SDL2/SDL.h>
 
 class Joypad {

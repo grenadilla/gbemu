@@ -8,7 +8,7 @@ uint8_t Memory::hardware_read(uint16_t address) const {
     // TODO IO registers
     switch(address) {
         case 0xFF00:
-            return joypad->read_joypad();
+            return joypad->read_joypad(); 
         case 0xFF04:
             return timer->get_divider();
         case 0xFF05:
