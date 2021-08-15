@@ -130,7 +130,7 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y) {
 
     if ((bg_window_over || pixel_color == TRANSPARENT) && bg_window_enable && window_enable) {
         int win_pixel_x = (pixel_x - window_x + 7);
-        int win_pixel_y = (pixel_y - window_y);
+        int win_pixel_y = (window_internal_line_counter - window_y);
 
         // Check if window in bounds
         if (win_pixel_x >= 0 && win_pixel_x < utils::SCREEN_X && win_pixel_y >= 0 && win_pixel_y < utils::SCREEN_Y) {
@@ -223,7 +223,7 @@ void PPU::tick() {
 
         case HBLANK: {
             if (internal_timer == 0) {
-                ly++;
+                increment_line();
                 if (stat_interrupt == LYC_STAT && ly == lyc) {
                     interrupts->set_interrupt(Interrupts::LCD_STAT);
                 }
@@ -255,13 +255,14 @@ void PPU::tick() {
                 status = OAM_SEARCH;
                 internal_timer = OAM_SEARCH_LEN;
                 ly = 0;
+                window_internal_line_counter = 0;
 
                 if (stat_interrupt == OAM_STAT) {
                     interrupts->set_interrupt(Interrupts::LCD_STAT);
                 }
             } else if (internal_timer % LINE_LEN == 0){
                 // Increment LY for each of the 10 VBLANK lines
-                ly++;
+                increment_line();
             }
             break;
         }
@@ -306,5 +307,13 @@ void PPU::update_all_tile_display() {
             draw_tile_display(address, false);
         }
         SDL_RenderPresent(tile_data_renderer);
+    }
+}
+
+void PPU::increment_line() {
+    ly++;
+    // Only increment window internal line counter if window is visible
+    if (window_x >= 0 && window_x < utils::SCREEN_X && window_y >= 0 && window_y < utils::SCREEN_Y) {
+        window_internal_line_counter++;
     }
 }
