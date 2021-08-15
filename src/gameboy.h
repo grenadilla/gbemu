@@ -5,6 +5,7 @@
 
 #include "interrupts.h"
 #include "timer.h"
+#include "joypad.h"
 #include "memory.h"
 #include "cpu.h"
 
@@ -22,6 +23,7 @@ class Gameboy {
 
         Interrupts interrupts;
         Timer timer;
+        Joypad joypad;
         PPU ppu;
         Memory* mem;
         bool quit = false;

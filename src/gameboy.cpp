@@ -6,8 +6,8 @@
 
 #include "utils.h"
 
-Gameboy::Gameboy(std::string rom_path) : timer(&interrupts), ppu(&interrupts) {
-    mem = new MBC0(rom_path, &interrupts, &timer, &ppu);
+Gameboy::Gameboy(std::string rom_path) : timer(&interrupts), ppu(&interrupts), joypad(&interrupts) {
+    mem = new MBC0(rom_path, &interrupts, &timer, &ppu, &joypad);
     tick_countdown = utils::LIMIT_TICKS;
 }
 
@@ -228,6 +228,8 @@ void Gameboy::tick(CPU& cpu) {
                 quit = true;
             } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
                 quit = true;
+            } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+                joypad.parse_key_event(event);
             }
         }
 

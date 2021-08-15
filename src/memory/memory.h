@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "interrupts.h"
 #include "ppu.h"
+#include "joypad.h"
 #include "utils.h"
 
 #include <string>
@@ -11,7 +12,7 @@
 
 class Memory {
     public:
-        Memory(const std::string rom_path, Interrupts* interrupts, Timer* new_timer, PPU* ppu);
+        Memory(const std::string rom_path, Interrupts* interrupts, Timer* new_timer, PPU* ppu, Joypad* joypad);
         virtual ~Memory() {}
         uint8_t read(uint16_t address, bool transfer = false, bool debug = false) const;
         void write(uint16_t address, uint8_t value);
@@ -45,11 +46,12 @@ class Memory {
         Interrupts* interrupts;
         Timer* timer;
         PPU* ppu;
+        Joypad* joypad;
 };
 
 class MBC0 : public Memory {
     public:
-        MBC0(const std::string rom_path, Interrupts*, Timer* timer, PPU* ppu);
+        MBC0(const std::string rom_path, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
         uint8_t rom_read(const uint16_t address) const;
         void rom_write(const uint16_t address, uint8_t value);
 };

@@ -7,6 +7,8 @@
 uint8_t Memory::hardware_read(uint16_t address) const {
     // TODO IO registers
     switch(address) {
+        case 0xFF00:
+            return joypad->read_joypad();
         case 0xFF04:
             return timer->get_divider();
         case 0xFF05:
@@ -49,6 +51,9 @@ uint8_t Memory::hardware_read(uint16_t address) const {
 void Memory::hardware_write(uint16_t address, uint8_t value) {
     // TODO IO registers
     switch (address) {
+        case 0xFF00:
+            joypad->write_joypad(value);
+            break;
         case 0xFF01:
             // Serial port
             // output character here for blargg's test roms

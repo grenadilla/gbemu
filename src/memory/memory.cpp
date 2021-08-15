@@ -4,8 +4,8 @@
 #include <fstream>
 #include <iomanip>
 
-Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu) 
-    : interrupts(interrupts), timer(timer), ppu(ppu) {
+Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
+    : interrupts(interrupts), timer(timer), ppu(ppu), joypad(joypad) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
         rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
@@ -144,8 +144,8 @@ void Memory::write(uint16_t address, uint8_t value) {
     }
 }
 
-MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu) 
-    : Memory(rom_path, interrupts, timer, ppu) {}
+MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
+    : Memory(rom_path, interrupts, timer, ppu, joypad) {}
 
 uint8_t MBC0::rom_read(uint16_t address) const {
     return rom_data[address];
