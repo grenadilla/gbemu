@@ -12,7 +12,8 @@
 
 class Memory {
     public:
-        Memory(const std::string rom_path, Interrupts* interrupts, Timer* new_timer, PPU* ppu, Joypad* joypad);
+        static Memory* get_cartridge(const std::string& rom_path, Interrupts* interrupts, Timer* new_timer, PPU* ppu, Joypad* joypad);
+        Memory(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* new_timer, PPU* ppu, Joypad* joypad);
         virtual ~Memory() {}
         uint8_t read(uint16_t address, bool transfer = false, bool debug = false) const;
         void write(uint16_t address, uint8_t value);
@@ -47,11 +48,4 @@ class Memory {
         Timer* timer;
         PPU* ppu;
         Joypad* joypad;
-};
-
-class MBC0 : public Memory {
-    public:
-        MBC0(const std::string rom_path, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
-        uint8_t rom_read(const uint16_t address) const;
-        void rom_write(const uint16_t address, uint8_t value);
 };

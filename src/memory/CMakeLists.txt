@@ -6,3 +6,4 @@ target_sources(gameboy
 )
 
 target_include_directories(gameboy PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+add_subdirectory(mbc)

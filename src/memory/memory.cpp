@@ -1,17 +1,24 @@
 #include "memory.h"
 
+#include "mbc0.h"
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
-Memory::Memory(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
-    : interrupts(interrupts), timer(timer), ppu(ppu), joypad(joypad) {
+Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
-        rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
+        const std::vector<uint8_t> rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
             std::istreambuf_iterator<char>());
+        return new MBC0(rom_data, interrupts, timer, ppu, joypad);
+    } else {
+        return nullptr;
     }
 }
+
+Memory::Memory(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
+    : rom_data(rom_data), interrupts(interrupts), timer(timer), ppu(ppu), joypad(joypad) { }
 
 bool Memory::is_loaded() const {
     return !rom_data.empty();
@@ -142,18 +149,6 @@ void Memory::write(uint16_t address, uint8_t value) {
     } else if (address == 0xFFFF) {
         hardware_write(address, value);
     }
-}
-
-MBC0::MBC0(const std::string rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
-    : Memory(rom_path, interrupts, timer, ppu, joypad) {}
-
-uint8_t MBC0::rom_read(uint16_t address) const {
-    return rom_data[address];
-}
-
-void MBC0::rom_write(uint16_t address, uint8_t value) {
-    std::cerr << "Attempted write into ROM of " << utils::hexify8 << +value 
-        << " at address " << utils::hexify16 << address << std::endl;
 }
 
 void Memory::tick(unsigned cycles) {
