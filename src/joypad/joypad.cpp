@@ -6,6 +6,7 @@ Joypad::Joypad(Interrupts* interrupts) : interrupts(interrupts) { }
 
 void Joypad::parse_key_event(SDL_Event event) {
     bool pressed = event.type == SDL_KEYDOWN;
+    bool raise_interrupt = true;
     switch (event.key.keysym.sym) {
         case SDLK_a:
             button_b = pressed;
@@ -32,6 +33,13 @@ void Joypad::parse_key_event(SDL_Event event) {
         case SDLK_RIGHT:
             right = pressed;
             break;
+        default:
+            raise_interrupt = false;
+            break;
+    }
+
+    if (raise_interrupt) {
+        interrupts->set_interrupt(Interrupts::JOYPAD);
     }
 }
 

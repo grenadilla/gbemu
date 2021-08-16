@@ -236,7 +236,8 @@ void Gameboy::tick(CPU& cpu) {
         // Cap FPS
         unsigned curr_time = SDL_GetTicks();
         unsigned time_delta = curr_time - last_time;
-        unsigned delay = (cycle_acc * 1000 - time_delta * utils::CLOCK_SPEED) / (utils::CLOCK_SPEED * 1000);
+        double expected_ms = cycles * 1000 / utils::CLOCK_SPEED;
+        int delay = static_cast<unsigned>(expected_ms - time_delta);
         if (delay > 0) {
             SDL_Delay(delay);
         }
