@@ -1,6 +1,8 @@
 #include "memory.h"
 
 #include "mbc0.h"
+#include "mbc1.h"
+#include "utils.h"
 
 #include <iostream>
 #include <fstream>
@@ -11,7 +13,19 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
     if (file.is_open()) {
         const std::vector<uint8_t> rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
             std::istreambuf_iterator<char>());
-        return new MBC0(rom_data, interrupts, timer, ppu, joypad);
+
+        uint8_t mbc_type = rom_data[utils::MBC_TYPE_ADDRESS];
+
+        switch (mbc_type) {
+            case 0x00:
+                return new MBC0(rom_data, interrupts, timer, ppu, joypad);
+            case 0x01:
+            case 0x02:
+            case 0x03:
+                return new MBC1(rom_data, interrupts, timer, ppu, joypad);
+            default:
+                return nullptr;
+        }
     } else {
         return nullptr;
     }
@@ -49,7 +63,7 @@ uint8_t Memory::read(uint16_t address, bool transfer, bool debug) const {
         // Cartridge fixed bank
         return rom_data[address];
     } else if (address <= 0x7FFF) {
-        return rom_read(address);
+        return mbc_read(address);
     } else if (address <= 0x9FFF) {
         // VRAM
         if (address <= 0x97FF) {
@@ -62,7 +76,7 @@ uint8_t Memory::read(uint16_t address, bool transfer, bool debug) const {
         }
     } else if (address <= 0xBFFF) {
         // External RAM
-        return ext_ram[address - 0xA000];
+        return mbc_read(address);
     } else if (address <= 0xCFFF) {
         // WRAM 0
         return wram0[address - 0xC000];
@@ -104,10 +118,9 @@ void Memory::write(uint16_t address, uint8_t value) {
 
     if (address <= 0x3FFF) {
         // Cartridge fixed bank
-        std::cerr << "Invalid write into fixed bank ROM of " << utils::hexify8 << +value
-            << " at memory address " << utils::hexify16 << address << std::endl;
+        mbc_write(address, value);
     } else if (address <= 0x7FFF) {
-        rom_write(address, value);
+        mbc_write(address, value);
     } else if (address <= 0x9FFF) {
         // VRAM
         if (address <= 0x97FF) {
@@ -120,7 +133,7 @@ void Memory::write(uint16_t address, uint8_t value) {
         }
     } else if (address <= 0xBFFF) {
         // External RAM
-        ext_ram[address - 0xA000] = value;
+         mbc_write(address, value);
     } else if (address <= 0xCFFF) {
         // WRAM 0
         wram0[address - 0xC000] = value;

@@ -191,7 +191,7 @@ void Gameboy::debug_run(CPU& cpu) {
 }
 
 void Gameboy::run(bool debug, bool tilemap) {
-    if (!mem->is_loaded()) {
+    if (mem == nullptr) {
         std::cout << "Bad file name or error while reading file" << std::endl;
         return;
     }

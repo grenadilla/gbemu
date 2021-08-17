@@ -24,4 +24,6 @@ namespace utils {
     constexpr unsigned OAM_SIZE = 160;
 
     constexpr unsigned SPRITE_LIMIT = 10;
+
+    constexpr uint16_t MBC_TYPE_ADDRESS = 0x0147;
 }

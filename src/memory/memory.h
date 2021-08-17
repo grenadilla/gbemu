@@ -23,17 +23,13 @@ class Memory {
         void tick(unsigned cycles);
 
     protected:
-        // The address used for rom_read and rom_write
-        // are relative to the ROM, not the memory map
-        // In practicality this is ptr - 0x4000
-        virtual uint8_t rom_read(uint16_t address) const = 0;
-        virtual void rom_write(uint16_t address, uint8_t value) = 0;
+        virtual uint8_t mbc_read(uint16_t address) const = 0;
+        virtual void mbc_write(uint16_t address, uint8_t value) = 0;
 
         uint8_t hardware_read(uint16_t address) const;
         void hardware_write(uint16_t address, uint8_t value);
 
         std::vector<uint8_t> rom_data;
-        uint8_t ext_ram[8 * utils::KILOBYTE];
         uint8_t wram0[4 * utils::KILOBYTE];
         uint8_t wram1[4 * utils::KILOBYTE];
         uint8_t hram[126];
