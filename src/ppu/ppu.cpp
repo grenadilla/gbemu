@@ -87,6 +87,10 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<
             uint8_t tile_index = sprite_attr[2];
             uint8_t sprite_flags = sprite_attr[3];
 
+            bool y_flip = sprite_flags & 0x40;
+            bool x_flip = sprite_flags & 0x20;
+            bool palette_number = sprite_flags & 0x10;
+
             // Priority is determined by which sprite has the lower x value
             // and which sprite is first in OAM for tiebreakers
             if (sprite_x >= lowest_x) {
@@ -99,23 +103,28 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<
 
             // Remember tiles are 16 bytes
             // When 8 x 16 tiles, ignore LSB of tile index, enforced by hardware
+            // When y is flipped for 8 x 16 sprites, we have to worry about flipping which object we are using too
             if (obj_size && pixel_y < sprite_y && (pixel_y + 8) >= sprite_y && (pixel_x + 8) >= sprite_x && pixel_x < sprite_x) {
                 // Bottom tile of 8 x 16 sprite
-                tile = tile_data + (tile_index | 0x01) * 16;
+                if (y_flip) {
+                    tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * 16;
+                } else {
+                    tile = tile_data + (tile_index | 0x01) * 16;
+                }
                 tile_offset_x = pixel_x - sprite_x + 8;
                 tile_offset_y = pixel_y - sprite_y + 8;
             } else if ((pixel_y + 8) < sprite_y && (pixel_y + 16) >= sprite_y && (pixel_x + 8) >= sprite_x && pixel_x < sprite_x) {
                 // Top tile of 8 x 16 sprite or in 8 x 8 sprite
-                tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * 16;
+                if (y_flip && obj_size) {
+                    tile = tile_data + (tile_index | 0x01) * 16;
+                } else {
+                    tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * 16;
+                }
                 tile_offset_x = pixel_x - sprite_x + 8;
                 tile_offset_y = pixel_y - sprite_y + 16;
             } else {
                 continue;
             }
-
-            bool y_flip = sprite_flags & 0x40;
-            bool x_flip = sprite_flags & 0x20;
-            bool palette_number = sprite_flags & 0x10;
 
             if (y_flip) {
                 tile_offset_y = 7 - tile_offset_y;
