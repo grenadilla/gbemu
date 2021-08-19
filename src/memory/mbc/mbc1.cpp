@@ -18,7 +18,7 @@ uint8_t MBC1::mbc_read(uint16_t address) const {
             uint16_t offset = address - 0xA000;
             return RAM[ram_bank_number * 8 * utils::KILOBYTE + offset];
         } else {
-            std::cerr << "Attempted to write into RAM bank when RAM is disabled" << std::endl;
+            std::cerr << "Attempted to read RAM bank when RAM is disabled" << std::endl;
         }
     }
     return 0xFF;
@@ -45,5 +45,13 @@ void MBC1::mbc_write(uint16_t address, uint8_t value) {
         }
     } else if (address >= 0x6000 && address < 0x8000) {
         rom_mode = !(value & 0x01);
+    } else if (address >= 0xA000 && address < 0xC000) {
+        // Ram banks
+        if (ram_enabled) {
+            uint16_t offset = address - 0xA000;
+            RAM[ram_bank_number * 8 * utils::KILOBYTE + offset] = value;
+        } else {
+            std::cerr << "Attempted to write into RAM bank when RAM is disabled" << std::endl;
+        }
     }
 }
