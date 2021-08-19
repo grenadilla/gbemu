@@ -76,7 +76,7 @@ uint8_t Memory::read(uint16_t address, bool transfer, bool debug) const {
         }
     } else if (address <= 0xBFFF) {
         // External RAM
-        return mbc_read(address);
+        return ram_read(address - 0xA000);
     } else if (address <= 0xCFFF) {
         // WRAM 0
         return wram0[address - 0xC000];
@@ -133,7 +133,7 @@ void Memory::write(uint16_t address, uint8_t value) {
         }
     } else if (address <= 0xBFFF) {
         // External RAM
-         mbc_write(address, value);
+        ram_write(address - 0xA000, value);
     } else if (address <= 0xCFFF) {
         // WRAM 0
         wram0[address - 0xC000] = value;

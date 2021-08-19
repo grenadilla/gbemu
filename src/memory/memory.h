@@ -23,11 +23,8 @@ class Memory {
         void tick(unsigned cycles);
 
     protected:
-        virtual uint8_t mbc_read(uint16_t address) const = 0;
-        virtual void mbc_write(uint16_t address, uint8_t value) = 0;
-
-        uint8_t hardware_read(uint16_t address) const;
-        void hardware_write(uint16_t address, uint8_t value);
+        bool ram_enabled = false;
+        std::vector<uint8_t> RAM;
 
         std::vector<uint8_t> rom_data;
         uint8_t wram0[4 * utils::KILOBYTE];
@@ -44,4 +41,15 @@ class Memory {
         Timer* timer;
         PPU* ppu;
         Joypad* joypad;
+
+        virtual uint8_t mbc_read(uint16_t address) const = 0;
+        virtual void mbc_write(uint16_t address, uint8_t value) = 0;
+
+        // Unlike the other read and write functions which go off address,
+        // RAM read/write functions go off offset from beginning of RAM address space
+        virtual uint8_t ram_read(uint16_t offset) const = 0;
+        virtual void ram_write(uint16_t offset, uint8_t value) = 0;
+
+        uint8_t hardware_read(uint16_t address) const;
+        void hardware_write(uint16_t address, uint8_t value);
 };
