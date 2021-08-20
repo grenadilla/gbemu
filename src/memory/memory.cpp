@@ -15,7 +15,6 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
             std::istreambuf_iterator<char>());
 
         uint8_t mbc_type = rom_data[utils::MBC_TYPE_ADDRESS];
-
         switch (mbc_type) {
             case 0x00:
                 return new MBC0(rom_data, interrupts, timer, ppu, joypad);
@@ -32,7 +31,9 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
 }
 
 Memory::Memory(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
-    : rom_data(rom_data), interrupts(interrupts), timer(timer), ppu(ppu), joypad(joypad) { }
+    : rom_data(rom_data), interrupts(interrupts), timer(timer), ppu(ppu), joypad(joypad) {
+    title = std::string(((char*) rom_data.data()) + utils::TITLE_ADDRESS);
+}
 
 bool Memory::is_loaded() const {
     return !rom_data.empty();

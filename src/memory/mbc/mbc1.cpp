@@ -4,7 +4,14 @@
 
 MBC1::MBC1(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
     : Memory(rom_data, interrupts, timer, ppu, joypad) {
-    RAM.resize(ram_size, 0);
+    std::ifstream file(title + ".sav", std::ios::in | std::ios::binary);
+    if (file.is_open()) {
+        RAM = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
+            std::istreambuf_iterator<char>());
+    }
+    if (RAM.size() < ram_size) {
+        RAM.resize(ram_size, 0);
+    }
 }
 
 uint8_t MBC1::mbc_read(uint16_t address) const {
@@ -20,11 +27,18 @@ uint8_t MBC1::mbc_read(uint16_t address) const {
 
 void MBC1::mbc_write(uint16_t address, uint8_t value) {
     if (address < 0x2000) {
+        bool previous = ram_enabled;
         ram_enabled = (value & 0x0F) == 0x0A;
         if (ram_enabled && RAM.size() < ram_size) {
             RAM.resize(ram_size, 0);
-        } else {
-            // Save RAM to disk
+        } else if (previous && !ram_enabled) {
+            // Turned RAM off, so save RAM to disk as save file
+            if (!save_file.is_open()) {
+                save_file = std::ofstream(title + ".sav", std::ios::out | std::ios::binary);
+            }
+            save_file.write(((char*) RAM.data()), ram_size);
+            save_file.seekp(0);
+            std::cerr << "Saving " << title << ".sav" << std::endl;
         }
     } else if (address >= 0x2000 && address < 0x4000) {
         // ROM bank number
@@ -44,9 +58,8 @@ void MBC1::mbc_write(uint16_t address, uint8_t value) {
         }
     } else if (address >= 0x6000 && address < 0x8000) {
         rom_mode = !(value & 0x01);
-        if (rom_mode) {
-            ram_size = 8 * utils::KILOBYTE;
-        } else {
+        // Check if we need to expand RAM size to 32kb save file
+        if (!rom_mode) {
             ram_size = 32 * utils::KILOBYTE;
         }
     }

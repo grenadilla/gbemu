@@ -5,6 +5,7 @@
 #include "utils.h"
 #include <vector>
 #include <cstdint>
+#include <fstream>
 
 class MBC1 : public Memory {
     public:
@@ -16,6 +17,8 @@ class MBC1 : public Memory {
         bool ram_enabled = false;
         bool rom_mode = true;
         unsigned ram_size = 8 * utils::KILOBYTE;
+
+        std::ofstream save_file;
 
         uint8_t mbc_read(const uint16_t address) const;
         void mbc_write(const uint16_t address, uint8_t value);

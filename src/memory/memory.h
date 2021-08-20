@@ -23,6 +23,8 @@ class Memory {
         void tick(unsigned cycles);
 
     protected:
+        std::string title;
+        
         bool ram_enabled = false;
         std::vector<uint8_t> RAM;
 
