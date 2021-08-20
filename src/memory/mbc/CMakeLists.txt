@@ -4,5 +4,7 @@ target_sources(gameboy
         mbc0.cpp
         mbc1.h
         mbc1.cpp
+        mbc3.h
+        mbc3.cpp
 )
 target_include_directories(gameboy PUBLIC ${CMAKE_CURRENT_LIST_DIR})

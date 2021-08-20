@@ -2,6 +2,7 @@
 
 #include "mbc0.h"
 #include "mbc1.h"
+#include "mbc3.h"
 #include "utils.h"
 
 #include <iostream>
@@ -22,6 +23,12 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
             case 0x02:
             case 0x03:
                 return new MBC1(rom_data, interrupts, timer, ppu, joypad);
+            case 0x0F:
+            case 0x10:
+            case 0x11:
+            case 0x12:
+            case 0x13:
+                return new MBC3(rom_data, interrupts, timer, ppu, joypad);
             default:
                 return nullptr;
         }
