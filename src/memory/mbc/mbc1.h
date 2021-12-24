@@ -9,7 +9,7 @@
 
 class MBC1 : public Memory {
     public:
-        MBC1(const std::vector<uint8_t>& rom_data, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
+        MBC1(const std::vector<uint8_t>& rom_data, unsigned num_banks, unsigned ram_size, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
 
     private:
         uint8_t bank1 = 0x01;
@@ -21,7 +21,8 @@ class MBC1 : public Memory {
 
         bool ram_enabled = false;
         bool rom_mode = true;
-        unsigned ram_size = 8 * utils::KILOBYTE;
+
+        unsigned ram_size = 0;
 
         std::ofstream save_file;
 

@@ -15,6 +15,59 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
         const std::vector<uint8_t> rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
             std::istreambuf_iterator<char>());
 
+        unsigned num_banks = 0;
+        switch (rom_data[utils::MBC_ROM_SIZE]) {
+            case 0x00:
+                num_banks = 0;
+                break;
+            case 0x01:
+                num_banks = 4;
+                break;
+            case 0x02:
+                num_banks = 8;
+                break;
+            case 0x03:
+                num_banks = 16;
+                break;
+            case 0x04:
+                num_banks = 32;
+                break;
+            case 0x05:
+                num_banks = 64;
+                break;
+            case 0x06:
+                num_banks = 128;
+                break;
+            case 0x07:
+                num_banks = 256;
+                break;
+            case 0x08:
+                num_banks = 512;
+                break;
+        }
+
+        unsigned ram_size = 0;
+        switch (rom_data[utils::MBC_RAM_SIZE]) {
+            case 0x00:
+                ram_size = 0;
+                break;
+            case 0x01:
+                ram_size = 2;
+                break;
+            case 0x02:
+                ram_size = 8;
+                break;
+            case 0x03:
+                ram_size = 32;
+                break;
+            case 0x04:
+                ram_size = 128;
+                break;
+            case 0x05:
+                ram_size = 64;
+                break;
+        }
+
         uint8_t mbc_type = rom_data[utils::MBC_TYPE_ADDRESS];
         switch (mbc_type) {
             case 0x00:
@@ -24,7 +77,7 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
             case 0x02:
             case 0x03:
                 std::cout << "MBC1" << std::endl;
-                return new MBC1(rom_data, interrupts, timer, ppu, joypad);
+                return new MBC1(rom_data, num_banks, ram_size, interrupts, timer, ppu, joypad);
             case 0x0F:
             case 0x10:
             case 0x11:
