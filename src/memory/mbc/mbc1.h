@@ -12,13 +12,20 @@ class MBC1 : public Memory {
         MBC1(const std::vector<uint8_t>& rom_data, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
 
     private:
-        uint8_t rom_bank_number = 0x01;
-        uint8_t ram_bank_number = 0x00;
+        uint8_t bank1 = 0x01;
+        uint8_t bank2 = 0x00;
+
         bool ram_enabled = false;
         bool rom_mode = true;
         unsigned ram_size = 8 * utils::KILOBYTE;
 
         std::ofstream save_file;
+
+        void set_bank1(uint8_t bits);
+        void set_bank2(uint8_t bits);
+
+        uint8_t get_rom_bank(bool lower) const;
+        uint8_t get_ram_bank() const;
 
         uint8_t mbc_read(const uint16_t address) const;
         void mbc_write(const uint16_t address, uint8_t value);

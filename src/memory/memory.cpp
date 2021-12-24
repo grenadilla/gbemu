@@ -18,16 +18,19 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
         uint8_t mbc_type = rom_data[utils::MBC_TYPE_ADDRESS];
         switch (mbc_type) {
             case 0x00:
+                std::cout << "MBC0" << std::endl;
                 return new MBC0(rom_data, interrupts, timer, ppu, joypad);
             case 0x01:
             case 0x02:
             case 0x03:
+                std::cout << "MBC1" << std::endl;
                 return new MBC1(rom_data, interrupts, timer, ppu, joypad);
             case 0x0F:
             case 0x10:
             case 0x11:
             case 0x12:
             case 0x13:
+                std::cout << "MBC3" << std::endl;
                 return new MBC3(rom_data, interrupts, timer, ppu, joypad);
             default:
                 return nullptr;
