@@ -16,7 +16,7 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
             std::istreambuf_iterator<char>());
 
         unsigned num_banks = 0;
-        switch (rom_data[utils::MBC_ROM_SIZE]) {
+        switch (rom_data[utils::MBC_ROM_SIZE_ADDRESS]) {
             case 0x00:
                 num_banks = 0;
                 break;
@@ -47,7 +47,7 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
         }
 
         unsigned ram_size = 0;
-        switch (rom_data[utils::MBC_RAM_SIZE]) {
+        switch (rom_data[utils::MBC_RAM_SIZE_ADDRESS]) {
             case 0x00:
                 ram_size = 0;
                 break;

@@ -18,7 +18,7 @@ MBC1::MBC1(const std::vector<uint8_t>& rom_data, unsigned num_banks, unsigned ra
 
     // Calculate number of ROM banks and form the mask
     // each bank is 16 kilobytes
-    bank_mask = num_banks - 1;
+    bank_mask = num_banks == 0 ? 1 : num_banks - 1;
 }
 
 void MBC1::set_bank1(uint8_t bits) {

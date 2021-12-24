@@ -26,8 +26,8 @@ namespace utils {
     constexpr unsigned SPRITE_LIMIT = 10;
 
     constexpr uint16_t MBC_TYPE_ADDRESS = 0x0147;
-    constexpr uint16_t MBC_ROM_SIZE = 0x0148;
-    constexpr uint16_t MBC_RAM_SIZE = 0x0149;
+    constexpr uint16_t MBC_ROM_SIZE_ADDRESS = 0x0148;
+    constexpr uint16_t MBC_RAM_SIZE_ADDRESS = 0x0149;
 
     constexpr uint16_t TITLE_ADDRESS = 0x0134;
 }
