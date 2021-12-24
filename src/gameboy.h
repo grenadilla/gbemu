@@ -13,7 +13,7 @@ class Gameboy {
     public:
         Gameboy(std::string rom_path);
         ~Gameboy();
-        void run(bool debug = false, bool tilemap = false);
+        void run(bool graphics = true, bool debug = false, bool tilemap = false);
 
     private:
         void tick(CPU& cpu);

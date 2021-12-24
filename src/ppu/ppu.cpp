@@ -229,7 +229,10 @@ void PPU::tick() {
         case READ: {
             // For simplicity we draw the whole line in the middle of the read
             if (internal_timer == READ_LEN / 2) {
-                draw_line(ly);
+                if (gb_renderer != nullptr) {
+                    // Renderer can be nullptr if ran without graphics
+                    draw_line(ly);
+                }
             } else if (internal_timer == 0) {
                 status = HBLANK;
                 internal_timer = HBLANK_LEN;
