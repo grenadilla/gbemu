@@ -84,7 +84,7 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
             case 0x12:
             case 0x13:
                 std::cout << "MBC3" << std::endl;
-                return new MBC3(rom_data, interrupts, timer, ppu, joypad);
+                return new MBC3(rom_data, num_banks, ram_size, interrupts, timer, ppu, joypad);
             default:
                 return nullptr;
         }

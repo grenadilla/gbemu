@@ -9,14 +9,17 @@
 
 class MBC3 : public Memory {
     public:
-        MBC3(const std::vector<uint8_t>& rom_data, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
+        MBC3(const std::vector<uint8_t>& rom_data, unsigned num_banks, unsigned ram_size, 
+            Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
 
     private:
         uint8_t rom_bank_number = 0x01;
         uint8_t ram_bank_number = 0x00;
         bool ram_enabled = false;
         bool rtc_mode = false;
-        constexpr static unsigned RAM_SIZE = 32 * utils::KILOBYTE;
+
+        uint8_t bank_mask = 0xFF;
+        unsigned ram_size = 0;
 
         std::ofstream save_file;
 
