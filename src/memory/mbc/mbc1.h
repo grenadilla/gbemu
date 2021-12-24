@@ -15,6 +15,10 @@ class MBC1 : public Memory {
         uint8_t bank1 = 0x01;
         uint8_t bank2 = 0x00;
 
+        // For ROM sizes less than 2 megabytes, we need to mask off the
+        // extra ROM bank bits that are unneeded
+        uint8_t bank_mask = 0xFF;
+
         bool ram_enabled = false;
         bool rom_mode = true;
         unsigned ram_size = 8 * utils::KILOBYTE;

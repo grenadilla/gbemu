@@ -13,6 +13,11 @@ MBC1::MBC1(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* 
     if (RAM.size() < ram_size) {
         RAM.resize(ram_size, 0);
     }
+
+    // Calculate number of ROM banks and form the mask
+    // each bank is 16 kilobytes
+    uint8_t num_banks = rom_data.size() / 16 / utils::KILOBYTE;
+    bank_mask = num_banks - 1;
 }
 
 void MBC1::set_bank1(uint8_t bits) {
@@ -31,14 +36,17 @@ uint8_t MBC1::get_rom_bank(bool lower) const {
         if (rom_mode) {
             return 0;
         } else {
-            return bank2 << 5;
+            return (bank2 << 5) & bank_mask;
         }
     } else {
-        return (bank2 << 5) | bank1;
+        return ((bank2 << 5) | bank1) & bank_mask;
     }
 }
 
 uint8_t MBC1::get_ram_bank() const {
+    if (rom_mode) {
+        return 0;
+    }
     return bank2;
 }
 

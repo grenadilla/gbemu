@@ -72,7 +72,7 @@ uint8_t Memory::read(uint16_t address, bool transfer, bool debug) const {
 
     if (address <= 0x3FFF) {
         // Cartridge fixed bank
-        return rom_data[address];
+        return mbc_read(address);
     } else if (address <= 0x7FFF) {
         return mbc_read(address);
     } else if (address <= 0x9FFF) {
