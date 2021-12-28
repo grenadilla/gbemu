@@ -19,6 +19,8 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return timer->get_control();
         case 0xFF0F:
             return interrupts->get_IF();
+        case 0xFF24:
+            return apu->get_nr50();
         case 0xFF40:
             return ppu->read_lcd_control();
         case 0xFF41:
@@ -73,6 +75,9 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             break;
         case 0xFF0F:
             interrupts->set_IF(value);
+            break;
+        case 0xFF24:
+            apu->set_nr50(value);
             break;
         case 0xFF40:
             ppu->write_lcd_control(value);

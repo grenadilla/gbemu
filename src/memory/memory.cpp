@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iomanip>
 
-Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) {
+Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupts, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad) {
     std::ifstream file(rom_path, std::ios::in | std::ios::binary);
     if (file.is_open()) {
         const std::vector<uint8_t> rom_data = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 
@@ -72,19 +72,19 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
         switch (mbc_type) {
             case 0x00:
                 std::cout << "MBC0" << std::endl;
-                return new MBC0(rom_data, interrupts, timer, ppu, joypad);
+                return new MBC0(rom_data, interrupts, timer, apu, ppu, joypad);
             case 0x01:
             case 0x02:
             case 0x03:
                 std::cout << "MBC1" << std::endl;
-                return new MBC1(rom_data, num_banks, ram_size, interrupts, timer, ppu, joypad);
+                return new MBC1(rom_data, num_banks, ram_size, interrupts, timer, apu, ppu, joypad);
             case 0x0F:
             case 0x10:
             case 0x11:
             case 0x12:
             case 0x13:
                 std::cout << "MBC3" << std::endl;
-                return new MBC3(rom_data, num_banks, ram_size, interrupts, timer, ppu, joypad);
+                return new MBC3(rom_data, num_banks, ram_size, interrupts, timer, apu, ppu, joypad);
             default:
                 return nullptr;
         }
@@ -93,8 +93,8 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
     }
 }
 
-Memory::Memory(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
-    : rom_data(rom_data), interrupts(interrupts), timer(timer), ppu(ppu), joypad(joypad) {
+Memory::Memory(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad) 
+    : rom_data(rom_data), interrupts(interrupts), timer(timer), apu(apu), ppu(ppu), joypad(joypad) {
     title = std::string(((char*) rom_data.data()) + utils::TITLE_ADDRESS);
 }
 

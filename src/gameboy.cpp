@@ -7,7 +7,7 @@
 #include "utils.h"
 
 Gameboy::Gameboy(std::string rom_path) : timer(&interrupts), ppu(&interrupts), joypad(&interrupts) {
-    mem = Memory::get_cartridge(rom_path, &interrupts, &timer, &ppu, &joypad);
+    mem = Memory::get_cartridge(rom_path, &interrupts, &timer, &apu, &ppu, &joypad);
     tick_countdown = utils::LIMIT_TICKS;
 }
 

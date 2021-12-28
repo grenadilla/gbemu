@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-MBC0::MBC0(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
-    : Memory(rom_data, interrupts, timer, ppu, joypad) {}
+MBC0::MBC0(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad) 
+    : Memory(rom_data, interrupts, timer, apu, ppu, joypad) {}
 
 uint8_t MBC0::mbc_read(uint16_t address) const {
     if (address < 0x8000) {

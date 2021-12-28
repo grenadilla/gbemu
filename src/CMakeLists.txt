@@ -14,6 +14,7 @@ target_link_libraries(gameboy PUBLIC ${SDL2_LIBRARIES})
 
 add_subdirectory(utils)
 add_subdirectory(interrupts)
+add_subdirectory(apu)
 add_subdirectory(ppu)
 add_subdirectory(joypad)
 add_subdirectory(timer)

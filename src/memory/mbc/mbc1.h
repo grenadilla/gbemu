@@ -10,7 +10,7 @@
 class MBC1 : public Memory {
     public:
         MBC1(const std::vector<uint8_t>& rom_data, unsigned num_banks, unsigned ram_size,
-            Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
+            Interrupts*, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad);
 
         void print_debug() {}
 

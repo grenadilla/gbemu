@@ -4,8 +4,8 @@
 #include <iostream>
 
 MBC1::MBC1(const std::vector<uint8_t>& rom_data, unsigned num_banks, unsigned ram_size, 
-    Interrupts* interrupts, Timer* timer, PPU* ppu, Joypad* joypad) 
-    : Memory(rom_data, interrupts, timer, ppu, joypad) {
+    Interrupts* interrupts, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad) 
+    : Memory(rom_data, interrupts, timer, apu, ppu, joypad) {
     std::ifstream file(title + ".sav", std::ios::in | std::ios::binary);
     if (file.is_open()) {
         RAM = std::vector<uint8_t>((std::istreambuf_iterator<char>(file)), 

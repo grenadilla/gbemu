@@ -7,7 +7,7 @@
 
 class MBC0 : public Memory {
     public:
-        MBC0(const std::vector<uint8_t>& rom_data, Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
+        MBC0(const std::vector<uint8_t>& rom_data, Interrupts*, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad);
 
         void print_debug() {}
 
