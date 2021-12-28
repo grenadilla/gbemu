@@ -22,6 +22,8 @@ class Memory {
         // Used for DMA transfer to OAM cycle counting
         void tick(unsigned cycles);
 
+        virtual void print_debug() = 0;
+
     protected:
         std::string title;
         

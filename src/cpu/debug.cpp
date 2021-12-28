@@ -18,6 +18,9 @@ void CPU::print_debug(uint8_t opcode) {
         << "Half Carry: " << F.get_half_carry() << '\n'
         << "Carry " << F.get_carry() << '\n' 
         << std::endl;
+
+    interrupts->print_debug();
+    mem->print_debug();
 }
 
 void CPU::print_line_debug(uint8_t opcode) {

@@ -25,6 +25,8 @@ class Interrupts {
 
         void set_interrupt(uint8_t flag);
 
+        void print_debug();
+
     private:
         uint8_t interrupt_enable = 0;
         uint8_t interrupt_flags = 0xE1;

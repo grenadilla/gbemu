@@ -12,6 +12,8 @@ class MBC3 : public Memory {
         MBC3(const std::vector<uint8_t>& rom_data, unsigned num_banks, unsigned ram_size, 
             Interrupts*, Timer* timer, PPU* ppu, Joypad* joypad);
 
+        void print_debug();
+
     private:
         uint8_t rom_bank_number = 0x01;
         uint8_t ram_bank_number = 0x00;

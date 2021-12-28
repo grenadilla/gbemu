@@ -78,3 +78,10 @@ void MBC3::ram_write(uint16_t offset, uint8_t value) {
         std::cerr << "Attempted to write into RAM bank when RAM is disabled" << std::endl;
     }
 }
+
+void MBC3::print_debug() {
+    std::cout << "Ram enabled: " << (int) ram_enabled << '\n'
+    << "RTC Mode: " << (int) rtc_mode << '\n'
+    << "Rom Bank: " << (int) rom_bank_number << '\n'
+    << "Ram Bank: " << (int) ram_bank_number << '\n' << std::endl;
+}

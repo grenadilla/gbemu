@@ -1,5 +1,7 @@
 #include "interrupts.h"
 
+#include <iostream>
+
 uint8_t Interrupts::get_IF() const {
     return interrupt_flags;
 }
@@ -68,4 +70,26 @@ uint8_t Interrupts::get_interrupt() {
     }
 
     return result;
+}
+
+void Interrupts::print_debug() {
+    std::cout << "Interrupt Master Enable: " << (int) ime << std::endl;
+
+    if (interrupt_enable & VBLANK) {
+        std::cout << "VBLANK enabled" << std::endl;
+    }
+    if (interrupt_enable & LCD_STAT) {
+        std::cout << "STAT enabled" << std::endl;
+    }
+    if (interrupt_enable & TIMER) {
+        std::cout << "TIMER enabled" << std::endl;
+    }
+    if (interrupt_enable & SERIAL) {
+        std::cout << "SERIAL enabled" << std::endl;
+    }
+    if (interrupt_enable & JOYPAD) {
+        std::cout << "JOYPAD enabled" << std::endl;
+    }
+
+    std::cout << std::endl;
 }
