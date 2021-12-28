@@ -11,6 +11,15 @@ uint8_t Timer::get_divider() const {
 }
 
 void Timer::set_divider(uint8_t val) {
+    // Depending on speed and bit, switching from high to low
+    // will still increment the timer
+    if ((speed == 0 && (divider & 0x0200))
+        || (speed == 1 && (divider & 0x0008))
+        || (speed == 2 && (divider & 0x0020))
+        || (speed == 3 && (divider & 0x0080))) {
+        counter++;
+    }
+
     divider = 0;
 }
 
