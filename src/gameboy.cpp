@@ -15,40 +15,59 @@ Gameboy::~Gameboy() {
     delete mem;
 }
 
-void Gameboy::init_graphics(bool tilemap) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+void Gameboy::init_sdl() {
+    int init_result;
+    if (use_video && use_audio) {
+        // Graphics and sound
+        init_result = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    } else if (!use_video && use_audio) {
+        // Only sound
+        init_result = SDL_Init(SDL_INIT_AUDIO);
+    } else if (use_video && !use_audio) {
+        // Only graphics
+        init_result = SDL_Init(SDL_INIT_VIDEO);
+    } else {
+        return;
+    }
+
+    if (init_result < 0) {
         std::cerr << "Could not initialize SDL! SDL Error: " << SDL_GetError() << std::endl;
         quit = true;
         return;
     }
 
-    // Set up main gameboy screen
-    window = SDL_CreateWindow
-    (
-        "Gameboy Emulator", 
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        utils::SCREEN_X * utils::SCREEN_MAGNIFY,
-        utils::SCREEN_Y * utils::SCREEN_MAGNIFY,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP
-    );
+    if (use_graphics) {
+        // Set up main gameboy screen
+        window = SDL_CreateWindow
+        (
+            "Gameboy Emulator", 
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            utils::SCREEN_X * utils::SCREEN_MAGNIFY,
+            utils::SCREEN_Y * utils::SCREEN_MAGNIFY,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP
+        );
 
-    if (window == nullptr) {
-        std::cerr << "SDL window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+        if (window == nullptr) {
+            std::cerr << "SDL window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+            quit = true;
+            return;
+        }
+
+        // TODO add option to select renderer type
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+        if (renderer == nullptr) {
+            std::cerr << "SDL renderer could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
+            quit = true;
+            return;
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
     }
 
-    // TODO add option to select renderer type
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-    if (renderer == nullptr) {
-        std::cerr << "SDL renderer could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
-    }
-
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
-
-    // Set up debug tile data screen
-    if (tilemap) {
+    if (use_tilemap) {
         tile_window = SDL_CreateWindow
         (
             "Gameboy Emulator Tile Data", 
@@ -61,11 +80,15 @@ void Gameboy::init_graphics(bool tilemap) {
 
         if (tile_window == nullptr) {
             std::cerr << "SDL window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+            quit = true;
+            return;
         }
 
         tile_renderer = SDL_CreateRenderer(tile_window, -1, SDL_RENDERER_SOFTWARE);
         if (tile_renderer == nullptr) {
             std::cerr << "SDL renderer could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
+            quit = true;
+            return;
         }
 
         SDL_SetRenderDrawColor(tile_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
@@ -94,6 +117,43 @@ void Gameboy::init_graphics(bool tilemap) {
     }
 
     ppu.set_renderer(renderer, tile_renderer);
+
+    if (use_audio) {
+        SDL_AudioSpec want;
+        want.freq = 44100;
+        want.format = AUDIO_S16SYS;
+        // For now just mono channel, switch to stereo later
+        want.channels = 1;
+        want.samples = 4096;
+        want.callback = nullptr;
+        want.userdata = nullptr;
+
+        SDL_AudioSpec have;
+        audio_device = SDL_OpenAudioDevice(nullptr, 0, &want, &have, SDL_AUDIO_ALLOW_ANY_CHANGE);
+        if (audio_device == 0) {
+            std::cerr << "SDL Audio device could not be initialized! SDL Error: " << SDL_GetError() << std::endl;
+            quit = true;
+            return;
+        }
+
+        SDL_PauseAudioDevice(audio_device, 0);
+    }
+
+    apu.set_audio_device(audio_device);
+}
+
+void Gameboy::shutdown_sdl() {
+    if (window != nullptr) {
+        SDL_DestroyWindow(window);
+    }
+    if (tile_window != nullptr) {
+        SDL_DestroyWindow(tile_window);
+    }
+    if (audio_device) {
+        SDL_PauseAudioDevice(audio_device, 1);
+        SDL_CloseAudio();
+    }
+    SDL_Quit();
 }
 
 void Gameboy::debug_run(CPU& cpu) {
@@ -190,15 +250,18 @@ void Gameboy::debug_run(CPU& cpu) {
     }
 }
 
-void Gameboy::run(bool graphics, bool debug, bool tilemap) {
+void Gameboy::run(bool debug, bool graphics, bool tilemap, bool sound) {
     if (mem == nullptr) {
         std::cout << "Bad file name or error while reading file" << std::endl;
         return;
     }
 
-    if (graphics) {
-        init_graphics(tilemap);
-    }
+    use_video = graphics || tilemap;
+    use_graphics = graphics;
+    use_tilemap = tilemap;
+    use_audio = sound;
+
+    init_sdl();
 
     CPU cpu = CPU(&interrupts, mem);
     while (!quit) {
@@ -209,9 +272,7 @@ void Gameboy::run(bool graphics, bool debug, bool tilemap) {
         }
     }
 
-    SDL_DestroyWindow(window);
-    SDL_DestroyWindow(tile_window);
-    SDL_Quit();
+    shutdown_sdl();
 }
 
 void Gameboy::tick(CPU& cpu) {
@@ -219,6 +280,7 @@ void Gameboy::tick(CPU& cpu) {
     // Tick memory in case of DMA transfor to OAM
     mem->tick(cycles);
     ppu.run(cycles);
+    apu.run(cycles);
     timer.update_timers(cycles);
 
     cycle_acc += cycles;
