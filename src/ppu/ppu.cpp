@@ -11,10 +11,10 @@ void PPU::set_renderer(SDL_Renderer* gb_renderer, SDL_Renderer* tile_data_render
 
 PPU::Color PPU::fetch_tile_pixel(uint8_t* tile, int tile_offset_x, int tile_offset_y, Color* palette, bool hide_obj) {
     // Each line in the tile is 2 bytes
-    uint8_t line_lsb = tile[tile_offset_y * 2];
-    uint8_t line_msb = tile[tile_offset_y * 2 + 1];
+    uint8_t line_lsb = tile[tile_offset_y * utils::TILE_LINE_BYTE_SIZE];
+    uint8_t line_msb = tile[tile_offset_y * utils::TILE_LINE_BYTE_SIZE + 1];
     // Leftmost bit is leftmost pixel
-    unsigned shift = utils::TILE_SIZE - 1 - tile_offset_x;
+    unsigned shift = utils::TILE_SIZE - (tile_offset_x + 1);
     uint8_t mask = 1 << shift;
     uint8_t lsb = (line_lsb & mask) >> shift;
     uint8_t msb = (line_msb & mask) >> shift;
@@ -34,13 +34,13 @@ uint8_t* PPU::get_bg_win_tile(int tile_map_pointer, bool tilemap) {
 
     // Multiply by 16 when addressing as each tile is 16 bytes
     if (tile_data_area) {
-        tile = tile_data + 16 * tile_data_pointer;
+        tile = tile_data + utils::TILE_BYTE_SIZE * tile_data_pointer;
     } else {
         if (tile_data_pointer <= 127) {
-            tile = tile_data + 0x1000 + 16 * tile_data_pointer;
+            tile = tile_data + 0x1000 + utils::TILE_BYTE_SIZE * tile_data_pointer;
         } else {
             // Subtract 128 to simulate converting unsigned tile data pointer to become signed
-            tile = tile_data + 0x0800 + 16 * (tile_data_pointer - 128);
+            tile = tile_data + 0x0800 + utils::TILE_BYTE_SIZE * (tile_data_pointer - 128);
         }
     }
 
@@ -75,7 +75,7 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<
         // Check sprites
         uint8_t lowest_x = 0xFF;
         uint8_t* selected_sprite = nullptr;
-        for (uint8_t* sprite_attr = OAM; sprite_attr < OAM + utils::OAM_SIZE; sprite_attr += 4) {
+        for (uint8_t* sprite_attr = OAM; sprite_attr < OAM + utils::OAM_SIZE; sprite_attr += utils::SPRITE_BYTE_SIZE) {
             if (drawn_sprites.size() == utils::SPRITE_LIMIT && drawn_sprites.count(sprite_attr) == 0) {
                 continue;
             }
@@ -104,33 +104,33 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<
             // Remember tiles are 16 bytes
             // When 8 x 16 tiles, ignore LSB of tile index, enforced by hardware
             // When y is flipped for 8 x 16 sprites, we have to worry about flipping which object we are using too
-            if (obj_size && pixel_y < sprite_y && (pixel_y + 8) >= sprite_y && (pixel_x + 8) >= sprite_x && pixel_x < sprite_x) {
+            if (obj_size && pixel_y < sprite_y && (pixel_y + utils::TILE_SIZE) >= sprite_y && (pixel_x + utils::TILE_SIZE) >= sprite_x && pixel_x < sprite_x) {
                 // Bottom tile of 8 x 16 sprite
                 if (y_flip) {
-                    tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * 16;
+                    tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * utils::TILE_BYTE_SIZE;
                 } else {
-                    tile = tile_data + (tile_index | 0x01) * 16;
+                    tile = tile_data + (tile_index | 0x01) * utils::TILE_BYTE_SIZE;
                 }
-                tile_offset_x = pixel_x - sprite_x + 8;
-                tile_offset_y = pixel_y - sprite_y + 8;
-            } else if ((pixel_y + 8) < sprite_y && (pixel_y + 16) >= sprite_y && (pixel_x + 8) >= sprite_x && pixel_x < sprite_x) {
+                tile_offset_x = pixel_x - sprite_x + utils::TILE_SIZE;
+                tile_offset_y = pixel_y - sprite_y + utils::TILE_SIZE;
+            } else if ((pixel_y + utils::TILE_SIZE) < sprite_y && (pixel_y + 2 * utils::TILE_SIZE) >= sprite_y && (pixel_x + utils::TILE_SIZE) >= sprite_x && pixel_x < sprite_x) {
                 // Top tile of 8 x 16 sprite or in 8 x 8 sprite
                 if (y_flip && obj_size) {
-                    tile = tile_data + (tile_index | 0x01) * 16;
+                    tile = tile_data + (tile_index | 0x01) * utils::TILE_BYTE_SIZE;
                 } else {
-                    tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * 16;
+                    tile = tile_data + (tile_index & (obj_size ? 0xFE : 0xFF)) * utils::TILE_BYTE_SIZE;
                 }
-                tile_offset_x = pixel_x - sprite_x + 8;
-                tile_offset_y = pixel_y - sprite_y + 16;
+                tile_offset_x = pixel_x - sprite_x + utils::TILE_SIZE;
+                tile_offset_y = pixel_y - sprite_y + 2 * utils::TILE_SIZE;
             } else {
                 continue;
             }
 
             if (y_flip) {
-                tile_offset_y = 7 - tile_offset_y;
+                tile_offset_y = utils::TILE_SIZE - (tile_offset_y + 1);
             }
             if (x_flip) {
-                tile_offset_x = 7 - tile_offset_x;
+                tile_offset_x = utils::TILE_SIZE - (tile_offset_x + 1);
             }
 
             Color sprite_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, palette_number ? obj_palette1 : obj_palette0);
@@ -148,7 +148,7 @@ void PPU::draw_pixel(SDL_Renderer* renderer, int pixel_x, int pixel_y, std::set<
     }
 
     if ((bg_window_over || pixel_color == TRANSPARENT) && bg_window_enable && window_enable) {
-        int win_pixel_x = (pixel_x - window_x + 7);
+        int win_pixel_x = (pixel_x - window_x + utils::WINDOW_X_OFFSET);
         int win_pixel_y = (window_internal_line_counter - window_y);
 
         // Check if window in bounds
@@ -250,7 +250,7 @@ void PPU::tick() {
                 if (stat_interrupt == LYC_STAT && ly == lyc) {
                     interrupts->set_interrupt(Interrupts::LCD_STAT);
                 }
-                if (ly < 144) {
+                if (ly < utils::SCREEN_Y) {
                     status = OAM_SEARCH;
                     internal_timer = OAM_SEARCH_LEN;
 
@@ -301,12 +301,12 @@ void PPU::run(unsigned cycles) {
 void PPU::draw_tile_display(uint16_t address, bool present) {
     if (tile_data_renderer) {
         // Each tile is 16 bytes
-        int tile_display_x = (address / 16) % utils::TILE_DATA_WIDTH;
-        int tile_display_y = (address / 16) / utils::TILE_DATA_WIDTH;
-        int tile_offset_y = (address % 16) / 2;
+        int tile_display_x = (address / utils::TILE_BYTE_SIZE) % utils::TILE_DATA_WIDTH;
+        int tile_display_y = (address / utils::TILE_BYTE_SIZE) / utils::TILE_DATA_WIDTH;
+        int tile_offset_y = (address % utils::TILE_BYTE_SIZE) / utils::TILE_LINE_BYTE_SIZE;
 
         for (int tile_offset_x = 0; tile_offset_x < utils::TILE_SIZE; tile_offset_x++) {
-            uint8_t* tile = tile_data + (address - (address % 16));
+            uint8_t* tile = tile_data + (address - (address % utils::TILE_BYTE_SIZE));
             Color pixel_color = fetch_tile_pixel(tile, tile_offset_x, tile_offset_y, bg_palette);
             set_draw_color(tile_data_renderer, pixel_color);
             SDL_Rect rect;
@@ -326,7 +326,7 @@ void PPU::draw_tile_display(uint16_t address, bool present) {
 
 void PPU::update_all_tile_display() {
     if (tile_data_renderer) {
-        for (uint16_t address = 0; address < 6 * utils::KILOBYTE; address += 2) {
+        for (uint16_t address = 0; address < 6 * utils::KILOBYTE; address += utils::TILE_LINE_BYTE_SIZE) {
             draw_tile_display(address, false);
         }
         SDL_RenderPresent(tile_data_renderer);

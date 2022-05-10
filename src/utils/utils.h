@@ -13,12 +13,24 @@ namespace utils {
     constexpr unsigned SCREEN_X = 160;
     constexpr unsigned SCREEN_Y = 144;
     constexpr unsigned SCREEN_MAGNIFY = 4;
-    constexpr static unsigned TILE_SIZE = 8;
+
+    // Each tile is 8 pixels
+    constexpr unsigned TILE_SIZE = 8;
+
     constexpr unsigned TILE_DATA_WIDTH = 24;
     constexpr unsigned TILE_DATA_HEIGHT = 16;
     constexpr unsigned TILE_DATA_WINDOW_WIDTH = utils::TILE_SIZE * utils::SCREEN_MAGNIFY * utils::TILE_DATA_WIDTH + utils::TILE_DATA_WIDTH + 1;
     constexpr unsigned TILE_DATA_WINDOW_HEIGHT = utils::TILE_SIZE * utils::SCREEN_MAGNIFY * utils::TILE_DATA_HEIGHT + utils::TILE_DATA_HEIGHT + 1;
     constexpr unsigned BACKGROUND_SIZE = 256;
+
+    // Each tile takes 8 x 8 tile takes up 16 bytes total,
+    // with each line taking 2 bytes
+    constexpr unsigned TILE_BYTE_SIZE = 16;
+    constexpr unsigned TILE_LINE_BYTE_SIZE = 2;
+    constexpr unsigned SPRITE_BYTE_SIZE = 4;
+
+    // The screen coordinates of the top left corner of the Window are (WX-7,WY)
+    constexpr unsigned WINDOW_X_OFFSET = 7;
 
     constexpr unsigned CLOCK_SPEED = 4194304;
     constexpr unsigned OAM_SIZE = 160;
