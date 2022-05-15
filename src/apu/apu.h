@@ -33,10 +33,11 @@ class APU {
     
     private:
         // Glorious sound!
-        void buffer_sound();
+        void sample_sound();
 
         void tick_fs();
         void tick_envelope();
+        void tick_length();
         void tick_c2();
 
         void trigger_c2();
@@ -48,10 +49,12 @@ class APU {
 
         static constexpr short WAVE_PATTERN[4][8] = {
             {0, 0, 0, 0, 0, 0, 0, 1},
-            {0, 0, 0, 0, 0, 0, 1, 1},
-            {0, 0, 0, 0, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 0}
+            {1, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 1, 1},
+            {0, 1, 1, 1, 1, 1, 1, 0}
         };
+
+        bool c2_enabled = false;
 
         // FRAME SEQUENCER
         unsigned frame_sequencer_timer = utils::FRAME_SEQUENCER_PERIOD;
@@ -64,9 +67,14 @@ class APU {
         unsigned c2_wave_position = 0;
         unsigned c2_duty_number = 0;
 
-        bool c2_counter_selection = false;
+        // LENGTH
+        bool c2_length_enable = false;
+        uint8_t c2_length_data = 0;
+        unsigned c2_length_counter = 64;
 
+        // VOLUME
         // Ranges from 0 to 15
+        bool c2_volume_enabled = true;
         unsigned c2_current_volume = 0;
         unsigned c2_initial_volume = 0;
         bool c2_volume_increase = false;

@@ -328,11 +328,9 @@ void Gameboy::tick(CPU& cpu) {
             }
         }
 
-        //unsigned delay = std::min((int) ((SDL_GetQueuedAudioSize(audio_device) - 4096) / sizeof(float) / utils::AUDIO_FREQUENCY), 0);
+        apu.queue_sound();
         unsigned delay = SDL_GetQueuedAudioSize(audio_device) / sizeof(float) / utils::AUDIO_FREQUENCY;
         SDL_Delay(delay);
-
-        apu.queue_sound();
     }
 }
 
