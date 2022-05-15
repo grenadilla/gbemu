@@ -13,6 +13,7 @@ uint8_t Channel::get_nrx0() const {
 void Channel::set_nrx1(uint8_t value) {
     duty_number = (value & 0xC0) >> 6;
     length_data = value & 0x3F;
+    // 256 for channel 3 - see WaveChannel
     length_counter = 64 - length_data;
 }
 

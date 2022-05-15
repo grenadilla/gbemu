@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include "utils.h"
 #include "channel.h"
+#include "wave_channel.h"
 
 class APU {
     public:
@@ -40,6 +41,24 @@ class APU {
         void set_nr24(uint8_t value);
         uint8_t get_nr24() const;
 
+        void set_nr30(uint8_t value);
+        uint8_t get_nr30() const;
+
+        void set_nr31(uint8_t value);
+        uint8_t get_nr31() const;
+
+        void set_nr32(uint8_t value);
+        uint8_t get_nr32() const;
+
+        void set_nr33(uint8_t value);
+        uint8_t get_nr33() const;
+
+        void set_nr34(uint8_t value);
+        uint8_t get_nr34() const;
+
+        void set_wave_ram(uint16_t address, uint8_t value);
+        uint8_t get_wave_ram(uint16_t address);
+
         void set_nr50(uint8_t value);
         uint8_t get_nr50() const;
 
@@ -69,6 +88,7 @@ class APU {
 
         Channel channel1;
         Channel channel2;
+        WaveChannel channel3;
 
         SDL_AudioDeviceID audio_device = 0;
         uint8_t nr50 = 0;

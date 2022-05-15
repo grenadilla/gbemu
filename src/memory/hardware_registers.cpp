@@ -5,6 +5,11 @@
 #include <iostream>
 
 uint8_t Memory::hardware_read(uint16_t address) const {
+    if (address >= 0xFF30 && address <= 0xFF3F) {
+        // Wave RAM
+        return apu->get_wave_ram(address - 0xFF30);
+    }
+
     // TODO IO registers
     switch(address) {
         case 0xFF00:
@@ -39,6 +44,16 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return apu->get_nr24();
         case 0xFF24:
             return apu->get_nr50();
+        case 0xFF1A:
+            return apu->get_nr30();
+        case 0xFF1B:
+            return apu->get_nr31();
+        case 0xFF1C:
+            return apu->get_nr32();
+        case 0xFF1D:
+            return apu->get_nr33();
+        case 0xFF1E:
+            return apu->get_nr34();
         case 0xFF40:
             return ppu->read_lcd_control();
         case 0xFF41:
@@ -69,6 +84,11 @@ uint8_t Memory::hardware_read(uint16_t address) const {
 }
 
 void Memory::hardware_write(uint16_t address, uint8_t value) {
+    if (address >= 0xFF30 && address <= 0xFF3F) {
+        // Wave RAM
+        apu->set_wave_ram(address - 0xFF30, value);
+    }
+
     // TODO IO registers
     switch (address) {
         case 0xFF00:
@@ -110,20 +130,31 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             apu->set_nr14(value);
             break;
         case 0xFF16:
-            //std::cout << "write ff16 " << utils::hexify8 << +value << std::endl;
             apu->set_nr21(value);
             break;
         case 0xFF17:
-            //std::cout << "write ff17 " << utils::hexify8 << +value << std::endl;
             apu->set_nr22(value);
             break;
         case 0xFF18:
-            //std::cout << "Write ff18 " << utils::hexify8 << +value << std::endl;
             apu->set_nr23(value);
             break;
         case 0xFF19:
-            //std::cout << "Write ff18 " << utils::hexify8 << +value << std::endl;
             apu->set_nr24(value);
+            break;
+        case 0xFF1A:
+            apu->set_nr30(value);
+            break;
+        case 0xFF1B:
+            apu->set_nr31(value);
+            break;
+        case 0xFF1C:
+            apu->set_nr32(value);
+            break;
+        case 0xFF1D:
+            apu->set_nr33(value);
+            break;
+        case 0xFF1E:
+            apu->set_nr34(value);
             break;
         case 0xFF24:
             apu->set_nr50(value);

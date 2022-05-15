@@ -39,6 +39,7 @@ class Channel {
             {0, 1, 1, 1, 1, 1, 1, 0}
         };
 
+    protected:
         bool channel_enabled = false;
 
         // Starts out as all 11 bits on

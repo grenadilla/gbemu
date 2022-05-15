@@ -82,7 +82,7 @@ void Channel::trigger_channel() {
     shadow_frequency = frequency;
 
     sweep_timer = sweep_period == 0 ? 8 : sweep_period;
-    sweep_enabled = sweep_period != 0 || sweep_shift != 0;;
+    sweep_enabled = sweep_period != 0 || sweep_shift != 0;
     if (sweep_shift != 0) {
         // Overflow check
         sweep_calculate_frequency();
