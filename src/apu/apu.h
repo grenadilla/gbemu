@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 #include <SDL2/SDL.h>
 #include "utils.h"
 
@@ -25,14 +26,25 @@ class APU {
 
         void set_nr50(uint8_t value);
         uint8_t get_nr50() const;
+
+
+        void queue_sound();
+        bool queue_full();
     
     private:
+        // Glorious sound!
+        void buffer_sound();
+
         void tick_fs();
         void tick_envelope();
         void tick_c2();
 
         void trigger_c2();
         float get_c2() const;
+
+        std::vector<float> sound_queue;
+
+        unsigned sample_counter = utils::CLOCK_SPEED / utils::AUDIO_FREQUENCY;
 
         static constexpr short WAVE_PATTERN[4][8] = {
             {0, 0, 0, 0, 0, 0, 0, 1},

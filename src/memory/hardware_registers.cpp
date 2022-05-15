@@ -85,15 +85,19 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             interrupts->set_IF(value);
             break;
         case 0xFF16:
+            //std::cout << "write ff16 " << utils::hexify8 << +value << std::endl;
             apu->set_nr21(value);
             break;
         case 0xFF17:
+            //std::cout << "write ff17 " << utils::hexify8 << +value << std::endl;
             apu->set_nr22(value);
             break;
         case 0xFF18:
+            //std::cout << "Write ff18 " << utils::hexify8 << +value << std::endl;
             apu->set_nr23(value);
             break;
         case 0xFF19:
+            //std::cout << "Write ff18 " << utils::hexify8 << +value << std::endl;
             apu->set_nr24(value);
             break;
         case 0xFF24:

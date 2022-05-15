@@ -1,4 +1,5 @@
 #include "apu.h"
+#include <iostream>
 
 void APU::set_audio_device(SDL_AudioDeviceID id) {
     audio_device = id;
@@ -13,6 +14,12 @@ void APU::run(unsigned cycles) {
 void APU::tick() {
     tick_fs();
     tick_c2();
+
+    sample_counter -= 1;
+    if (sample_counter == 0) {
+        sample_counter = utils::CLOCK_SPEED / utils::AUDIO_FREQUENCY;
+        buffer_sound();
+    }
 }
 
 void APU::tick_fs() {
@@ -67,5 +74,34 @@ void APU::trigger_c2() {
 
 float APU::get_c2() const {
     unsigned dac_input = WAVE_PATTERN[c2_duty_number][c2_wave_position] * c2_current_volume;
-    return (dac_input / 7.5) - 1.0;
+    // Shift to range between 0 and 128
+    return (128 * dac_input) / 7;
+}
+
+void APU::buffer_sound() {
+    if (audio_device == 0) {
+        return;
+    }
+
+    float channel2 = get_c2();
+    float result = 0.0;
+    //Sint32 result = channel2 * utils::AUDIO_AMPLITUDE;
+    SDL_MixAudioFormat((Uint8*) &result, (Uint8*) &channel2, AUDIO_F32SYS, sizeof(float), utils::AUDIO_AMPLITUDE);
+    sound_queue.push_back(result);
+}
+
+void APU::queue_sound() {
+    if (sound_queue.size() == 0) {
+        //std::cout << "Empty queue!" << std::endl;
+        return;
+    }
+
+    //std::cout << "Queue!" << std::endl;
+
+    SDL_QueueAudio(audio_device, sound_queue.data(), sizeof(float) * sound_queue.size());
+    sound_queue.clear();
+}
+
+bool APU::queue_full() {
+    return sound_queue.size() > utils::AUDIO_BUFFER_SIZE / sizeof(float);
 }

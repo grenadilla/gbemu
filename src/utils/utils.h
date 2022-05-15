@@ -7,7 +7,7 @@ namespace utils {
     std::ostream& hexify8(std::ostream& out);
     std::ostream& hexify16(std::ostream& out);
 
-    constexpr unsigned LIMIT_TICKS = 2000;
+    constexpr unsigned LIMIT_TICKS = 1000;
 
     constexpr unsigned KILOBYTE = 1024;
     constexpr unsigned SCREEN_X = 160;
@@ -45,6 +45,8 @@ namespace utils {
 
     constexpr unsigned AUDIO_FREQUENCY = 44100;
     constexpr unsigned AUDIO_BUFFER_SIZE = 4096;
+    constexpr unsigned AUDIO_AMPLITUDE = 20000;
 
     constexpr unsigned FRAME_SEQUENCER_PERIOD = 8192;
+
 }

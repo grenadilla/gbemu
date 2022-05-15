@@ -1,6 +1,7 @@
 #include "gameboy.h"
 
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include <cstdint>
 
@@ -121,7 +122,7 @@ void Gameboy::init_sdl() {
     if (use_audio) {
         SDL_AudioSpec want;
         want.freq = utils::AUDIO_FREQUENCY;
-        want.format = AUDIO_S16SYS;
+        want.format = AUDIO_F32SYS;
         // For now just mono channel, switch to stereo later
         want.channels = 1;
         want.samples = utils::AUDIO_BUFFER_SIZE;
@@ -135,6 +136,8 @@ void Gameboy::init_sdl() {
             quit = true;
             return;
         }
+
+        std::cerr << "Audio device " << audio_device << std::endl;
 
         SDL_PauseAudioDevice(audio_device, 0);
     }
@@ -283,6 +286,7 @@ void Gameboy::tick(CPU& cpu) {
     apu.run(cycles);
     timer.update_timers(cycles);
 
+    /*
     cycle_acc += cycles;
     tick_countdown--;
     if (tick_countdown == 0) {
@@ -297,6 +301,8 @@ void Gameboy::tick(CPU& cpu) {
             }
         }
 
+        apu.queue_sound();
+
         // Cap FPS
         unsigned curr_time = SDL_GetTicks();
         unsigned time_delta = curr_time - last_time;
@@ -308,6 +314,25 @@ void Gameboy::tick(CPU& cpu) {
         last_time = curr_time;
         cycle_acc = 0;
         tick_countdown = utils::LIMIT_TICKS;
+    }*/
+
+    if (apu.queue_full()) {
+        SDL_Event event;
+        while(SDL_PollEvent(&event) != 0) {
+            if (event.type == SDL_QUIT) {
+                quit = true;
+            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                quit = true;
+            } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+                joypad.parse_key_event(event);
+            }
+        }
+
+        //unsigned delay = std::min((int) ((SDL_GetQueuedAudioSize(audio_device) - 4096) / sizeof(float) / utils::AUDIO_FREQUENCY), 0);
+        unsigned delay = SDL_GetQueuedAudioSize(audio_device) / sizeof(float) / utils::AUDIO_FREQUENCY;
+        SDL_Delay(delay);
+
+        apu.queue_sound();
     }
 }
 
