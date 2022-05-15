@@ -4,6 +4,7 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include "utils.h"
+#include "channel.h"
 
 class APU {
     public:
@@ -36,12 +37,6 @@ class APU {
         void sample_sound();
 
         void tick_fs();
-        void tick_envelope();
-        void tick_length();
-        void tick_c2();
-
-        void trigger_c2();
-        float get_c2() const;
 
         std::vector<float> sound_queue;
 
@@ -60,27 +55,7 @@ class APU {
         unsigned frame_sequencer_timer = utils::FRAME_SEQUENCER_PERIOD;
         unsigned frame_sequencer_step = 0;
 
-        // CHANNEL 2
-        // Starts out as all 11 bits on
-        uint16_t c2_frequency = 2047;
-        unsigned c2_frequency_timer = 4;
-        unsigned c2_wave_position = 0;
-        unsigned c2_duty_number = 0;
-
-        // LENGTH
-        bool c2_length_enable = false;
-        uint8_t c2_length_data = 0;
-        unsigned c2_length_counter = 64;
-
-        // VOLUME
-        // Ranges from 0 to 15
-        bool c2_volume_enabled = true;
-        unsigned c2_current_volume = 0;
-        unsigned c2_initial_volume = 0;
-        bool c2_volume_increase = false;
-        // Ranges from 0 to 7
-        unsigned c2_envelope_period_timer = 0;
-        unsigned c2_envelope_period = 0;
+        Channel channel2;
 
         SDL_AudioDeviceID audio_device = 0;
         uint8_t nr50 = 0;
