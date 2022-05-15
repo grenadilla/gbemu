@@ -31,6 +31,39 @@ void Channel::tick_length() {
     }
 }
 
+unsigned Channel::sweep_calculate_frequency() {
+    unsigned new_frequency = shadow_frequency >> sweep_shift;
+    if (sweep_increase) {
+        new_frequency = shadow_frequency + new_frequency;
+    } else {
+        new_frequency = shadow_frequency - new_frequency;
+    }
+
+    if (new_frequency > 2047) {
+        channel_enabled = false;
+    }
+
+    return new_frequency;
+}
+
+void Channel::tick_sweep() {
+    sweep_timer -= 1;
+    if (sweep_timer == 0) {
+        sweep_timer = sweep_period == 0 ? 8 : sweep_period;
+
+        if (sweep_enabled && sweep_period != 0) {
+            unsigned new_frequency = sweep_calculate_frequency();
+            if (new_frequency <= 2047 && sweep_shift != 0) {
+                frequency = new_frequency;
+                shadow_frequency = new_frequency;
+
+                // Overflow check again
+                sweep_calculate_frequency();
+            }
+        }
+    }
+}
+
 void Channel::tick_channel() {
     frequency_timer -= 1;
     if (frequency_timer == 0) {
@@ -41,10 +74,20 @@ void Channel::tick_channel() {
 
 void Channel::trigger_channel() {
     channel_enabled = true;
+
     volume_enabled = true;
-    frequency_timer = (2048 - frequency) * 4;
     envelope_period_timer = envelope_period;
     current_volume = initial_volume;
+
+    frequency_timer = (2048 - frequency) * 4;
+    shadow_frequency = frequency;
+
+    sweep_timer = sweep_period == 0 ? 8 : sweep_period;
+    sweep_enabled = sweep_period != 0 || sweep_shift != 0;;
+    if (sweep_shift != 0) {
+        // Overflow check
+        sweep_calculate_frequency();
+    }
 }
 
 float Channel::sample_channel() const {
@@ -53,5 +96,5 @@ float Channel::sample_channel() const {
     }
     unsigned dac_input = WAVE_PATTERN[duty_number][wave_position] * current_volume;
     // Shift to range between 0 and 128
-    return (128 * dac_input) / 7;
+    return dac_input;
 }

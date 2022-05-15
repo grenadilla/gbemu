@@ -13,6 +13,8 @@ void APU::run(unsigned cycles) {
 
 void APU::tick() {
     tick_fs();
+
+    channel1.tick_channel();
     channel2.tick_channel();
 
     sample_counter -= 1;
@@ -30,13 +32,15 @@ void APU::tick_fs() {
 
         if (frame_sequencer_step % 2 == 0) {
             // Length ctrl on 0, 2, 4, 6, makes 256hz
+            channel1.tick_length();
             channel2.tick_length();
         }
         if (frame_sequencer_step == 7) {
+            channel1.tick_envelope();
             channel2.tick_envelope();
         }
         if (frame_sequencer_step == 2 || frame_sequencer_step == 6) {
-
+            channel1.tick_sweep();
         }
     }
 }
@@ -46,9 +50,13 @@ void APU::sample_sound() {
         return;
     }
 
-    float input = channel2.sample_channel();
     float result = 0.0;
+
+    float input = channel1.sample_channel() / 100;
     SDL_MixAudioFormat((Uint8*) &result, (Uint8*) &input, AUDIO_F32SYS, sizeof(float), utils::AUDIO_AMPLITUDE);
+    //input = channel2.sample_channel() / 100;
+    //SDL_MixAudioFormat((Uint8*) &result, (Uint8*) &input, AUDIO_F32SYS, sizeof(float), utils::AUDIO_AMPLITUDE);
+
     sound_queue.push_back(result);
 }
 
@@ -62,5 +70,5 @@ void APU::queue_sound() {
 }
 
 bool APU::queue_full() {
-    return sound_queue.size() > utils::AUDIO_BUFFER_SIZE / sizeof(float);
+    return sound_queue.size() > utils::AUDIO_BUFFER_SIZE / sizeof(float) / 2;
 }

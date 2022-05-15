@@ -19,6 +19,16 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return timer->get_control();
         case 0xFF0F:
             return interrupts->get_IF();
+        case 0xFF10:
+            return apu->get_nr10();
+        case 0xFF11:
+            return apu->get_nr11();
+        case 0xFF12:
+            return apu->get_nr12();
+        case 0xFF13:
+            return apu->get_nr13();
+        case 0xFF14:
+            return apu->get_nr14();
         case 0xFF16:
             return apu->get_nr21();
         case 0xFF17:
@@ -83,6 +93,21 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             break;
         case 0xFF0F:
             interrupts->set_IF(value);
+            break;
+        case 0xFF10:
+            apu->set_nr10(value);
+            break;
+        case 0xFF11:
+            apu->set_nr11(value);
+            break;
+        case 0xFF12:
+            apu->set_nr12(value);
+            break;
+        case 0xFF13:
+            apu->set_nr13(value);
+            break;
+        case 0xFF14:
+            apu->set_nr14(value);
             break;
         case 0xFF16:
             //std::cout << "write ff16 " << utils::hexify8 << +value << std::endl;

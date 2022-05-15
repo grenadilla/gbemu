@@ -1,5 +1,15 @@
 #include "channel.h"
 
+void Channel::set_nrx0(uint8_t value) {
+    sweep_period = (value & 0xE0) >> 5;
+    sweep_increase = (value & 0x08) == 0;
+    sweep_shift = value & 0x07;
+}
+
+uint8_t Channel::get_nrx0() const {
+    return (sweep_period << 5) | (sweep_increase << 3) | sweep_shift;
+}
+
 void Channel::set_nrx1(uint8_t value) {
     duty_number = (value & 0xC0) >> 6;
     length_data = value & 0x3F;

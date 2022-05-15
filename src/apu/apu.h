@@ -13,6 +13,21 @@ class APU {
 
         void set_audio_device(SDL_AudioDeviceID id);
 
+        void set_nr10(uint8_t value);
+        uint8_t get_nr10() const;
+
+        void set_nr11(uint8_t value);
+        uint8_t get_nr11() const;
+
+        void set_nr12(uint8_t value);
+        uint8_t get_nr12() const;
+
+        void set_nr13(uint8_t value);
+        uint8_t get_nr13() const;
+
+        void set_nr14(uint8_t value);
+        uint8_t get_nr14() const;
+
         void set_nr21(uint8_t value);
         uint8_t get_nr21() const;
 
@@ -27,7 +42,6 @@ class APU {
 
         void set_nr50(uint8_t value);
         uint8_t get_nr50() const;
-
 
         void queue_sound();
         bool queue_full();
@@ -49,12 +63,11 @@ class APU {
             {0, 1, 1, 1, 1, 1, 1, 0}
         };
 
-        bool c2_enabled = false;
-
         // FRAME SEQUENCER
         unsigned frame_sequencer_timer = utils::FRAME_SEQUENCER_PERIOD;
         unsigned frame_sequencer_step = 0;
 
+        Channel channel1;
         Channel channel2;
 
         SDL_AudioDeviceID audio_device = 0;

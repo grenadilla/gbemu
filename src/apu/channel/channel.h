@@ -7,10 +7,15 @@ class Channel {
     public:
         void tick_envelope();
         void tick_length();
+        void tick_sweep();
         void tick_channel();
 
         void trigger_channel();
         float sample_channel() const;
+
+        // Channel 1 only
+        void set_nrx0(uint8_t value);
+        uint8_t get_nrx0() const;
 
         void set_nrx1(uint8_t value);
         uint8_t get_nrx1() const;
@@ -25,6 +30,8 @@ class Channel {
         uint8_t get_nrx4() const;
 
     private:
+        unsigned sweep_calculate_frequency();
+
         static constexpr short WAVE_PATTERN[4][8] = {
             {0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 1},
@@ -54,4 +61,13 @@ class Channel {
         // Ranges from 0 to 7
         unsigned envelope_period_timer = 0;
         unsigned envelope_period = 0;
+
+        // SWEEP
+        unsigned sweep_period = 7;
+        bool sweep_increase = true;
+        unsigned sweep_shift = 0;
+
+        bool sweep_enabled = false;
+        unsigned shadow_frequency = frequency;
+        unsigned sweep_timer = sweep_period;
 };
