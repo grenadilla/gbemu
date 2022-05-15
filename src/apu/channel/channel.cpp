@@ -25,7 +25,6 @@ void Channel::tick_length() {
     if (length_enable) {
         length_counter -= 1;
         if (length_counter == 0) {
-            //c2_length_counter = 64 - c2_length_data;
             channel_enabled = false;
         }
     }
