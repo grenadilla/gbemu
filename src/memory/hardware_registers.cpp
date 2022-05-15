@@ -19,6 +19,14 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return timer->get_control();
         case 0xFF0F:
             return interrupts->get_IF();
+        case 0xFF16:
+            return apu->get_nr21();
+        case 0xFF17:
+            return apu->get_nr22();
+        case 0xFF18:
+            return apu->get_nr23();
+        case 0xFF19:
+            return apu->get_nr24();
         case 0xFF24:
             return apu->get_nr50();
         case 0xFF40:
@@ -75,6 +83,18 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             break;
         case 0xFF0F:
             interrupts->set_IF(value);
+            break;
+        case 0xFF16:
+            apu->set_nr21(value);
+            break;
+        case 0xFF17:
+            apu->set_nr22(value);
+            break;
+        case 0xFF18:
+            apu->set_nr23(value);
+            break;
+        case 0xFF19:
+            apu->set_nr24(value);
             break;
         case 0xFF24:
             apu->set_nr50(value);

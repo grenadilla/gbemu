@@ -42,4 +42,9 @@ namespace utils {
     constexpr uint16_t MBC_RAM_SIZE_ADDRESS = 0x0149;
 
     constexpr uint16_t TITLE_ADDRESS = 0x0134;
+
+    constexpr unsigned AUDIO_FREQUENCY = 44100;
+    constexpr unsigned AUDIO_BUFFER_SIZE = 4096;
+
+    constexpr unsigned FRAME_SEQUENCER_PERIOD = 8192;
 }
