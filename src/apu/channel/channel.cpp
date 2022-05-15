@@ -1,7 +1,6 @@
 #include "channel.h"
 
 void Channel::tick_envelope() {
-    // Tick channel 2 envelope
     if (envelope_period != 0) {
         if (envelope_period_timer > 0) {
             envelope_period_timer -= 1;
@@ -86,6 +85,10 @@ void Channel::trigger_channel() {
     if (sweep_shift != 0) {
         // Overflow check
         sweep_calculate_frequency();
+    }
+
+    if (length_counter == 0) {
+        length_counter = 64;
     }
 }
 

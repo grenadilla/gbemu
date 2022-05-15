@@ -9,7 +9,7 @@ uint8_t WaveChannel::get_wave_ram(uint16_t address) const {
 }
 
 float WaveChannel::sample_channel() const {
-    if (!channel_enabled) {
+    if (!channel_enabled || !playback) {
         return 0;
     }
     return current_sample;
@@ -43,17 +43,27 @@ void WaveChannel::tick_channel() {
     }
 }
 
+void WaveChannel::trigger_channel() {
+    channel_enabled = true;
+
+    wave_position = 0;
+    frequency_timer = (2048 - frequency) * 2;
+    if (length_counter == 0) {
+        length_counter = 256;
+    }
+}
+
 void WaveChannel::set_nrx0(uint8_t value) {
-    channel_enabled = (value & 0x80) != 0;
+    playback = (value & 0x80) != 0;
 }
 
 uint8_t WaveChannel::get_nrx0() const {
-    return channel_enabled << 7;
+    return playback << 7;
 }
 
 void WaveChannel::set_nrx1(uint8_t value) {
     length_data = value;
-    length_counter = 264 - length_data;
+    length_counter = 256 - length_data;
 }
 
 uint8_t WaveChannel::get_nrx1() const {

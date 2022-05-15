@@ -7,6 +7,7 @@ class WaveChannel : public Channel {
     public:
         float sample_channel() const;
         void tick_channel();
+        void trigger_channel();
 
         void set_nrx0(uint8_t value);
         uint8_t get_nrx0() const;
@@ -25,4 +26,6 @@ class WaveChannel : public Channel {
         unsigned volume_shift = 0;
 
         unsigned current_sample = 0;
+
+        bool playback = false;
 };
