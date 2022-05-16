@@ -36,10 +36,12 @@ void APU::tick_fs() {
             channel1.tick_length();
             channel2.tick_length();
             channel3.tick_length();
+            channel4.tick_length();
         }
         if (frame_sequencer_step == 7) {
             channel1.tick_envelope();
             channel2.tick_envelope();
+            channel4.tick_envelope();
         }
         if (frame_sequencer_step == 2 || frame_sequencer_step == 6) {
             channel1.tick_sweep();
@@ -54,8 +56,9 @@ void APU::sample_sound() {
 
     float result = 0.0;
 
-    float input = (channel1.sample_channel() + channel2.sample_channel() + channel3.sample_channel()) / 100;
-    input /= 3;
+    //float input = (channel1.sample_channel() + channel2.sample_channel() + channel3.sample_channel() + channel4.sample_channel()) / 100;
+    //input /= 4;
+    float input = channel4.sample_channel() / 100;
     SDL_MixAudioFormat((Uint8*) &result, (Uint8*) &input, AUDIO_F32SYS, sizeof(float), SDL_MIX_MAXVOLUME);
 
     sound_queue.push_back(result);

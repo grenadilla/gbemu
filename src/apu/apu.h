@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "channel.h"
 #include "wave_channel.h"
+#include "noise_channel.h"
 
 class APU {
     public:
@@ -59,6 +60,18 @@ class APU {
         void set_wave_ram(uint16_t address, uint8_t value);
         uint8_t get_wave_ram(uint16_t address);
 
+        void set_nr41(uint8_t value);
+        uint8_t get_nr41() const;
+
+        void set_nr42(uint8_t value);
+        uint8_t get_nr42() const;
+
+        void set_nr43(uint8_t value);
+        uint8_t get_nr43() const;
+
+        void set_nr44(uint8_t value);
+        uint8_t get_nr44() const;
+
         void set_nr50(uint8_t value);
         uint8_t get_nr50() const;
 
@@ -89,6 +102,7 @@ class APU {
         Channel channel1;
         Channel channel2;
         WaveChannel channel3;
+        NoiseChannel channel4;
 
         SDL_AudioDeviceID audio_device = 0;
         uint8_t nr50 = 0;

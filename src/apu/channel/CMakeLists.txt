@@ -5,5 +5,7 @@ target_sources(gameboy
         channel_mem.cpp
         wave_channel.h
         wave_channel.cpp
+        noise_channel.h
+        noise_channel.cpp
 )
 target_include_directories(gameboy PUBLIC ${CMAKE_CURRENT_LIST_DIR})

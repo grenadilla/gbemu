@@ -97,6 +97,5 @@ float Channel::sample_channel() const {
         return 0;
     }
     unsigned dac_input = WAVE_PATTERN[duty_number][wave_position] * current_volume;
-    // Shift to range between 0 and 128
     return dac_input;
 }

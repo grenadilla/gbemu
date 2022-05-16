@@ -120,6 +120,39 @@ uint8_t APU::get_wave_ram(uint16_t address) {
     return channel3.get_wave_ram(address);
 }
 
+void APU::set_nr41(uint8_t value) {
+    channel4.set_nrx1(value);
+}
+
+uint8_t APU::get_nr41() const {
+    return channel4.get_nrx1();
+}
+
+void APU::set_nr42(uint8_t value) {
+    channel4.set_nrx2(value);
+}
+
+uint8_t APU::get_nr42() const {
+    return channel4.get_nrx2();
+}
+
+void APU::set_nr43(uint8_t value) {
+    channel4.set_nrx3(value);
+}
+
+uint8_t APU::get_nr43() const {
+    return channel4.get_nrx3();
+}
+
+void APU::set_nr44(uint8_t value) {
+    channel4.set_nrx4(value);
+}
+
+uint8_t APU::get_nr44() const {
+    return channel4.get_nrx4();
+}
+
+
 void APU::set_nr50(uint8_t value) {
     nr50 = value;
 }

@@ -54,6 +54,14 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return apu->get_nr33();
         case 0xFF1E:
             return apu->get_nr34();
+        case 0xFF20:
+            return apu->get_nr41();
+        case 0xFF21:
+            return apu->get_nr42();
+        case 0xFF22:
+            return apu->get_nr43();
+        case 0xFF23:
+            return apu->get_nr44();
         case 0xFF40:
             return ppu->read_lcd_control();
         case 0xFF41:
@@ -155,6 +163,18 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             break;
         case 0xFF1E:
             apu->set_nr34(value);
+            break;
+        case 0xFF20:
+            apu->set_nr41(value);
+            break;
+        case 0xFF21:
+            apu->set_nr42(value);
+            break;
+        case 0xFF22:
+            apu->set_nr43(value);
+            break;
+        case 0xFF23:
+            apu->set_nr44(value);
             break;
         case 0xFF24:
             apu->set_nr50(value);
