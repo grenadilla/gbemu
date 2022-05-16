@@ -8,6 +8,9 @@ class NoiseChannel : public Channel {
         void set_nrx3(uint8_t value);
         uint8_t get_nrx3() const;
 
+        void set_nrx4(uint8_t value);
+        uint8_t get_nrx4() const;
+
         void tick_channel();
         void trigger_channel();
         float sample_channel() const;

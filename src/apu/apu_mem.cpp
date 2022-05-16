@@ -152,7 +152,6 @@ uint8_t APU::get_nr44() const {
     return channel4.get_nrx4();
 }
 
-
 void APU::set_nr50(uint8_t value) {
     nr50 = value;
 }

@@ -11,6 +11,21 @@ uint8_t NoiseChannel::get_nrx3() const {
     return (divisor_shift << 4) | (counter_width_less << 3) | base_divisor_code;
 }
 
+void NoiseChannel::set_nrx4(uint8_t value) {
+    //std::cout << utils::hexify8 << +value << std::endl;
+    length_enable = (value & 0x40) != 0;
+
+    if ((value & 0x80) != 0) {
+        // Restart sound
+        //std::cout << "Trigger channel 4" << std::endl;
+        trigger_channel();
+    }
+}
+
+uint8_t NoiseChannel::get_nrx4() const {
+    return (length_enable << 6);
+}
+
 void NoiseChannel::tick_channel() {
     frequency_timer -= 1;
     if (frequency_timer == 0) {
@@ -24,9 +39,11 @@ void NoiseChannel::tick_channel() {
 
         if (counter_width_less) {
             // Store in bit 6
-            lfsr &= 0b10111111;
+            lfsr &= ~(0x01 << 6);
             lfsr |= (xored << 6);
         }
+
+
     }
 }
 
