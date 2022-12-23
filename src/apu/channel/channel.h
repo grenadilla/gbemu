@@ -29,6 +29,8 @@ class Channel {
         void set_nrx4(uint8_t value);
         uint8_t get_nrx4() const;
 
+        bool is_enabled() const { return channel_enabled; }
+
     private:
         unsigned sweep_calculate_frequency();
 

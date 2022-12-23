@@ -75,10 +75,15 @@ class APU {
         void set_nr50(uint8_t value);
         uint8_t get_nr50() const;
 
+        void set_nr52(uint8_t value);
+        uint8_t get_nr52() const;
+
         void queue_sound();
         bool queue_full();
     
     private:
+        bool apu_on = false;
+
         // Glorious sound!
         void sample_sound();
 

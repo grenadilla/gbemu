@@ -159,3 +159,12 @@ void APU::set_nr50(uint8_t value) {
 uint8_t APU::get_nr50() const {
     return nr50;
 }
+
+void APU::set_nr52(uint8_t value) {
+    apu_on = (value & 0x80) >> 7;
+}
+
+uint8_t APU::get_nr52() const {
+    return (apu_on << 7) | (channel4.is_enabled() << 3) | (channel3.is_enabled() << 2)
+        | (channel2.is_enabled() << 1) | channel1.is_enabled();
+}
