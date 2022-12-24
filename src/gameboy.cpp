@@ -123,8 +123,7 @@ void Gameboy::init_sdl() {
         SDL_AudioSpec want;
         want.freq = utils::AUDIO_FREQUENCY;
         want.format = AUDIO_F32SYS;
-        // For now just mono channel, switch to stereo later
-        want.channels = 1;
+        want.channels = 2;
         want.samples = utils::AUDIO_BUFFER_SIZE;
         want.callback = nullptr;
         want.userdata = nullptr;

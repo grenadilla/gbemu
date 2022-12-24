@@ -44,6 +44,8 @@ uint8_t Memory::hardware_read(uint16_t address) const {
             return apu->get_nr24();
         case 0xFF24:
             return apu->get_nr50();
+        case 0xFF25:
+            return apu->get_nr51();
         case 0xFF26:
             return apu->get_nr52();
         case 0xFF1A:
@@ -180,6 +182,9 @@ void Memory::hardware_write(uint16_t address, uint8_t value) {
             break;
         case 0xFF24:
             apu->set_nr50(value);
+            break;
+        case 0xFF25:
+            apu->set_nr51(value);
             break;
         case 0xFF26:
             apu->set_nr52(value);

@@ -75,6 +75,9 @@ class APU {
         void set_nr50(uint8_t value);
         uint8_t get_nr50() const;
 
+        void set_nr51(uint8_t value);
+        uint8_t get_nr51() const;
+
         void set_nr52(uint8_t value);
         uint8_t get_nr52() const;
 
@@ -110,5 +113,10 @@ class APU {
         NoiseChannel channel4;
 
         SDL_AudioDeviceID audio_device = 0;
-        uint8_t nr50 = 0;
+
+        bool c1_left, c2_left, c3_left, c4_left, c1_right, c2_right, c3_right, c4_right;
+        unsigned left_volume = 0;
+        unsigned right_volume = 0;
+        bool left_vin = false;
+        bool right_vin = false;
 };

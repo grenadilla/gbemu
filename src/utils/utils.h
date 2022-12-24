@@ -46,7 +46,9 @@ namespace utils {
     constexpr unsigned AUDIO_FREQUENCY = 44100;
     constexpr unsigned AUDIO_BUFFER_SIZE = 2048;
     constexpr unsigned AUDIO_AMPLITUDE = 5000;
-    constexpr unsigned AUDIO_SAMPLE_SIZE = sizeof(float);
+    constexpr unsigned AUDIO_SAMPLE_SIZE = sizeof(float) * 2;
+
+    constexpr unsigned MAX_VOLUME = 8;
 
     constexpr unsigned FRAME_SEQUENCER_PERIOD = 8192;
 

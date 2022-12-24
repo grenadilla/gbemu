@@ -153,11 +153,30 @@ uint8_t APU::get_nr44() const {
 }
 
 void APU::set_nr50(uint8_t value) {
-    nr50 = value;
+    left_vin = (value & 0x80) >> 7;
+    left_volume = (value & 0x70) >> 4;
+    right_vin = (value & 0x08) >> 3;
+    right_volume = value & 0x07;
 }
 
 uint8_t APU::get_nr50() const {
-    return nr50;
+    return (left_vin << 7) | (left_volume << 4) | (right_vin << 3) | right_volume;
+}
+
+void APU::set_nr51(uint8_t value) {
+    c4_left = (value & 0x80) >> 7;
+    c3_left = (value & 0x40) >> 6;
+    c2_left = (value & 0x20) >> 5;
+    c1_left = (value & 0x10) >> 4;
+    c4_right = (value & 0x08) >> 3;
+    c3_right = (value & 0x04) >> 2;
+    c2_right = (value & 0x02) >> 1;
+    c1_right = (value & 0x01);
+}
+
+uint8_t APU::get_nr51() const {
+    return (c4_left << 7) | (c3_left << 6) | (c2_left << 5) | (c1_left << 4)
+        | (c4_right << 3) | (c3_right << 2) | (c2_right << 1) | c1_right;
 }
 
 void APU::set_nr52(uint8_t value) {

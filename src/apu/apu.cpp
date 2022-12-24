@@ -63,6 +63,7 @@ void APU::sample_sound() {
     }
 
     sound_queue.push_back(result);
+    sound_queue.push_back(result);
 }
 
 void APU::queue_sound() {
@@ -70,7 +71,7 @@ void APU::queue_sound() {
         return;
     }
 
-    SDL_QueueAudio(audio_device, sound_queue.data(), utils::AUDIO_SAMPLE_SIZE * sound_queue.size());
+    SDL_QueueAudio(audio_device, sound_queue.data(), sizeof(float) * sound_queue.size());
     sound_queue.clear();
 }
 
