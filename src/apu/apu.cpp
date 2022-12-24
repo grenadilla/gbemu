@@ -75,5 +75,5 @@ void APU::queue_sound() {
 }
 
 bool APU::queue_full() {
-    return sound_queue.size() >= utils::AUDIO_BUFFER_SIZE / sizeof(float) - 128;
+    return sound_queue.size() >= utils::AUDIO_BUFFER_SIZE / sizeof(float);
 }

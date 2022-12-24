@@ -44,7 +44,7 @@ namespace utils {
     constexpr uint16_t TITLE_ADDRESS = 0x0134;
 
     constexpr unsigned AUDIO_FREQUENCY = 44100;
-    constexpr unsigned AUDIO_BUFFER_SIZE = 4096;
+    constexpr unsigned AUDIO_BUFFER_SIZE = 2048;
     constexpr unsigned AUDIO_AMPLITUDE = 5000;
 
     constexpr unsigned FRAME_SEQUENCER_PERIOD = 8192;
