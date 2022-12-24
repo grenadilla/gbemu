@@ -27,5 +27,5 @@ class WaveChannel : public Channel {
 
         unsigned current_sample = 0;
 
-        bool playback = false;
+        bool dac_enabled = false;
 };

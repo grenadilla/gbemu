@@ -9,7 +9,7 @@ uint8_t WaveChannel::get_wave_ram(uint16_t address) const {
 }
 
 float WaveChannel::sample_channel() const {
-    if (!channel_enabled || !playback) {
+    if (!channel_enabled || !dac_enabled) {
         return 0;
     }
     return current_sample;
@@ -54,11 +54,15 @@ void WaveChannel::trigger_channel() {
 }
 
 void WaveChannel::set_nrx0(uint8_t value) {
-    playback = (value & 0x80) != 0;
+    dac_enabled = (value & 0x80) != 0;
+
+    if (!dac_enabled) {
+        channel_enabled = false;
+    }
 }
 
 uint8_t WaveChannel::get_nrx0() const {
-    return playback << 7;
+    return dac_enabled << 7;
 }
 
 void WaveChannel::set_nrx1(uint8_t value) {
