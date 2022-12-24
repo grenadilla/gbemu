@@ -59,7 +59,7 @@ void APU::sample_sound() {
 
     if (apu_on) {
         float input = (channel1.sample_channel() + channel2.sample_channel() + channel3.sample_channel() + channel4.sample_channel()) / 400;
-        SDL_MixAudioFormat((Uint8*) &result, (Uint8*) &input, AUDIO_F32SYS, sizeof(float), SDL_MIX_MAXVOLUME);
+        SDL_MixAudioFormat((Uint8*) &result, (Uint8*) &input, AUDIO_F32SYS, utils::AUDIO_SAMPLE_SIZE, SDL_MIX_MAXVOLUME);
     }
 
     sound_queue.push_back(result);
@@ -70,10 +70,10 @@ void APU::queue_sound() {
         return;
     }
 
-    SDL_QueueAudio(audio_device, sound_queue.data(), sizeof(float) * sound_queue.size());
+    SDL_QueueAudio(audio_device, sound_queue.data(), utils::AUDIO_SAMPLE_SIZE * sound_queue.size());
     sound_queue.clear();
 }
 
 bool APU::queue_full() {
-    return sound_queue.size() >= utils::AUDIO_BUFFER_SIZE / sizeof(float);
+    return sound_queue.size() >= utils::AUDIO_BUFFER_SIZE / utils::AUDIO_SAMPLE_SIZE;
 }
