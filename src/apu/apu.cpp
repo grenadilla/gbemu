@@ -88,13 +88,12 @@ void APU::sample_sound() {
         channel_volume = left_volume + 1;
 
         if (num_channels > 0) {
-            input = (raw_input / num_channels) * (channel_volume / utils::MAX_VOLUME) / 100.0;
+            input = (raw_input / 4.0) / 10.0;
         } else {
-            input = 0;
             input = 0.0;
         }
 
-        SDL_MixAudioFormat((Uint8*) &left, (Uint8*) &input, AUDIO_F32SYS, utils::AUDIO_CHANNEL_SAMPLE_SIZE, SDL_MIX_MAXVOLUME);
+        SDL_MixAudioFormat((Uint8*) &left, (Uint8*) &input, AUDIO_F32SYS, utils::AUDIO_CHANNEL_SAMPLE_SIZE, channel_volume * 16);
 
         raw_input = 0;
         num_channels = 0;
@@ -123,13 +122,12 @@ void APU::sample_sound() {
         channel_volume = right_volume + 1;
 
         if (num_channels > 0) {
-            input = (raw_input / num_channels) * (channel_volume / utils::MAX_VOLUME) / 100.0;
+            input = (raw_input / 4.0) / 10.0;
         } else {
-            input = 0;
             input = 0.0;
         }
 
-        SDL_MixAudioFormat((Uint8*) &right, (Uint8*) &input, AUDIO_F32SYS, utils::AUDIO_CHANNEL_SAMPLE_SIZE, SDL_MIX_MAXVOLUME);
+        SDL_MixAudioFormat((Uint8*) &right, (Uint8*) &input, AUDIO_F32SYS, utils::AUDIO_CHANNEL_SAMPLE_SIZE, channel_volume * 16);
     }
 
     sound_queue.push_back(left);
