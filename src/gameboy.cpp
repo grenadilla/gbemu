@@ -285,51 +285,54 @@ void Gameboy::tick(CPU& cpu) {
     apu.run(cycles);
     timer.update_timers(cycles);
 
-    /*
-    cycle_acc += cycles;
-    tick_countdown--;
-    if (tick_countdown == 0) {
-        SDL_Event event;
-        while(SDL_PollEvent(&event) != 0) {
-            if (event.type == SDL_QUIT) {
-                quit = true;
-            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
-                quit = true;
-            } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-                joypad.parse_key_event(event);
+    if (use_audio) {
+        // Time using audio
+        if (apu.queue_full()) {
+            SDL_Event event;
+            while(SDL_PollEvent(&event) != 0) {
+                if (event.type == SDL_QUIT) {
+                    quit = true;
+                } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                    quit = true;
+                } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+                    joypad.parse_key_event(event);
+                }
             }
-        }
 
-        apu.queue_sound();
-
-        // Cap FPS
-        unsigned curr_time = SDL_GetTicks();
-        unsigned time_delta = curr_time - last_time;
-        double expected_ms = cycles * 1000 / utils::CLOCK_SPEED;
-        int delay = static_cast<unsigned>(expected_ms - time_delta);
-        if (delay > 0) {
+            apu.queue_sound();
+            unsigned delay = SDL_GetQueuedAudioSize(audio_device) / utils::AUDIO_SAMPLE_SIZE / utils::AUDIO_FREQUENCY;
             SDL_Delay(delay);
         }
-        last_time = curr_time;
-        cycle_acc = 0;
-        tick_countdown = utils::LIMIT_TICKS;
-    }*/
-
-    if (apu.queue_full()) {
-        SDL_Event event;
-        while(SDL_PollEvent(&event) != 0) {
-            if (event.type == SDL_QUIT) {
-                quit = true;
-            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
-                quit = true;
-            } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-                joypad.parse_key_event(event);
+    } else {
+        // Time using instructions
+        cycle_acc += cycles;
+        tick_countdown--;
+        if (tick_countdown == 0) {
+            SDL_Event event;
+            while(SDL_PollEvent(&event) != 0) {
+                if (event.type == SDL_QUIT) {
+                    quit = true;
+                } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                    quit = true;
+                } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+                    joypad.parse_key_event(event);
+                }
             }
-        }
 
-        apu.queue_sound();
-        unsigned delay = SDL_GetQueuedAudioSize(audio_device) / utils::AUDIO_SAMPLE_SIZE / utils::AUDIO_FREQUENCY;
-        SDL_Delay(delay);
+            apu.queue_sound();
+
+            // Cap FPS
+            unsigned curr_time = SDL_GetTicks();
+            unsigned time_delta = curr_time - last_time;
+            double expected_ms = cycles * 1000 / utils::CLOCK_SPEED;
+            int delay = static_cast<unsigned>(expected_ms - time_delta);
+            if (delay > 0) {
+                SDL_Delay(delay);
+            }
+            last_time = curr_time;
+            cycle_acc = 0;
+            tick_countdown = utils::LIMIT_TICKS;
+        }
     }
 }
 
