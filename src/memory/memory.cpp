@@ -95,7 +95,15 @@ Memory* Memory::get_cartridge(const std::string& rom_path, Interrupts* interrupt
 
 Memory::Memory(const std::vector<uint8_t>& rom_data, Interrupts* interrupts, Timer* timer, APU* apu, PPU* ppu, Joypad* joypad) 
     : rom_data(rom_data), interrupts(interrupts), timer(timer), apu(apu), ppu(ppu), joypad(joypad) {
-    title = std::string(((char*) rom_data.data()) + utils::TITLE_ADDRESS);
+    char title_bytes[17] = {0};
+    char* title_address = (char*) rom_data.data() + utils::TITLE_ADDRESS;
+    for (size_t i = 0; i < utils::TITLE_LEN; i++) {
+        title_bytes[i] = title_address[i];
+        if (title_address[i] == 0) {
+            break;
+        }
+    }
+    title = std::string(title_bytes);
 }
 
 bool Memory::is_loaded() const {
