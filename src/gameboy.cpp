@@ -287,7 +287,8 @@ void Gameboy::tick(CPU& cpu) {
 
     if (use_audio) {
         // Time using audio
-        if (apu.queue_full()) {
+        tick_countdown--;
+        if (tick_countdown == 0) {
             SDL_Event event;
             while(SDL_PollEvent(&event) != 0) {
                 if (event.type == SDL_QUIT) {
@@ -298,9 +299,12 @@ void Gameboy::tick(CPU& cpu) {
                     joypad.parse_key_event(event);
                 }
             }
+            tick_countdown = utils::LIMIT_TICKS;
+        }
 
-            apu.queue_sound();
-            unsigned delay = SDL_GetQueuedAudioSize(audio_device) / utils::AUDIO_SAMPLE_SIZE / utils::AUDIO_FREQUENCY;
+        unsigned num_samples = SDL_GetQueuedAudioSize(audio_device) / utils::AUDIO_SAMPLE_SIZE;
+        if (num_samples > utils::AUDIO_BUFFER_SIZE * 2) {
+            unsigned delay = (num_samples - utils::AUDIO_BUFFER_SIZE) / utils::AUDIO_FREQUENCY;
             SDL_Delay(delay);
         }
     } else {
@@ -319,7 +323,7 @@ void Gameboy::tick(CPU& cpu) {
                 }
             }
 
-            apu.queue_sound();
+            //apu.queue_sound();
 
             // Cap FPS
             unsigned curr_time = SDL_GetTicks();

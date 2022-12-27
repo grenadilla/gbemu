@@ -130,19 +130,6 @@ void APU::sample_sound() {
         SDL_MixAudioFormat((Uint8*) &right, (Uint8*) &input, AUDIO_F32SYS, utils::AUDIO_CHANNEL_SAMPLE_SIZE, channel_volume * 16);
     }
 
-    sound_queue.push_back(left);
-    sound_queue.push_back(right);
-}
-
-void APU::queue_sound() {
-    if (sound_queue.size() == 0) {
-        return;
-    }
-
-    SDL_QueueAudio(audio_device, sound_queue.data(), utils::AUDIO_CHANNEL_SAMPLE_SIZE * sound_queue.size());
-    sound_queue.clear();
-}
-
-bool APU::queue_full() {
-    return sound_queue.size() >= utils::AUDIO_BUFFER_SIZE / utils::AUDIO_SAMPLE_SIZE;
+    SDL_QueueAudio(audio_device, &left, utils::AUDIO_CHANNEL_SAMPLE_SIZE);
+    SDL_QueueAudio(audio_device, &right, utils::AUDIO_CHANNEL_SAMPLE_SIZE);
 }

@@ -45,7 +45,7 @@ namespace utils {
     constexpr size_t TITLE_LEN = 15;
 
     constexpr unsigned AUDIO_FREQUENCY = 44100;
-    constexpr unsigned AUDIO_BUFFER_SIZE = 2048;
+    constexpr unsigned AUDIO_BUFFER_SIZE = 1024;
     constexpr unsigned AUDIO_CHANNEL_SAMPLE_SIZE = sizeof(float);
     constexpr unsigned AUDIO_SAMPLE_SIZE = AUDIO_CHANNEL_SAMPLE_SIZE * 2;
 
