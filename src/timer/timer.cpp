@@ -43,47 +43,50 @@ void Timer::update_timers(unsigned cycles) {
     // See detailed schematics: https://gbdev.io/pandocs/Timer_Obscure_Behaviour.html
 
     // Falling edge detection
-    bool previous_div_bit = 0;
-    switch (speed) {
-        case 0:
-            previous_div_bit = divider & 0x0200;
-            break;
-        case 1:
-            previous_div_bit = divider & 0x0008;
-            break;
-        case 2:
-            previous_div_bit = divider & 0x0020;
-            break;
-        case 3:
-            previous_div_bit = divider & 0x0080;
-    }
+    // TODO simplify and make more efficient
+    for (unsigned i = 0; i < cycles; i += 4) {
+        bool previous_div_bit = 0;
+        switch (speed) {
+            case 0:
+                previous_div_bit = divider & 0x0200;
+                break;
+            case 1:
+                previous_div_bit = divider & 0x0008;
+                break;
+            case 2:
+                previous_div_bit = divider & 0x0020;
+                break;
+            case 3:
+                previous_div_bit = divider & 0x0080;
+        }
 
-    divider += 4 * cycles;
+        divider += 4;
 
-    bool next_div_bit = 0;
-    switch (speed) {
-        case 0:
-            next_div_bit = divider & 0x0200;
-            break;
-        case 1:
-            next_div_bit = divider & 0x0008;
-            break;
-        case 2:
-            next_div_bit = divider & 0x0020;
-            break;
-        case 3:
-            next_div_bit = divider & 0x0080;
-    }
+        bool next_div_bit = 0;
+        switch (speed) {
+            case 0:
+                next_div_bit = divider & 0x0200;
+                break;
+            case 1:
+                next_div_bit = divider & 0x0008;
+                break;
+            case 2:
+                next_div_bit = divider & 0x0020;
+                break;
+            case 3:
+                next_div_bit = divider & 0x0080;
+        }
 
-    bool previous = previous_div_bit & running;
-    bool after = next_div_bit & running;
+        bool previous = previous_div_bit & running;
+        bool after = next_div_bit & running;
 
-    if (previous && !after) {
-        counter++;
-        if (counter == 0) {
-            // Interrupt!
-            interrupts->set_interrupt(Interrupts::TIMER);
-            counter = modulo;
+        if (previous && !after) {
+            counter++;
+            if (counter == 0) {
+                // Interrupt!
+                interrupts->set_interrupt(Interrupts::TIMER);
+                counter = modulo;
+            }
         }
     }
 }
