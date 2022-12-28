@@ -303,7 +303,7 @@ void Gameboy::tick(CPU& cpu) {
         }
 
         unsigned num_samples = SDL_GetQueuedAudioSize(audio_device) / utils::AUDIO_SAMPLE_SIZE;
-        if (num_samples > utils::AUDIO_BUFFER_SIZE * 2) {
+        if (num_samples > utils::AUDIO_BUFFER_SIZE + utils::AUDIO_BUFFER_DELAY_SIZE) {
             unsigned delay = (num_samples - utils::AUDIO_BUFFER_SIZE) / utils::AUDIO_FREQUENCY;
             SDL_Delay(delay);
         }
